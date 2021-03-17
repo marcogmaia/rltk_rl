@@ -1,0 +1,3 @@
+lib/libtcod/
+build/
+.vscode
