@@ -2,7 +2,7 @@
 
 #include "actor.hpp"
 
-Actor::Actor(position_t position, int ch, const TCODColor& color)
+Actor::Actor(const position_t& position, int ch, const TCODColor& color)
     : position(position)
     , ch(ch)
     , color(color) {

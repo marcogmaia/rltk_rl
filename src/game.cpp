@@ -1,13 +1,18 @@
 #include <iostream>
+#include <fmt/format.h>
 #include "libtcod.hpp"
 #include "game.hpp"
 #include "engine.hpp"
 
 
 void game() {
-    while(TCODConsole::isWindowClosed() == false) {
-        engine::engine.render();
-        TCODConsole::root->flush();
-        engine::engine.update();
+    engine::init();
+    while(!TCODConsole::isWindowClosed()) {
+        engine::render();
+        TCODConsole::flush();
+        engine::update();
     }
+
+    std::cout << fmt::format("ran for {} seconds\n",
+                             TCODSystem::getElapsedSeconds());
 }

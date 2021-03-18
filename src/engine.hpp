@@ -6,16 +6,16 @@
 
 namespace engine {
 
-class Engine {
-public:
-    std::vector<std::unique_ptr<Actor>> actors;
-    std::unique_ptr<Actor> player;
-    std::unique_ptr<Map> map;
+// class Engine {
+// public:
+    // std::vector<std::unique_ptr<Actor>> actors;
+    // std::unique_ptr<Actor> player;
+    // std::unique_ptr<Map> map;
 
-    Engine();
+    void init();
     void update();
-    void render() const;
-};
+    void render();
+// };
 
-extern Engine engine;
+// extern Engine engine;
 }  // namespace engine

@@ -3,15 +3,42 @@
 
 namespace engine {
 
-Engine engine;
+namespace {
 
-Engine::Engine() {
+// std::vector<std::unique_ptr<Actor>> actors;
+// std::unique_ptr<Actor> player;
+std::unique_ptr<Map> map;
+
+}  // namespace
+
+// Engine engine;
+
+void init() {
+    static bool initialized = false;
+    if(initialized) {
+        return;
+    }
+    initialized = true;
+
     TCODConsole::initRoot(80, 50, "Maia Learning", false);
     TCODSystem::setFps(30);
-    player = std::make_unique<Actor>(position_t{40, 25}, '@', TCODColor::white);
-    actors.emplace_back(
-        std::make_unique<Actor>(position_t{60, 13}, 'F', TCODColor::yellow));
-    map = std::make_unique<Map>(80, 45);
+    
+
+    // const auto& room_pos = map->get_room_positions();
+    // if(room_pos.size() > 0) {
+    //     player = std::make_unique<Actor>(room_pos[0], '@', TCODColor::white);
+    // }
+
+    // if(room_pos.size() > 1) {
+    //     std::for_each(std::cbegin(room_pos) + 1, std::cend(room_pos),
+    //                   [](const position_t& pos) {
+    //                       auto gen = TCODRandom::getInstance()->getInt(0, 2);
+    //                       if(gen == 0) {
+    //                           actors.emplace_back(std::make_unique<Actor>(
+    //                               pos, 'D', TCODColor::red));
+    //                       }
+    //                   });
+    // }
 }
 
 position_t get_next_position(const TCOD_key_t& key, position_t pos) {
@@ -54,27 +81,46 @@ position_t get_next_position(const TCOD_key_t& key, position_t pos) {
     return pos;
 }
 
-void Engine::update() {
-    TCOD_key_t keypress;
-    TCOD_mouse_t mouse;
-    TCODSystem::waitForEvent(TCOD_EVENT_ANY, &keypress, &mouse, false);
-    auto& player_pos = player->position;
-    auto pos         = get_next_position(keypress, player_pos);
-    if(map->is_walkable(pos)) {
-        player_pos = pos;
-    }
-#ifdef DEBUG
-    std::cout << mouse.cx << ' ' << mouse.cy << std::endl;
-#endif
+bool has_event(TCOD_key_t* keypress, TCOD_mouse_t* mouse,
+               uint32_t timeout = 20) {
+    TCODSystem::getElapsedMilli();
+
+    auto ret = TCODSystem::waitForEvent(TCOD_EVENT_KEY_PRESS | TCOD_EVENT_MOUSE,
+                                        keypress, mouse, false);
+    return ret != TCOD_EVENT_NONE;
 }
 
-void Engine::render() const {
+void update() {
+    TCOD_key_t keypress;
+    TCOD_mouse_t mouse;
+    // constexpr uint32_t timeout = 10;
+
+    has_event(&keypress, &mouse);
+    // if(player) {
+    //     auto& player_pos = player->position;
+
+    //     auto pos = get_next_position(keypress, player_pos);
+    //     if(map->is_walkable(pos)) {
+    //         player_pos = pos;
+    //     }
+    // }
+}
+
+void render() {
     TCODConsole::root->clear();
-    map->render();
-    player->render();
-    for(const auto& actor : actors) {
-        actor->render();
+    map = std::make_unique<Map>(80, 45);
+    if(map) {
+        map->render();
     }
+    map.reset();
+    // for(const auto& actor : actors) {
+    //     if(actor) {
+    //         actor->render();
+    //     }
+    // }
+    // if(player) {
+    //     player->render();
+    // }
 }
 
 }  // namespace engine

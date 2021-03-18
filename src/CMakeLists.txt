@@ -1,4 +1,5 @@
 
+
 include_directories("include")
 include_directories(".")
 
@@ -10,9 +11,10 @@ add_library(
    "actor.cpp"
 )
 
-target_link_libraries(game LIBTCOD)
+target_link_libraries(game pthread fmt LIBTCOD)
 
 # set(CMAKE_BUILD_TYPE RELEASE)
 set(CMAKE_BUILD_TYPE DEBUG)
+
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
