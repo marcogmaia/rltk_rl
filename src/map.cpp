@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <ranges>
 #include <fmt/format.h>
 
 #include <utility>
@@ -7,70 +8,71 @@
 #include "map.hpp"
 #include "libtcod.hpp"
 
-static constexpr uint32_t room_max_size = 12;
-static constexpr uint32_t room_min_size = 6;
+static constexpr int room_max_size = 12;
+static constexpr int room_min_size = 5;
 
 Map::Map(int width, int height)
-    : bsp(0, 0, width, height)
+    : map(width, height)
+    , bsp(0, 0, width, height)
     , width(width)
     , height(height) {
-    tiles.resize(width * height);
-    bsp.splitRecursive(nullptr, 8, room_max_size, room_max_size, 1.5f, 1.5f);
-    bsp.traverseInvertedLevelOrder(this, nullptr);
-
-#ifdef DEBUG
     std::cout << "Map CTOR called\n";
-#endif
+    tiles.resize(width * height);
+    bsp.splitRecursive(nullptr, 5, room_max_size, room_max_size, 1.5f, 1.5f);
+    bsp.traverseLevelOrder(this, nullptr);
+
+    auto first = room_positions.crbegin();
+    auto last  = room_positions.crend();
+    if(first != last) {
+        auto trailer = first;
+        ++first;
+        for(; first != last; ++first) {
+            create_corridor(*trailer, *first);
+        }
+    }
+
+    std::cout << fmt::format("num of rooms: {}\n", room_positions.size());
 }
 
 Map::~Map() {
-#ifdef DEBUG
     std::cout << "Map DTOR called\n";
-#endif
 }
 
-void Map::set_wall(position_t pos) {
-    auto index            = pos.x + width * pos.y;
-    tiles[index].walkable = false;
-}
+// void Map::set_wall(position_t pos) {
+//     auto index            = pos.x + width * pos.y;
+//     tiles[index].walkable = false;
+// }
 
-bool Map::is_wall(position_t pos) const {
-    return !tiles[pos.x + width * pos.y].walkable;
-}
+// bool Map::is_wall(position_t pos) const {
+//     return !tiles[pos.x + width * pos.y].walkable;
+// }
 
-bool Map::is_walkable(position_t pos) const {
-    auto is_walkable = tiles[pos.x + width * pos.y].walkable;
-    return is_walkable;
-}
+// bool Map::is_walkable(position_t pos) const {
+//     auto is_walkable = tiles[pos.x + width * pos.y].walkable;
+//     return is_walkable;
+// }
 
 void Map::render() const {
     for(int x = 0; x < width; ++x) {
         for(int y = 0; y < height; ++y) {
-            auto color = is_wall({x, y}) ? darkWall : darkGround;
+            auto color = map.isWalkable(x, y) ? darkGround : darkWall;
             TCODConsole::root->setCharBackground(x, y, color);
         }
     }
 }
 
-#include <cassert>
+bool Map::is_walkable(position_t pos) const {
+    return map.isWalkable(pos.x, pos.y);
+}
 
-void Map::dig(position_t pos1, position_t pos2) {
-    // swap position so that the top left is pos1
-    if(pos1.x > pos2.x) {
-        std::swap(pos1.x, pos2.x);
+void Map::dig_rect(rect_t rect) {
+    if(rect.w == 0 || rect.h == 0) {
+        // nothing to dig here
+        return;
     }
-    if(pos1.y > pos2.y) {
-        std::swap(pos1.y, pos2.y);
-    }
-    // fill rectangle
-    for(int x = pos1.x; x < pos2.x; ++x) {
-        for(int y = pos1.y; y < pos2.y; ++y) {
-            auto pos                  = x + y * width;
-            static const auto max_pos = width * height - 1;
-            if(pos > max_pos) {
-                break;
-            }
-            tiles[x + y * width].walkable = true;
+    for(int xi = rect.x; xi < (rect.x + rect.w); ++xi) {
+        for(int yi = rect.y; yi < (rect.y + rect.h); ++yi) {
+            map.setProperties(xi, yi, false, true);
         }
     }
 }
@@ -80,68 +82,80 @@ const std::vector<position_t>& Map::get_room_positions() const {
 }
 
 // return a vector of positions that centers each room
-void Map::create_room(position_t pos1, position_t pos2) {
-    dig(pos1, pos2);
-    position_t center_pos = (pos1 + pos2) / 2;
-    room_positions.push_back(center_pos);
+void Map::create_room(rect_t rect) {
+    dig_rect(rect);
 }
 
 void Map::create_corridor(position_t pos1, position_t pos2) {
-    if(pos1.x > pos2.x) {
-        std::swap(pos1.x, pos2.x);
-    }
-    if(pos1.y > pos2.y) {
-        std::swap(pos1.y, pos2.y);
-    }
+    if(pos1 > pos2)
+        std::swap(pos1, pos2);
+    int xi = std::min(pos1.x, pos2.x);
+    int yi = std::min(pos1.y, pos2.y);
+    int w  = std::abs(pos2.x - pos1.x);
+    int h  = std::abs(pos2.y - pos1.y);
 
-    for(int x = pos1.x; x < pos2.x; ++x) {
-        tiles[x + pos1.y * width].walkable = true;
+    dig_rect(rect_t{xi, yi, w, 1});
+    if(yi < pos2.y) {
+        dig_rect(rect_t{xi + w, yi, 1, h});
     }
-    for(int y = pos1.y; y < pos2.y; ++y) {
-        tiles[pos1.x + y * width].walkable = true;
+    else {
+        dig_rect(rect_t{xi, yi, 1, h});
     }
 }
 
+// bool get_sub_rect(rect_t* rect) {
+//     auto* rng = TCODRandom::getInstance();
+//     // max value for x and y to be compatible with roomsize
+//     auto max_x = (rect->x + rect->w - 1) - room_min_size;
+//     auto max_y = (rect->y + rect->h - 1) - room_min_size;
+//     auto x     = rng->getInt(rect->x, max_x);
+//     if(x > max_x) {
+//         return false;
+//     }
+//     auto y = rng->getInt(rect->y, max_y);
+//     if(y > max_y) {
+//         return false;
+//     }
+//     auto w = rng->getInt(room_min_size, rect->w);
+//     auto h = rng->getInt(room_min_size, rect->h);
+//     *rect  = rect_t{x, y, w, h};
+//     return true;
+// }
 
-std::pair<position_t, position_t> get_valid_rectangle(TCODBsp* node) {
-    auto* rng     = TCODRandom::getInstance();
-    auto w        = node->w;
-    auto w_half   = w / 2;
-    auto x        = node->x;
-    auto y        = node->y;
-    auto p1x      = rng->getInt(x, x + w_half);
-    auto p1y      = rng->getInt(y, y + node->h);
-    position_t p1 = {p1x, p1y};
-    auto p2x      = rng->getInt(x + w_half, x + w);
-    auto p2y      = rng->getInt(y, y + node->h);
-    position_t p2 = {p2x, p2y};
-    return std::make_pair(p1, p2);
-}
+bool get_valid_rectangle(TCODBsp* node, rect_t* dst) {
+    // 1. pego um subrect
+    // 2. verifico se ele satisfaz o minsize
+    // 3. retorno done, simples
 
-// bool BspListener::visitNode(TCODBsp* node, void* userData) {
-bool Map::visitNode(TCODBsp* node, void* userData) {
-    // auto* map           = static_cast<Map*>(userData);
-    static uint32_t cnt = 0;
-    ++cnt;
+    // 1.
+    auto* rng = TCODRandom::getInstance();
+    auto x    = rng->getInt(node->x, node->x + node->w);
+    auto y    = rng->getInt(node->y, node->y + node->h);
+    auto wf   = node->x + node->w - x;  // node->w - (x - node->x) - 3;
+    auto hf   = node->y + node->h - y;  // node->h - (y - node->y) - 3;
+    auto w    = rng->getInt(0, wf);
+    auto h    = rng->getInt(0, hf);
 
-    // BUG por algum motivo essa call tá crashando aleatoriamente (o if)
-    if(node->isLeaf()) {
-        auto rng = TCODRandom::getInstance();
-        auto pos = get_valid_rectangle(node);
-        create_room(pos.first, pos.second);
-        // map->create_room(pos.first, pos.second);
+    // 2.
+    if(w < room_min_size || h < room_min_size)
+        return false;
 
-        // last_pos = {x + w / 2, y + h / 2};
-        last_pos = (pos.first + pos.second) / 2;
-        if(room_num != 0) {
-            // dig a corridor from last room
-            auto center_pos
-                = position_t{node->x + node->w, node->y + node->h} / 2;
-            // map->create_corridor(last_pos, center_pos);
-        }
-        ++room_num;
-    }
-
+    // 3.
+    *dst = rect_t{x, y, w, h};
     return true;
-    // std::cout << fmt::format("visited {} nodes\n", cnt);
+}
+
+bool Map::visitNode(TCODBsp* node, void* userData) {
+    if(node->isLeaf()) {
+        rect_t rect;
+        auto is_valid = false;
+        while(!is_valid) {
+            is_valid = get_valid_rectangle(node, &rect);
+        }
+        if(is_valid) {
+            create_room(rect);
+            room_positions.push_back(rect.center());
+        }
+    }
+    return true;
 }

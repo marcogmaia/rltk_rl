@@ -4,9 +4,11 @@ project(learning VERSION 0.1.0)
 set(BUILD_SHARED_LIBS ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -O0 -Wall -g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall -DNDEBUG")
+set(MYW_DISABLES "-Wno-attributes ")
+# set(MYW_DISABLES "-Wno-attributes -Wno-unused-parameter")
+
+set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -O0 -Wall -Wextra ${MYW_DISABLES} -g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall -Wextra ${MYW_DISABLES} -DNDEBUG")
 
 
 # include(CTest)
@@ -14,6 +16,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall -DNDEBUG")
 
 # add_subdirectory(src)
 add_subdirectory("lib/libtcod")
+
+set(CMAKE_CXX_STANDARD 20)
 add_subdirectory("src")
 
 include_directories("src/include")

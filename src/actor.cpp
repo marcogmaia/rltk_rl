@@ -6,15 +6,15 @@ Actor::Actor(const position_t& position, int ch, const TCODColor& color)
     : position(position)
     , ch(ch)
     , color(color) {
-#ifdef DEBUG
-    std::cout << "Actor CTOR called\n";
-#endif
+    // #ifdef DEBUG
+    //     std::cout << "Actor CTOR called\n";
+    // #endif
 }
 
 Actor::~Actor() {
-#ifdef DEBUG
-    std::cout << "Actor DTOR called\n";
-#endif
+    // #ifdef DEBUG
+    //     std::cout << "Actor DTOR called\n";
+    // #endif
 }
 
 void Actor::render() const {
