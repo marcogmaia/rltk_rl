@@ -2,8 +2,10 @@
 
 #include "actor.hpp"
 
-Actor::Actor(const position_t& position, int ch, const TCODColor& color)
+Actor::Actor(const position_t& position, int ch, uint32_t fov_rad,
+             const TCODColor& color)
     : position(position)
+    , fov_radius(fov_rad)
     , ch(ch)
     , color(color) {
     // #ifdef DEBUG

@@ -4,8 +4,8 @@ project(learning VERSION 0.1.0)
 set(BUILD_SHARED_LIBS ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(MYW_DISABLES "-Wno-attributes ")
-# set(MYW_DISABLES "-Wno-attributes -Wno-unused-parameter")
+# set(MYW_DISABLES "-Wno-attributes ")
+set(MYW_DISABLES "-Wno-attributes -Wno-unused-parameter")
 
 set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -O0 -Wall -Wextra ${MYW_DISABLES} -g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall -Wextra ${MYW_DISABLES} -DNDEBUG")

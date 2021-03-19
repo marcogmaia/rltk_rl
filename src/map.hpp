@@ -2,8 +2,12 @@
 
 #include <memory>
 #include <vector>
-#include "common.hpp"
+
 #include "libtcod.hpp"
+
+#include "common.hpp"
+#include "actor.hpp"
+
 
 struct tile_t {
     bool explored = false;
@@ -18,8 +22,11 @@ class Map : public ITCODBspCallback {
     position_t last_pos{0, 0};
 
 
-    const TCODColor darkWall{72 + 20, 72, 72};
-    const TCODColor darkGround{120 + 20, 120, 120};
+    const TCODColor darkWall{10 + 20, 10, 10};
+    const TCODColor darkGround{50 + 20, 50, 50};
+
+    const TCODColor lightWall{130, 110, 50};
+    const TCODColor lightGround{200, 180, 50};
 
 private:
     TCODMap map;
@@ -50,10 +57,16 @@ private:
 public:
     Map(int width, int height);
     ~Map();
+
     bool is_walkable(position_t position) const;
-    bool is_explored(position_t pos);
+
+    bool is_explored(position_t pos) const;
+
+    bool is_in_fov(position_t pos);
+
+    void compute_fov(const Actor& player);
 
     const std::vector<position_t>& get_room_positions() const;
 
-    void render() const;
+    void render();
 };
