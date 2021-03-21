@@ -7,7 +7,7 @@
             ],
             "browse": {
                 "path": [
-                    "${workspaceFolder}/lib/libtcod/src/**",
+                    "${workspaceFolder}/lib/libtcod/**",
                     "${workspaceFolder}/src/**"
                 ],
                 "limitSymbolsToIncludedHeaders": true,

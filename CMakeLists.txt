@@ -14,23 +14,25 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall -Wextra ${MYW_DISABLES} -DNDEBUG")
 # include(CTest)
 # enable_testing()
 
-# add_subdirectory(src)
+
 add_subdirectory("lib/libtcod")
 
 set(CMAKE_CXX_STANDARD 20)
-add_subdirectory("src")
+add_subdirectory(src)
 
-include_directories("src/include")
-# include_directories("lib/libtcod/src")
+# set(CMAKE_BUILD_TYPE RELEASE)
+set(CMAKE_BUILD_TYPE DEBUG)
+
+
+
 add_executable(
     ${PROJECT_NAME}
     "src/main.cpp"
 )
 
-target_link_libraries(${PROJECT_NAME} pthread game)
+target_link_libraries(${PROJECT_NAME} game tbb pthread)
 
-# set(CMAKE_BUILD_TYPE DEBUG)
-set(CMAKE_BUILD_TYPE DEBUG)
+
 # set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 # set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 # include(CPack)

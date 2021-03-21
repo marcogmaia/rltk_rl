@@ -1,7 +1,6 @@
 #pragma once
 
 #include <compare>
-
 #include "libtcod.hpp"
 
 struct position_t {

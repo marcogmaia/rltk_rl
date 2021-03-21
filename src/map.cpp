@@ -19,7 +19,7 @@ Map::Map(int width, int height)
     , height(height) {
     std::cout << "Map CTOR called\n";
     tiles.resize(width * height);
-    bsp.splitRecursive(nullptr, 20, room_max_size, room_max_size, 1.5f, 1.5f);
+    bsp.splitRecursive(nullptr, 4, room_max_size, room_max_size, 1.5f, 1.5f);
     bsp.traverseLevelOrder(this, nullptr);
     // for each adjancent room, create a corridor
     auto first = rooms.crbegin();
@@ -91,7 +91,7 @@ bool Map::is_in_fov(position_t pos) {
     return false;
 }
 
-static bool pos_is_empty(position_t pos) {
+bool Map::pos_is_empty(position_t pos) {
     bool is_empty = true;
     for(auto& actor : engine::actors) {
         if(pos == actor->position) {
@@ -102,9 +102,9 @@ static bool pos_is_empty(position_t pos) {
     return is_empty;
 }
 
+
 bool Map::is_walkable(position_t pos) const {
-    auto is_walkable = map.isWalkable(pos.x, pos.y) && pos_is_empty(pos);
-    return is_walkable;
+    return map.isWalkable(pos.x, pos.y);
 }
 
 void Map::set_property(position_t pos, bool transparent, bool walkable) {

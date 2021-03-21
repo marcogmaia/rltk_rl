@@ -6,7 +6,7 @@
 #include "libtcod.hpp"
 
 #include "common.hpp"
-#include "actor.hpp"
+#include "actor/actor.hpp"
 
 
 struct tile_t {
@@ -58,6 +58,8 @@ public:
     Map(int width, int height);
     ~Map();
 
+    bool pos_is_empty(position_t pos);
+
     bool is_walkable(position_t position) const;
 
     void set_property(position_t pos, bool transparent, bool walkable);
@@ -65,7 +67,7 @@ public:
     bool is_explored(position_t pos) const;
 
     bool is_in_fov(position_t pos);
-    
+
     void add_enemy(position_t pos);
 
     void compute_fov(const Actor& player);
