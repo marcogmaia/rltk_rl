@@ -33,7 +33,7 @@ private:
     TCODBsp bsp;
 
     std::vector<tile_t> tiles;
-    std::vector<position_t> room_positions;
+    std::vector<rect_t> rooms;
 
     int width;
     int height;
@@ -60,13 +60,17 @@ public:
 
     bool is_walkable(position_t position) const;
 
+    void set_property(position_t pos, bool transparent, bool walkable);
+
     bool is_explored(position_t pos) const;
 
     bool is_in_fov(position_t pos);
+    
+    void add_enemy(position_t pos);
 
     void compute_fov(const Actor& player);
 
-    const std::vector<position_t>& get_room_positions() const;
+    const std::vector<rect_t>& get_room_positions() const;
 
     void render();
 };

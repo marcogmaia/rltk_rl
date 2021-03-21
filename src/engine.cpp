@@ -1,18 +1,11 @@
-#include "engine.hpp"
 #include <iostream>
+#include "engine.hpp"
 
 namespace engine {
 
-namespace {
-
+Actor* player;
 std::vector<std::unique_ptr<Actor>> actors;
-std::unique_ptr<Actor> player;
 std::unique_ptr<Map> map;
-// bool compute_fov = false;
-
-}  // namespace
-
-// Engine engine;
 
 void init() {
     static bool initialized = false;
@@ -21,24 +14,22 @@ void init() {
     }
     initialized = true;
 
-    TCODConsole::initRoot(80, 50, "Maia Learning", false);
+    TCODConsole::initRoot(80, 80, "Maia Learning", false);
     TCODSystem::setFps(30);
-    map = std::make_unique<Map>(80, 45);
+    map = std::make_unique<Map>(80, 70);
 
     const auto& room_pos = map->get_room_positions();
     if(room_pos.size() > 0) {
-        player = std::make_unique<Actor>(room_pos[0]);
+        actors.emplace_back(
+            std::make_unique<Actor>(room_pos[0].center(), '@', "", 8));
+        player = actors.back().get();
         map->compute_fov(*player);
     }
 
     if(room_pos.size() > 1) {
         std::for_each(std::cbegin(room_pos) + 1, std::cend(room_pos),
-                      [](const position_t& pos) {
-                          auto gen = TCODRandom::getInstance()->getInt(0, 1);
-                          if(gen == 0) {
-                              actors.emplace_back(std::make_unique<Actor>(
-                                  pos, 'D', 5, TCODColor::red));
-                          }
+                      [](const rect_t& rect) {
+                          map->add_enemy(rect.random_pos());
                       });
     }
 }
@@ -101,31 +92,33 @@ bool has_event(TCOD_key_t* keypress, TCOD_mouse_t* mouse,
     return ret != TCOD_EVENT_NONE;
 }
 
+
 void update() {
+    if(player == nullptr) {
+        return;
+    }
     TCOD_key_t keypress;
     TCOD_mouse_t mouse;
 
     has_event(&keypress, &mouse);
-    if(player) {
-        auto& player_pos = player->position;
-
-        position_t pos = player_pos;
-        get_next_position(keypress, &pos);
-        if(map->is_walkable(pos)) {
-            player_pos = pos;
-            map->compute_fov(*player);
-        }
+    auto& player_pos = player->position;
+    position_t pos   = player_pos;
+    get_next_position(keypress, &pos);
+    if(map->is_walkable(pos)) {
+        player_pos = pos;
+        map->compute_fov(*player);
     }
 }
 
 void render() {
     TCODConsole::root->clear();
     map->render();
-
     for(const auto& actor : actors) {
-        actor->render();
+        // only show actors in fov
+        if(map->is_in_fov(actor->position)) {
+            actor->render();
+        }
     }
-    player->render();
 }
 
 }  // namespace engine

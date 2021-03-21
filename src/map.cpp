@@ -5,6 +5,7 @@
 
 #include <utility>
 
+#include "engine.hpp"
 #include "map.hpp"
 #include "libtcod.hpp"
 
@@ -13,26 +14,26 @@ static constexpr int room_min_size = 5;
 
 Map::Map(int width, int height)
     : map(width, height)
-    , bsp(0, 0, width, height)
+    , bsp(1, 1, width - 2, height - 2)
     , width(width)
     , height(height) {
     std::cout << "Map CTOR called\n";
     tiles.resize(width * height);
-    bsp.splitRecursive(nullptr, 5, room_max_size, room_max_size, 1.5f, 1.5f);
+    bsp.splitRecursive(nullptr, 20, room_max_size, room_max_size, 1.5f, 1.5f);
     bsp.traverseLevelOrder(this, nullptr);
-
     // for each adjancent room, create a corridor
-    auto first = room_positions.crbegin();
-    auto last  = room_positions.crend();
+    auto first = rooms.crbegin();
+    auto last  = rooms.crend();
     if(first != last) {
         auto trailer = first;
         ++first;
         for(; first != last; ++first) {
-            create_corridor(*trailer, *first);
+            create_corridor(trailer->center(), first->center());
         }
     }
-
-    std::cout << fmt::format("num of rooms: {}\n", room_positions.size());
+    // desfaz a  BSP
+    bsp.removeSons();
+    std::cout << fmt::format("num of rooms: {}\n", rooms.size());
 }
 
 Map::~Map() {
@@ -40,6 +41,12 @@ Map::~Map() {
 }
 
 void Map::render() {
+    // auto console_w = TCODConsole::root->getWidth();
+    // auto console_h = TCODConsole::root->getHeight();
+
+    // int px = 0;
+    // int py = 0;
+
     for(int x = 0; x < width; ++x) {
         for(int y = 0; y < height; ++y) {
             if(is_in_fov({x, y})) {
@@ -51,6 +58,24 @@ void Map::render() {
                 TCODConsole::root->setCharBackground(x, y, color);
             }
         }
+    }
+}
+
+bool probability(int prob) {
+    auto* rng   = TCODRandom::getInstance();
+    auto chance = rng->getInt(0, 99);
+    return chance < prob;
+}
+
+void Map::add_enemy(position_t pos) {
+    auto gen_orc = probability(80);
+    if(gen_orc) {
+        engine::actors.emplace_back(
+            std::make_unique<Actor>(pos, 'O', "Orc", 6, TCODColor::green));
+    }
+    else {
+        engine::actors.emplace_back(
+            std::make_unique<Actor>(pos, 'T', "Troll", 6, TCODColor::orange));
     }
 }
 
@@ -66,13 +91,29 @@ bool Map::is_in_fov(position_t pos) {
     return false;
 }
 
+static bool pos_is_empty(position_t pos) {
+    bool is_empty = true;
+    for(auto& actor : engine::actors) {
+        if(pos == actor->position) {
+            is_empty = false;
+            break;
+        }
+    }
+    return is_empty;
+}
+
 bool Map::is_walkable(position_t pos) const {
-    return map.isWalkable(pos.x, pos.y);
+    auto is_walkable = map.isWalkable(pos.x, pos.y) && pos_is_empty(pos);
+    return is_walkable;
+}
+
+void Map::set_property(position_t pos, bool transparent, bool walkable) {
+    map.setProperties(pos.x, pos.y, transparent, walkable);
 }
 
 void Map::compute_fov(const Actor& player) {
     const auto& pos = player.position;
-    map.computeFov(pos.x, pos.y, player.fov_radius);
+    map.computeFov(pos.x, pos.y, player.fov_radius, true, FOV_DIAMOND);
 }
 
 void Map::dig_rect(rect_t rect) {
@@ -87,13 +128,14 @@ void Map::dig_rect(rect_t rect) {
     }
 }
 
-const std::vector<position_t>& Map::get_room_positions() const {
-    return room_positions;
+const std::vector<rect_t>& Map::get_room_positions() const {
+    return rooms;
 }
 
 // return a vector of positions that centers each room
 void Map::create_room(rect_t rect) {
     dig_rect(rect);
+    rooms.push_back(rect);
 }
 
 void Map::create_corridor(position_t pos1, position_t pos2) {
@@ -142,7 +184,6 @@ bool Map::visitNode(TCODBsp* node, void* userData) {
         }
         if(is_valid) {
             create_room(rect);
-            room_positions.push_back(rect.center());
         }
     }
     return true;

@@ -1,5 +1,9 @@
 #pragma once
+
 #include <compare>
+
+#include "libtcod.hpp"
+
 struct position_t {
     int x;
     int y;
@@ -51,24 +55,23 @@ struct rect_t {
         , w(wi)
         , h(hi) {}
 
-    position_t center() {
+    position_t center() const {
         return position_t{x + w / 2, y + h / 2};
     }
 
-    // int max_index() {
-    //     // auto index = x + y * w;
-    //     auto maxidx = w * h - 1;
-    //     return maxidx;
-    // }
-
-    // template <typename C, typename F>
-    // void fill(C& collection, F& func, int gw, int gh) {
-    //     for(int xi = x; xi < (x + w); ++xi) {
-    //         for(int yi = y; yi < (y + h); ++yi) {
-    //             func(collection[xi + yi * gw]);
-    //         }
-    //     }
-    // }
+    position_t random_pos() const {
+        auto* rng = TCODRandom::getInstance();
+        // treating the exceptional cases
+        auto rw = std::abs(w);
+        auto rh = std::abs(h);
+        if(rw == 0 || rh == 0) {
+            rw = rh = 1;
+        }
+        // now we can get a valid position
+        auto rx = rng->getInt(x, x + rw - 1);
+        auto ry = rng->getInt(y, y + rh - 1);
+        return position_t{rx, ry};
+    }
 };
 
 template <typename Fw_iter, typename Func>

@@ -6,16 +6,20 @@
 
 namespace engine {
 
-// class Engine {
-// public:
-    // std::vector<std::unique_ptr<Actor>> actors;
-    // std::unique_ptr<Actor> player;
-    // std::unique_ptr<Map> map;
+extern Actor* player;
+extern std::vector<std::unique_ptr<Actor>> actors;
+extern std::unique_ptr<Map> map;
 
-    void init();
-    void update();
-    void render();
-// };
+enum game_status_t {
+    STARTUP,
+    IDLE,
+    NEW_TURN,
+    VICTORY,
+    DEFEAT,
+};
 
-// extern Engine engine;
+void init();
+void update();
+void render();
+
 }  // namespace engine

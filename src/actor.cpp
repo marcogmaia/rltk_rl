@@ -2,22 +2,19 @@
 
 #include "actor.hpp"
 
-Actor::Actor(const position_t& position, int ch, uint32_t fov_rad,
-             const TCODColor& color)
-    : position(position)
+Actor::Actor(const position_t& position, int ch, std::string name,
+             uint32_t fov_rad, const TCODColor& color)
+    : ch(ch)
+    , name(name)
+    , position(position)
     , fov_radius(fov_rad)
-    , ch(ch)
     , color(color) {
-    // #ifdef DEBUG
-    //     std::cout << "Actor CTOR called\n";
-    // #endif
-}
+        std::cout << "Actor CTOR\n";
+    }
 
-Actor::~Actor() {
-    // #ifdef DEBUG
-    //     std::cout << "Actor DTOR called\n";
-    // #endif
-}
+    Actor::~Actor() {
+        std::cout << "Actor DTOR\n";
+    }
 
 void Actor::render() const {
     TCODConsole::root->setChar(position.x, position.y, ch);
