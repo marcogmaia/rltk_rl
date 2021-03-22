@@ -49,6 +49,8 @@ private:
      */
     void create_room(rect_t rect);
 
+    void add_enemies_to_room(const rect_t& rect);
+
     void create_corridor(position_t pos1, position_t pos2);
 
 
@@ -60,7 +62,9 @@ public:
 
     bool pos_is_empty(position_t pos);
 
-    bool is_walkable(position_t position) const;
+    bool is_wall(position_t position) const;
+
+    bool can_walk(position_t pos) const;
 
     void set_property(position_t pos, bool transparent, bool walkable);
 
@@ -72,7 +76,7 @@ public:
 
     void compute_fov(const Actor& player);
 
-    const std::vector<rect_t>& get_room_positions() const;
+    const std::vector<rect_t>& get_rooms() const;
 
     void render();
 };

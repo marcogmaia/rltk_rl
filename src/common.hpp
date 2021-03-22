@@ -4,13 +4,15 @@
 #include "libtcod.hpp"
 
 struct position_t {
-    int x;
-    int y;
+    int x = 0;
+    int y = 0;
 
+    position_t() = default;
 
     position_t(int a, int b)
         : x(a)
         , y(b){};
+
     // copy constructor
     position_t(const position_t& rhs) = default;
 

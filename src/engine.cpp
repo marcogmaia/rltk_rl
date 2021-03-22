@@ -11,6 +11,7 @@ Actor* player;
 std::vector<std::unique_ptr<Actor>> actors;
 std::unique_ptr<Map> map;
 game_status_t game_status = game_status_t::STARTUP;
+TCOD_key_t last_key;
 
 void init() {
     static bool initialized = false;
@@ -24,73 +25,23 @@ void init() {
     TCODSystem::setFps(120);
     map = std::make_unique<Map>(80, 45);
 
-    const auto& rooms = map->get_room_positions();
-    if(rooms.size() > 0) {
-        actors.emplace_back(
-            std::make_unique<Actor>(rooms[0].random_pos(), '@', "", 8));
-        player = actors.back().get();
+    const auto& rooms = map->get_rooms();
+    if(!rooms.empty()) {
+        auto pos = rooms[0].random_pos();
+        while(!map->can_walk(pos)) {
+            pos = rooms[0].random_pos();
+        }
+        auto uptr_player = std::make_unique<Actor>(pos, '@', "Player", 8);
+        player           = uptr_player.get();
+        player->ai       = std::make_unique<AiPlayer>();
+        actors.emplace_back(std::move(uptr_player));
         map->compute_fov(*player);
     }
-
-    if(rooms.size() > 1) {
-        std::for_each(std::cbegin(rooms) + 1, std::cend(rooms),
-                      [](const rect_t& rect) {
-                          map->add_enemy(rect.random_pos());
-                      });
-    }
 }
 
-bool get_next_position(const TCOD_key_t& key, position_t* pos) {
-    bool performed_move = false;
-    int dy              = 0;
-    int dx              = 0;
-    switch(key.vk) {
-    case TCODK_KP8:
-    case TCODK_UP: {
-        --dy;
-    } break;
-    case TCODK_KP2:
-    case TCODK_DOWN: {
-        ++dy;
-    } break;
-    case TCODK_KP4:
-    case TCODK_LEFT: {
-        --dx;
-    } break;
-    case TCODK_KP6:
-    case TCODK_RIGHT: {
-        ++dx;
-    } break;
-    case TCODK_KP7: {
-        --dx;
-        --dy;
-    } break;
-    case TCODK_KP9: {
-        ++dx;
-        --dy;
-    } break;
-    case TCODK_KP1: {
-        --dx;
-        ++dy;
-    } break;
-    case TCODK_KP3: {
-        ++dx;
-        ++dy;
-    } break;
-    default:
-        break;
-    }
-    pos->x += dx;
-    pos->y += dy;
-    if(dx != 0 || dy != 0) {
-        performed_move = true;
-    }
-    return performed_move;
-}
-
-bool get_key_mouse_event(TCOD_key_t* keypress, TCOD_mouse_t* mouse) {
-    TCOD_event_t ret = TCODSystem::checkForEvent(
-        TCOD_EVENT_KEY_PRESS | TCOD_EVENT_MOUSE, keypress, mouse);
+bool get_key_mouse_event(TCOD_key_t* keypress) {
+    TCOD_event_t ret
+        = TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS, keypress, nullptr);
     return ret != TCOD_EVENT_NONE;
 }
 
@@ -132,14 +83,8 @@ static void handle_game_status() {
         game_status = game_status_t::IDLE;
     } break;
     case game_status_t::IDLE: {
-        TCOD_key_t keypress;
-        TCOD_mouse_t mouse;
-        get_key_mouse_event(&keypress, &mouse);
-        auto player_pos     = player->position;
-        position_t next_pos = player_pos;
-        bool performed_move = get_next_position(keypress, &next_pos);
-        if(performed_move) {
-            player->move_attack(next_pos);
+        get_key_mouse_event(&last_key);
+        if(player->update()) {
             map->compute_fov(*player);
             game_status = NEW_TURN;
         }

@@ -1,12 +1,21 @@
 #pragma once
 #include <string>
-#include "common.hpp"
+#include <memory>
+
 #include "libtcod.hpp"
 
+#include "common.hpp"
+#include "destructible.hpp"
+#include "ai.hpp"
+#include "attacker.hpp"
 
 
 constexpr size_t max_actor_name_len = 64;
 
+/**
+ * @brief  An actor is anything that can perform an action on the game world
+ *
+ */
 class Actor {
 public:
     int ch;  // ascii code
@@ -15,6 +24,12 @@ public:
     uint32_t fov_radius;
     TCODColor color;
 
+    bool blocks = true;  // can walk over this actor
+
+    Attacker* attacker         = nullptr;  // something that deals damage
+    Destructible* destructible = nullptr;  // something that can be damaged
+    std::unique_ptr<Ai> ai;                // something self-updating
+
 
     Actor(const position_t& position, int ch = '@', const char* src_name = "",
           uint32_t fov_rad = 8, const TCODColor& color = TCODColor::white);
@@ -22,18 +37,16 @@ public:
     //  copy constructor
     Actor(const Actor& rhs) = default;
 
-    void update();
-
-    /**
-     * @brief move self or attack other actor
-     *
-     * @param pos position to move or attack
-     * @return true if moved, false otherwise
-     */
-    bool move_attack(position_t pos);
-
     ~Actor();
     // ~Actor() = default;
+
+    /**
+     * @brief
+     *
+     * @return true if updated, false otherwise
+     */
+    bool update();
+
 
     void render() const;
 };

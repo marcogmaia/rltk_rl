@@ -12,6 +12,8 @@
 static constexpr int room_max_size = 12;
 static constexpr int room_min_size = 5;
 
+static constexpr int max_enemies_per_room = 3;
+
 Map::Map(int width, int height)
     : map(width, height)
     , bsp(1, 1, width - 2, height - 2)
@@ -41,12 +43,6 @@ Map::~Map() {
 }
 
 void Map::render() {
-    // auto console_w = TCODConsole::root->getWidth();
-    // auto console_h = TCODConsole::root->getHeight();
-
-    // int px = 0;
-    // int py = 0;
-
     for(int x = 0; x < width; ++x) {
         for(int y = 0; y < height; ++y) {
             if(is_in_fov({x, y})) {
@@ -103,8 +99,20 @@ bool Map::pos_is_empty(position_t pos) {
 }
 
 
-bool Map::is_walkable(position_t pos) const {
-    return map.isWalkable(pos.x, pos.y);
+bool Map::is_wall(position_t pos) const {
+    return !map.isWalkable(pos.x, pos.y);
+}
+
+bool Map::can_walk(position_t pos) const {
+    if(is_wall(pos))
+        return false;
+    for(auto& actor : engine::actors) {
+        if(actor->blocks && actor->position == pos) {
+            // actor blocking here
+            return false;
+        }
+    }
+    return true;
 }
 
 void Map::set_property(position_t pos, bool transparent, bool walkable) {
@@ -128,14 +136,27 @@ void Map::dig_rect(rect_t rect) {
     }
 }
 
-const std::vector<rect_t>& Map::get_room_positions() const {
+const std::vector<rect_t>& Map::get_rooms() const {
     return rooms;
+}
+
+void Map::add_enemies_to_room(const rect_t& rect) {
+    auto num_enemies
+        = TCODRandom::getInstance()->getInt(0, max_enemies_per_room);
+    while(num_enemies > 0) {
+        auto pos = rect.random_pos();
+        if(can_walk(pos)) {
+            add_enemy(pos);
+        }
+        --num_enemies;
+    }
 }
 
 // return a vector of positions that centers each room
 void Map::create_room(rect_t rect) {
     dig_rect(rect);
     rooms.push_back(rect);
+    add_enemies_to_room(rect);
 }
 
 void Map::create_corridor(position_t pos1, position_t pos2) {

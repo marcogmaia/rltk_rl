@@ -2,11 +2,13 @@
 
 
 
-include_directories("include")
-include_directories(".")
-include_directories("./actor")
-add_subdirectory("./actor")
+include_directories(
+    "."
+    "include"
+    "actor"
+)
 
+add_subdirectory("./actor")
 
 add_library(
     game

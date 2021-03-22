@@ -1,10 +1,8 @@
 #include <iostream>
 #include <fmt/format.h>
 
-#include "engine.hpp"
 #include "actor.hpp"
-
-
+#include "engine.hpp"
 
 Actor::Actor(const position_t& position, int ch, const char* src_name,
              uint32_t fov_rad, const TCODColor& color)
@@ -20,28 +18,15 @@ Actor::~Actor() {
     std::cout << "Actor DTOR\n";
 }
 
-void Actor::update() {
-    std::cout << fmt::format("updating {}\n", name);
-}
-
-// how to make the Actor be self contained
-bool Actor::move_attack(position_t pos) {
-    auto& map = engine::map;
-    if(!map->is_walkable(pos))
-        return false;
-
-    for(auto& actor : engine::actors) {
-        if(this == actor.get())
-            continue;
-        if(pos == actor->position) {
-            std::cout << fmt::format(
-                "The {} laughs at your punny attempt to attack him!\n",
-                actor->name);
-            return false;
+bool Actor::update() {
+    auto updated = false;
+    if(ai) {
+        updated = ai->update(this);
+        if(updated) {
+            std::cout << fmt::format("updating {}\n", name);
         }
     }
-    this->position = pos;
-    return true;
+    return updated;
 }
 
 void Actor::render() const {
