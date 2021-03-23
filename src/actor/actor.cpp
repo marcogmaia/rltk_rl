@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fmt/format.h>
+#include <algorithm>
 
 #include "actor.hpp"
 #include "engine.hpp"
@@ -8,9 +9,9 @@ Actor::Actor(const position_t& position, int ch, const char* src_name,
              uint32_t fov_rad, const TCODColor& color)
     : ch(ch)
     , position(position)
+    , name(src_name)
     , fov_radius(fov_rad)
     , color(color) {
-    strncpy(name, src_name, sizeof name - 1);
     std::cout << fmt::format("Actor CTOR {}\n", name);
 }
 
@@ -27,6 +28,21 @@ bool Actor::update() {
         }
     }
     return updated;
+}
+
+void Actor::die() {
+    if(!destructible) {
+        std::cout << fmt::format("The {} is though as f*ck\n", name);
+        return;
+    }
+    destructible->die(this);
+}
+
+bool Actor::is_dead() {
+    if(!destructible) {
+        return false;
+    }
+    return destructible->is_dead();
 }
 
 void Actor::render() const {

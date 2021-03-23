@@ -9,6 +9,10 @@ namespace engine {
 
 Actor* player;
 std::vector<std::unique_ptr<Actor>> actors;
+
+// TODO manage the actors render order
+std::list<Actor*> actor_render_list;
+
 std::unique_ptr<Map> map;
 game_status_t game_status = game_status_t::STARTUP;
 TCOD_key_t last_key;
@@ -34,6 +38,9 @@ void init() {
         auto uptr_player = std::make_unique<Actor>(pos, '@', "Player", 8);
         player           = uptr_player.get();
         player->ai       = std::make_unique<AiPlayer>();
+        player->attacker = std::make_unique<Attacker>(5.f);
+        player->destructible
+            = std::make_unique<DestructiblePlayer>(100.f, 5.f, "ded");
         actors.emplace_back(std::move(uptr_player));
         map->compute_fov(*player);
     }
@@ -48,29 +55,30 @@ bool get_key_mouse_event(TCOD_key_t* keypress) {
 // nice candidate to parallel dispatch
 static void update_enemies() {
     // using parallel algorithms
-    // std::for_each(std::execution::par_unseq, actors.begin(), actors.end(),
-    //               [](std::unique_ptr<Actor>& actor) {
-    //                   if(actor.get() == player) {
-    //                       return;
-    //                   }
-    //                   actor->update();
-    //               });
+    std::for_each(std::execution::par_unseq, actors.begin(), actors.end(),
+                  [](std::unique_ptr<Actor>& actor) {
+                      if(actor.get() == player) {
+                          return;
+                      }
+                      actor->update();
+                  });
 
     // using futures
-    std::vector<std::future<void>> futures;
-    for(auto& actor : actors) {
-        futures.emplace_back(std::async(std::launch::async, [&actor]() {
-            if(actor.get() == player) {
-                return;
-            }
-            actor->update();
-        }));
-    }
-    std::cout << "waiting updates...\n";
-    for(auto& future : futures) {
-        future.wait();
-    }
-    std::cout << fmt::format("done update. futures.size: {}\n", futures.size());
+    // std::vector<std::future<void>> futures;
+    // for(auto& actor : actors) {
+    //     futures.emplace_back(std::async(std::launch::async, [&actor]() {
+    //         if(actor.get() == player) {
+    //             return;
+    //         }
+    //         actor->update();
+    //     }));
+    // }
+    // std::cout << "waiting updates...\n";
+    // for(auto& future : futures) {
+    //     future.wait();
+    // }
+    // std::cout << fmt::format("done update. futures.size: {}\n",
+    // futures.size());
 
     // update all, then add to action_queue to perform the action in proper
     // order
@@ -85,8 +93,13 @@ static void handle_game_status() {
     case game_status_t::IDLE: {
         get_key_mouse_event(&last_key);
         if(player->update()) {
-            map->compute_fov(*player);
-            game_status = NEW_TURN;
+            if(player->is_dead()) {
+                game_status = game_status_t::DEFEAT;
+            }
+            else {
+                map->compute_fov(*player);
+                game_status = NEW_TURN;
+            }
         }
     } break;
     case game_status_t::NEW_TURN: {
@@ -113,6 +126,7 @@ void update() {
 void render() {
     TCODConsole::root->clear();
     map->render();
+    // render_actors();
     for(const auto& actor : actors) {
         // only show actors in fov
         if(map->is_in_fov(actor->position)) {

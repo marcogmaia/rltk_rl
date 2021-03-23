@@ -1,8 +1,12 @@
+#include <iostream>
+#include <fmt/format.h>
 #include "destructible.hpp"
 #include "actor.hpp"
+#include "engine.hpp"
 
 Destructible::Destructible(float max_hp, float defense, const char* corpse_name)
-    : maxHp(maxHp)
+    : max_hp(max_hp)
+    , hp(max_hp)
     , defense(defense)
     , corpse_name(corpse_name) {}
 
@@ -18,12 +22,32 @@ float Destructible::take_damage(Actor* owner, float damage) {
     return final_damage;
 }
 
-void Destructible::die(Actor* owner) {}
+void Destructible::die(Actor* owner) {
+    owner->ch     = '%';
+    owner->color  = TCODColor::darkRed;
+    owner->name   = corpse_name;
+    owner->blocks = false;
 
-DestructibleObject::DestructibleObject(float max_hp, float defense,
-                                       const char* corpse_name)
+    // make sure the corpse is sent to the back of the rendering queue
+}
+
+DestructibleEnemy::DestructibleEnemy(float max_hp, float defense,
+                                     const char* corpse_name)
     : Destructible(max_hp, defense, corpse_name) {}
+
+void DestructibleEnemy::die(Actor* owner) {
+    std::cout << fmt::format("{} is dead.\n", owner->name);
+    Destructible::die(owner);
+}
 
 DestructiblePlayer::DestructiblePlayer(float max_hp, float defense,
                                        const char* corpse_name)
     : Destructible(max_hp, defense, corpse_name) {}
+
+void DestructiblePlayer::die(Actor* owner) {
+    std::cout << fmt::format(
+        "The light slowly fades away as {} bleeds to the death... Now laying "
+        "on the ground is {} motionless.\n",
+        owner->name);
+    Destructible::die(owner);
+}

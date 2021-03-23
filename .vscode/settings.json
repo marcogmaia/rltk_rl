@@ -95,7 +95,8 @@
         "valarray": "cpp",
         "variant": "cpp",
         "sdl.h": "c",
-        "*.rh": "cpp"
+        "*.rh": "cpp",
+        "*.def": "cpp"
     },
     "C_Cpp.default.intelliSenseMode": "linux-gcc-x64"
 }

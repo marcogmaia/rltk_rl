@@ -1,10 +1,11 @@
 #pragma once
+#include <string>
 
 class Actor;
 
 class Destructible {
 public:
-    float maxHp;              // maximum health points
+    float max_hp;             // maximum health points
     float hp;                 // current health points
     float defense;            // hit points deflected
     const char* corpse_name;  // the actor's name once dead/destroyed
@@ -28,9 +29,13 @@ public:
 };
 
 class DestructiblePlayer : public Destructible {
+public:
     DestructiblePlayer(float max_hp, float defense, const char* corpse_name);
+    void die(Actor* owner) override;
 };
 
-class DestructibleObject : public Destructible {
-    DestructibleObject(float max_hp, float defense, const char* corpse_name);
+class DestructibleEnemy : public Destructible {
+public:
+    DestructibleEnemy(float max_hp, float defense, const char* corpse_name);
+    void die(Actor* owner) override;
 };

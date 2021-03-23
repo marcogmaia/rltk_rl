@@ -3,7 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/lib/libtcod/src/**"
+                "${workspaceFolder}/lib/libtcod/src/**",
+                "${workspaceFolder}/src"
             ],
             "browse": {
                 "path": [

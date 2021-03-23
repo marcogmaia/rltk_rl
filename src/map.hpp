@@ -64,6 +64,8 @@ public:
 
     bool is_wall(position_t position) const;
 
+    bool is_occupied(position_t pos) const;
+
     bool can_walk(position_t pos) const;
 
     void set_property(position_t pos, bool transparent, bool walkable);

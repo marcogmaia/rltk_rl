@@ -103,17 +103,20 @@ bool Map::is_wall(position_t pos) const {
     return !map.isWalkable(pos.x, pos.y);
 }
 
-bool Map::can_walk(position_t pos) const {
-    if(is_wall(pos))
-        return false;
+bool Map::is_occupied(position_t pos) const {
     for(auto& actor : engine::actors) {
         if(actor->blocks && actor->position == pos) {
-            // actor blocking here
             return false;
         }
     }
     return true;
 }
+
+bool Map::can_walk(position_t pos) const {
+    auto can_walk = is_wall(pos) || is_occupied(pos);
+    return can_walk;
+}
+
 
 void Map::set_property(position_t pos, bool transparent, bool walkable) {
     map.setProperties(pos.x, pos.y, transparent, walkable);
