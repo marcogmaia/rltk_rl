@@ -17,10 +17,10 @@ add_subdirectory("lib/libtcod")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_BUILD_TYPE DEBUG)
+# set(CMAKE_BUILD_TYPE RELEASE)
 
 add_subdirectory(src)
 
-# set(CMAKE_BUILD_TYPE RELEASE)
 
 add_executable(
     ${PROJECT_NAME}

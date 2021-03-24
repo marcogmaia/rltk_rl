@@ -16,6 +16,27 @@ Gui::~Gui() {
 Gui::Message::Message(const char* text, const TCODColor& color)
     : text(text)
     , color(color) {}
+    
+Gui::Message::Message(const std::string& text, const TCODColor& color)
+    : text(text)
+    , color(color) {}
+
+Gui::Message::Message(const std::string&& text, const TCODColor& color)
+    : text(text)
+    , color(color) {}
+
+void Gui::render_messages() {
+    int y           = 1;
+    float colorCoef = 0.4f;
+    for(auto& message : m_log) {
+        m_console.setDefaultForeground(message.color * colorCoef);
+        m_console.print(MSG_X, y, message.text);
+        y++;
+        if(colorCoef < 1.0f) {
+            colorCoef += 0.3f;
+        }
+    }
+}
 
 void Gui::render() {
     // Clear the GUI console
@@ -26,6 +47,8 @@ void Gui::render() {
     render_bar(position_t(1, 1), BAR_WIDTH, "HP", player_status->hp,
                player_status->max_hp, TCODColor::lightRed,
                TCODColor::darkerRed);
+    render_mouse_look();
+    render_messages();
     TCODConsole::blit(&m_console, 0, 0, engine::screen_width, PANEL_HEIGHT,
                       TCODConsole::root, 0,
                       TCODConsole::root->getHeight() - PANEL_HEIGHT);
@@ -48,7 +71,32 @@ void Gui::render_bar(position_t pos, int width, const char* name, float value,
     }
     // print text on top of the bar
     m_console.setDefaultForeground(TCODColor::white);
-    m_console.printEx(
+    m_console.printf(
         pos.x + width / 2, pos.y, TCOD_bkgnd_flag_t::TCOD_BKGND_NONE,
         TCOD_alignment_t::TCOD_CENTER, "%s : %g/%g", name, value, max_value);
 }
+
+void Gui::render_mouse_look() {
+    auto mouse_pos = position_t{engine::mouse.cx, engine::mouse.cy};
+    if(!engine::map->is_in_fov(mouse_pos)) {
+        return;
+    }
+
+    char buf[128] = {0};
+    bool first    = true;
+    for(auto& actor : engine::actors) {
+        if(actor->position == mouse_pos) {
+            if(!first) {
+                strcat(buf, ", ");
+            }
+            else {
+                first = false;
+            }
+            strcat(buf, actor->name);
+        }
+    }
+    m_console.setDefaultForeground(TCODColor::lightGrey);
+    m_console.printf(1, 3, "%s", buf);
+}
+
+// void Gui::message(const char* text, const TCODColor& color) {}

@@ -45,13 +45,20 @@ Map::~Map() {
 void Map::render() {
     for(int x = 0; x < width; ++x) {
         for(int y = 0; y < height; ++y) {
+            position_t pos{x, y};
+            auto ch    = is_wall(pos) ? wall_ch : ground_ch;
+            auto &croot = *TCODConsole::root;
             if(is_in_fov({x, y})) {
                 auto color = map.isWalkable(x, y) ? lightWall : lightGround;
-                TCODConsole::root->setCharBackground(x, y, color);
+                croot.setCharBackground(x, y, color);
+                croot.setCharForeground(x, y, TCODColor::white);
+                croot.setChar(x, y, ch);
             }
             else if(is_explored({x, y})) {
                 auto color = map.isWalkable(x, y) ? darkGround : darkWall;
-                TCODConsole::root->setCharBackground(x, y, color);
+                croot.setCharBackground(x, y, color);
+                croot.setCharForeground(x, y, TCODColor::darkestGrey);
+                croot.setChar(x, y, ch);
             }
         }
     }
@@ -75,8 +82,8 @@ void Map::add_enemy(position_t pos) {
         engine::actors.emplace_back(std::move(enemy));
     }
     else {
-        auto enemy      = std::make_unique<Actor>(pos, 'T', "Troll", 6,
-                                             TCODColor::orange);
+        auto enemy
+            = std::make_unique<Actor>(pos, 'T', "Troll", 6, TCODColor::orange);
         enemy->ai       = std::make_unique<AiEnemy>();
         enemy->attacker = std::make_unique<Attacker>(4.f);
         enemy->destructible
@@ -89,7 +96,7 @@ bool Map::is_explored(position_t pos) const {
     return tiles[pos.x + pos.y * width].explored;
 }
 
-bool Map::is_in_fov(position_t pos) {
+bool Map::is_in_fov(const position_t& pos) {
     if(map.isInFov(pos.x, pos.y)) {
         tiles[pos.x + pos.y * width].explored = true;
         return true;

@@ -27,6 +27,8 @@ class Map : public ITCODBspCallback {
 
     const TCODColor lightWall{130, 110, 50};
     const TCODColor lightGround{200, 180, 50};
+    const unsigned char wall_ch   = '#';
+    const unsigned char ground_ch = '.';
 
 private:
     TCODMap map;
@@ -72,7 +74,7 @@ public:
 
     bool is_explored(position_t pos) const;
 
-    bool is_in_fov(position_t pos);
+    bool is_in_fov(const position_t& pos);
 
     void add_enemy(position_t pos);
 

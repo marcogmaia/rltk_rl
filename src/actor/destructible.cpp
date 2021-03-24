@@ -16,8 +16,8 @@ float Destructible::take_damage(Actor* owner, float damage) {
         final_damage = 0.f;
     }
     hp -= final_damage;
-    std::cout << fmt::format("{} takes {} damage.\n", owner->name,
-                             static_cast<int>(final_damage));
+    engine::gui.message(TCODColor::lightRed, "{} takes {} damage.\n",
+                        owner->name, static_cast<int>(final_damage));
     if(hp <= 0.f) {
         die(owner);
     }
