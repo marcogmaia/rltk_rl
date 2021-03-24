@@ -8,7 +8,7 @@ public:
     virtual bool update(Actor* owner) = 0;
 };
 
-class AiPlayer : public Ai {
+class AiPlayer final : public Ai {
 protected:
     /**
      * @brief move self or attack other actor
@@ -29,7 +29,7 @@ public:
     bool update(Actor* owner) override;
 };
 
-class AiEnemy : public Ai {
+class AiEnemy final : public Ai {
 protected:
     /**
      * @brief move self or attack other actor

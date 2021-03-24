@@ -4,6 +4,7 @@
 #include <list>
 #include "actor.hpp"
 #include "map.hpp"
+#include "gui.hpp"
 
 
 namespace engine {
@@ -15,6 +16,8 @@ extern TCOD_key_t last_key;
 
 extern uint32_t screen_width;
 extern uint32_t screen_height;
+
+extern Gui gui;
 
 extern std::list<Actor*> actor_render_list;
 

@@ -19,6 +19,8 @@ TCOD_key_t last_key;
 uint32_t screen_width  = 80;
 uint32_t screen_height = 50;
 
+Gui gui;
+
 void init() {
     static bool initialized = false;
     if(initialized) {
@@ -35,7 +37,7 @@ void init() {
 void init_game_map() {
     actors.clear();
     map.reset();
-    map = std::make_unique<Map>(80, 45);
+    map = std::make_unique<Map>(80, 43);
 
     const auto& rooms = map->get_rooms();
     if(!rooms.empty()) {
@@ -57,6 +59,7 @@ void init_game_map() {
 void terminate() {
     // actors.clear();
     // map.reset();
+    // gui.clear()
 }
 
 bool get_key_mouse_event(TCOD_key_t* keypress) {
@@ -149,9 +152,7 @@ void render() {
     }
     player->render();
     // show player stats
-    TCODConsole::root->print(1, screen_height - 2, "HP : %d/%d",
-                             static_cast<int>(player->destructible->hp),
-                             static_cast<int>(player->destructible->max_hp));
+    gui.render();
 }
 
 }  // namespace engine

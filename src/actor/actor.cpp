@@ -11,13 +11,9 @@ Actor::Actor(const position_t& position, int ch, const char* src_name,
     , name(src_name)
     , position(position)
     , fov_radius(fov_rad)
-    , color(color) {
-    std::cout << fmt::format("Actor CTOR {}\n", name);
-}
+    , color(color) {}
 
-Actor::~Actor() {
-    std::cout << "Actor DTOR\n";
-}
+Actor::~Actor() {}
 
 bool Actor::update() {
     auto updated = false;

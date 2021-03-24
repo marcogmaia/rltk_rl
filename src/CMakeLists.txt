@@ -15,6 +15,7 @@ add_library(
     "game.cpp"
     "engine.cpp"
     "map.cpp"
+    "gui.cpp"
 )
 
 target_link_libraries(game actor pthread fmt LIBTCOD)
