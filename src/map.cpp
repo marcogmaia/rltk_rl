@@ -68,13 +68,19 @@ void Map::add_enemy(position_t pos) {
     if(gen_orc) {
         auto enemy
             = std::make_unique<Actor>(pos, 'O', "Orc", 6, TCODColor::green);
-        enemy->ai = std::make_unique<AiEnemy>();
+        enemy->ai       = std::make_unique<AiEnemy>();
+        enemy->attacker = std::make_unique<Attacker>(3.f);
+        enemy->destructible
+            = std::make_unique<DestructibleEnemy>(10.f, 1.f, "dead orc");
         engine::actors.emplace_back(std::move(enemy));
     }
     else {
-        auto enemy = std::make_unique<Actor>(pos, 'T', "Troll", 6,
-                                             TCODColor::darkOrange);
-        enemy->ai  = std::make_unique<AiEnemy>();
+        auto enemy      = std::make_unique<Actor>(pos, 'T', "Troll", 6,
+                                             TCODColor::orange);
+        enemy->ai       = std::make_unique<AiEnemy>();
+        enemy->attacker = std::make_unique<Attacker>(4.f);
+        enemy->destructible
+            = std::make_unique<DestructibleEnemy>(16.f, 1.f, "dead troll");
         engine::actors.emplace_back(std::move(enemy));
     }
 }

@@ -16,6 +16,8 @@ float Destructible::take_damage(Actor* owner, float damage) {
         final_damage = 0.f;
     }
     hp -= final_damage;
+    std::cout << fmt::format("{} takes {} damage.\n", owner->name,
+                             static_cast<int>(final_damage));
     if(hp <= 0.f) {
         die(owner);
     }
@@ -23,6 +25,7 @@ float Destructible::take_damage(Actor* owner, float damage) {
 }
 
 void Destructible::die(Actor* owner) {
+    std::cout << fmt::format("{} dies.\n", owner->name);
     owner->ch     = '%';
     owner->color  = TCODColor::darkRed;
     owner->name   = corpse_name;
@@ -36,7 +39,6 @@ DestructibleEnemy::DestructibleEnemy(float max_hp, float defense,
     : Destructible(max_hp, defense, corpse_name) {}
 
 void DestructibleEnemy::die(Actor* owner) {
-    std::cout << fmt::format("{} is dead.\n", owner->name);
     Destructible::die(owner);
 }
 
@@ -45,9 +47,10 @@ DestructiblePlayer::DestructiblePlayer(float max_hp, float defense,
     : Destructible(max_hp, defense, corpse_name) {}
 
 void DestructiblePlayer::die(Actor* owner) {
+    // TODO death message
     std::cout << fmt::format(
         "The light slowly fades away as {} bleeds to the death... Now laying "
         "on the ground is {} motionless.\n",
-        owner->name);
+        owner->name, owner->name);
     Destructible::die(owner);
 }

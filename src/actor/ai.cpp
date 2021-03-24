@@ -68,16 +68,8 @@ bool AiPlayer::move_attack(Actor* owner, position_t target_pos) {
             continue;
         }
         if(actor->destructible) {
-            if(actor->position == target_pos) {
-                std::cout << fmt::format("You attack the {}.\n", actor->name);
-                return false;
-            }
-        }
-        else {
-            if(actor->position == target_pos) {
-                std::cout << fmt::format(
-                    "The {} laughs at your punny attempts to attack him.\n",
-                    actor->name);
+            if(owner->attacker && actor->position == target_pos) {
+                owner->attacker->attack(owner, actor.get());
                 return false;
             }
         }
@@ -99,7 +91,10 @@ bool AiPlayer::update(Actor* owner) {
 }
 
 bool AiEnemy::move_attack(Actor* owner, position_t target) {
+    auto moved     = true;
     auto dpos      = target - owner->position;
+    auto stepx     = dpos.x > 0 ? 1 : -1;
+    auto stepy     = dpos.y > 0 ? 1 : -1;
     float distance = dpos.normalize();
     if(distance >= 2.f) {
         dpos.x = static_cast<int>(roundf(dpos.x / distance));
@@ -107,17 +102,33 @@ bool AiEnemy::move_attack(Actor* owner, position_t target) {
         if(engine::map->can_walk(owner->position + dpos)) {
             owner->position = owner->position + dpos;
         }
-        else if(owner->attacker) {
-            owner->attacker->attack(owner, engine::player);
+        else if(engine::map->can_walk(owner->position + position_t{stepx, 0})) {
+            owner->position.x += stepx;
+        }
+        else if(engine::map->can_walk(owner->position + position_t{0, stepy})) {
+            owner->position.y += stepy;
         }
     }
+    else if(owner->attacker) {
+        std::cout << fmt::format("The {} attacks you.\n", owner->name);
+        owner->attacker->attack(owner, engine::player);
+        moved = false;
+    }
+    return moved;
 }
 
 bool AiEnemy::update(Actor* owner) {
     if(owner->is_dead()) {
         return false;
     }
-    move_attack(owner, engine::player->position);
 
+    if(engine::map->is_in_fov(owner->position)) {
+        move_count = TRACKING_TURNS;
+    }
+
+    if(move_count > 0) {
+        move_attack(owner, engine::player->position);
+        --move_count;
+    }
     return true;
 }

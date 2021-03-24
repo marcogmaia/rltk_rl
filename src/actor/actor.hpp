@@ -33,7 +33,6 @@ public:
     // destructible methods
     std::unique_ptr<Destructible>
         destructible;  // something that can be damaged
-    void die();
     bool is_dead();
 
     std::unique_ptr<Ai> ai;  // something self-updating

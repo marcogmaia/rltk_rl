@@ -23,19 +23,8 @@ bool Actor::update() {
     auto updated = false;
     if(ai) {
         updated = ai->update(this);
-        if(updated) {
-            std::cout << fmt::format("updating {}\n", name);
-        }
     }
     return updated;
-}
-
-void Actor::die() {
-    if(!destructible) {
-        std::cout << fmt::format("The {} is though as f*ck\n", name);
-        return;
-    }
-    destructible->die(this);
 }
 
 bool Actor::is_dead() {

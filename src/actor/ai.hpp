@@ -9,7 +9,7 @@ public:
 };
 
 class AiPlayer : public Ai {
-private:
+protected:
     /**
      * @brief move self or attack other actor
      *
@@ -30,13 +30,19 @@ public:
 };
 
 class AiEnemy : public Ai {
+protected:
     /**
      * @brief move self or attack other actor
      *
      * @param pos position to move or attack
      * @return true if moved, false otherwise
      */
-    bool move_attack(Actor* owner, position_t pos);
+    virtual bool move_attack(Actor* owner, position_t pos);
+
+    // how many turns the monster chases the player
+    // after losing his sight
+    static const int TRACKING_TURNS = 3;
+    int move_count                  = TRACKING_TURNS;
 
 public:
     AiEnemy() = default;

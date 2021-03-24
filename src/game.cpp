@@ -8,9 +8,9 @@
 void game() {
     engine::init();
     while(!TCODConsole::isWindowClosed()) {
+        engine::update();
         engine::render();
         TCODConsole::flush();
-        engine::update();
     }
 
     std::cout << fmt::format("ran for {} seconds\n",

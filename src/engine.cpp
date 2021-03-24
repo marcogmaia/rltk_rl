@@ -29,6 +29,12 @@ void init() {
     TCODConsole::initRoot(screen_width, screen_height, "Maia Learning", false,
                           TCOD_renderer_t::TCOD_RENDERER_SDL2);
     TCODSystem::setFps(120);
+    // init_game_map();
+}
+
+void init_game_map() {
+    actors.clear();
+    map.reset();
     map = std::make_unique<Map>(80, 45);
 
     const auto& rooms = map->get_rooms();
@@ -46,6 +52,11 @@ void init() {
         actors.emplace_back(std::move(uptr_player));
         map->compute_fov(*player);
     }
+}
+
+void terminate() {
+    // actors.clear();
+    // map.reset();
 }
 
 bool get_key_mouse_event(TCOD_key_t* keypress) {
@@ -89,19 +100,18 @@ static void update_enemies() {
 static void handle_game_status() {
     switch(game_status) {
     case game_status_t::STARTUP: {
+        init_game_map();
         map->compute_fov(*player);
         game_status = game_status_t::IDLE;
     } break;
     case game_status_t::IDLE: {
         get_key_mouse_event(&last_key);
+        if(player->is_dead()) {
+            game_status = game_status_t::DEFEAT;
+        }
         if(player->update()) {
-            if(player->is_dead()) {
-                game_status = game_status_t::DEFEAT;
-            }
-            else {
-                map->compute_fov(*player);
-                game_status = NEW_TURN;
-            }
+            map->compute_fov(*player);
+            game_status = NEW_TURN;
         }
     } break;
     case game_status_t::NEW_TURN: {
@@ -109,6 +119,8 @@ static void handle_game_status() {
         game_status = IDLE;
     } break;
     case game_status_t::DEFEAT: {
+        terminate();
+        game_status = STARTUP;
     } break;
     case game_status_t::VICTORY: {
     } break;
@@ -119,9 +131,9 @@ static void handle_game_status() {
 
 
 void update() {
-    if(player == nullptr) {
-        return;
-    }
+    // if(player == nullptr) {
+    //     return;
+    // }
     handle_game_status();
 }
 
