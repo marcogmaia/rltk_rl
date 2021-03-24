@@ -16,8 +16,14 @@ float Destructible::take_damage(Actor* owner, float damage) {
         final_damage = 0.f;
     }
     hp -= final_damage;
-    engine::gui.message(TCODColor::lightRed, "{} takes {} damage.\n",
-                        owner->name, static_cast<int>(final_damage));
+    if(owner == engine::player) {
+        engine::gui.message(TCODColor::darkRed, "You lose {} hp.\n",
+                            static_cast<int>(final_damage));
+    }
+    else {
+        engine::gui.message(TCODColor::lightRed, "{} loses {} hp.\n",
+                            owner->name, static_cast<int>(final_damage));
+    }
     if(hp <= 0.f) {
         die(owner);
     }
@@ -25,7 +31,8 @@ float Destructible::take_damage(Actor* owner, float damage) {
 }
 
 void Destructible::die(Actor* owner) {
-    std::cout << fmt::format("{} dies.\n", owner->name);
+    // std::cout << fmt::format("{} dies.\n", owner->name);
+    engine::gui.message(TCODColor::darkestRed, "{} dies.\n", owner->name);
     owner->ch     = '%';
     owner->color  = TCODColor::darkRed;
     owner->name   = corpse_name;

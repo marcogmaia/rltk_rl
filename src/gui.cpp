@@ -16,7 +16,7 @@ Gui::~Gui() {
 Gui::Message::Message(const char* text, const TCODColor& color)
     : text(text)
     , color(color) {}
-    
+
 Gui::Message::Message(const std::string& text, const TCODColor& color)
     : text(text)
     , color(color) {}
@@ -26,11 +26,11 @@ Gui::Message::Message(const std::string&& text, const TCODColor& color)
     , color(color) {}
 
 void Gui::render_messages() {
-    int y           = 1;
+    int y           = 0;
     float colorCoef = 0.4f;
     for(auto& message : m_log) {
         m_console.setDefaultForeground(message.color * colorCoef);
-        m_console.print(MSG_X, y, message.text);
+        m_console.printf(MSG_X, y, message.text.c_str());
         y++;
         if(colorCoef < 1.0f) {
             colorCoef += 0.3f;
@@ -98,5 +98,3 @@ void Gui::render_mouse_look() {
     m_console.setDefaultForeground(TCODColor::lightGrey);
     m_console.printf(1, 3, "%s", buf);
 }
-
-// void Gui::message(const char* text, const TCODColor& color) {}

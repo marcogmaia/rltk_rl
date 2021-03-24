@@ -110,7 +110,6 @@ bool AiEnemy::move_attack(Actor* owner, position_t target) {
         }
     }
     else if(owner->attacker) {
-        std::cout << fmt::format("The {} attacks you.\n", owner->name);
         owner->attacker->attack(owner, engine::player);
         moved = false;
     }

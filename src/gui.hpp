@@ -23,7 +23,7 @@ private:
     static constexpr int PANEL_HEIGHT = 7;
     static constexpr int BAR_WIDTH    = 20;
     static constexpr int MSG_X        = BAR_WIDTH + 2;
-    static constexpr int MSG_HEIGHT   = PANEL_HEIGHT + 2;
+    static constexpr int MSG_HEIGHT   = PANEL_HEIGHT;
 
     // std::unique_ptr<TCODConsole> m_console;
     TCODConsole m_console;
