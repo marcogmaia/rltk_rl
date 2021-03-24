@@ -97,3 +97,27 @@ bool AiPlayer::update(Actor* owner) {
     }
     return got_pos;
 }
+
+bool AiEnemy::move_attack(Actor* owner, position_t target) {
+    auto dpos      = target - owner->position;
+    float distance = dpos.normalize();
+    if(distance >= 2.f) {
+        dpos.x = static_cast<int>(roundf(dpos.x / distance));
+        dpos.y = static_cast<int>(roundf(dpos.y / distance));
+        if(engine::map->can_walk(owner->position + dpos)) {
+            owner->position = owner->position + dpos;
+        }
+        else if(owner->attacker) {
+            owner->attacker->attack(owner, engine::player);
+        }
+    }
+}
+
+bool AiEnemy::update(Actor* owner) {
+    if(owner->is_dead()) {
+        return false;
+    }
+    move_attack(owner, engine::player->position);
+
+    return true;
+}

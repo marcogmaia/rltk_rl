@@ -8,8 +8,8 @@
 Actor::Actor(const position_t& position, int ch, const char* src_name,
              uint32_t fov_rad, const TCODColor& color)
     : ch(ch)
-    , position(position)
     , name(src_name)
+    , position(position)
     , fov_radius(fov_rad)
     , color(color) {
     std::cout << fmt::format("Actor CTOR {}\n", name);

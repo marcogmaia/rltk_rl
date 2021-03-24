@@ -26,6 +26,11 @@ struct position_t {
         return pt;
     }
 
+    position_t operator*(const position_t& rhs) {
+        auto pt = position_t{(x * rhs.x), (y * rhs.y)};
+        return pt;
+    }
+
     position_t operator-(const position_t& rhs) {
         auto pt = position_t{(x - rhs.x), (y - rhs.y)};
         return pt;
@@ -39,6 +44,11 @@ struct position_t {
 
     bool operator!=(const position_t& rhs) const {
         return !(*this == rhs);
+    }
+
+    float normalize() {
+        auto squared = x * x + y * y;
+        return sqrtf(squared);
     }
 };
 

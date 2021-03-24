@@ -66,12 +66,16 @@ bool probability(int prob) {
 void Map::add_enemy(position_t pos) {
     auto gen_orc = probability(80);
     if(gen_orc) {
-        engine::actors.emplace_back(
-            std::make_unique<Actor>(pos, 'O', "Orc", 6, TCODColor::green));
+        auto enemy
+            = std::make_unique<Actor>(pos, 'O', "Orc", 6, TCODColor::green);
+        enemy->ai = std::make_unique<AiEnemy>();
+        engine::actors.emplace_back(std::move(enemy));
     }
     else {
-        engine::actors.emplace_back(
-            std::make_unique<Actor>(pos, 'T', "Troll", 6, TCODColor::orange));
+        auto enemy = std::make_unique<Actor>(pos, 'T', "Troll", 6,
+                                             TCODColor::darkOrange);
+        enemy->ai  = std::make_unique<AiEnemy>();
+        engine::actors.emplace_back(std::move(enemy));
     }
 }
 
@@ -106,14 +110,14 @@ bool Map::is_wall(position_t pos) const {
 bool Map::is_occupied(position_t pos) const {
     for(auto& actor : engine::actors) {
         if(actor->blocks && actor->position == pos) {
-            return false;
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 bool Map::can_walk(position_t pos) const {
-    auto can_walk = is_wall(pos) || is_occupied(pos);
+    auto can_walk = !is_wall(pos) && !is_occupied(pos);
     return can_walk;
 }
 

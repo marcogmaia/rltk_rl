@@ -38,7 +38,6 @@ public:
 
     std::unique_ptr<Ai> ai;  // something self-updating
 
-
     Actor(const position_t& position, int ch = '@', const char* src_name = "",
           uint32_t fov_rad = 8, const TCODColor& color = TCODColor::white);
 

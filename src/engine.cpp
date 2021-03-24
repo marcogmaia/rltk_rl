@@ -16,6 +16,8 @@ std::list<Actor*> actor_render_list;
 std::unique_ptr<Map> map;
 game_status_t game_status = game_status_t::STARTUP;
 TCOD_key_t last_key;
+uint32_t screen_width  = 80;
+uint32_t screen_height = 50;
 
 void init() {
     static bool initialized = false;
@@ -24,7 +26,7 @@ void init() {
     }
     initialized = true;
 
-    TCODConsole::initRoot(80, 50, "Maia Learning", false,
+    TCODConsole::initRoot(screen_width, screen_height, "Maia Learning", false,
                           TCOD_renderer_t::TCOD_RENDERER_SDL2);
     TCODSystem::setFps(120);
     map = std::make_unique<Map>(80, 45);
@@ -40,7 +42,7 @@ void init() {
         player->ai       = std::make_unique<AiPlayer>();
         player->attacker = std::make_unique<Attacker>(5.f);
         player->destructible
-            = std::make_unique<DestructiblePlayer>(100.f, 5.f, "ded");
+            = std::make_unique<DestructiblePlayer>(100.f, 2.f, "ded");
         actors.emplace_back(std::move(uptr_player));
         map->compute_fov(*player);
     }
@@ -133,6 +135,11 @@ void render() {
             actor->render();
         }
     }
+    player->render();
+    // show player stats
+    TCODConsole::root->print(1, screen_height - 2, "HP : %d/%d",
+                             static_cast<int>(player->destructible->hp),
+                             static_cast<int>(player->destructible->max_hp));
 }
 
 }  // namespace engine
