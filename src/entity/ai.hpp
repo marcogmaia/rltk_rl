@@ -1,22 +1,23 @@
 #pragma once
 #include "common.hpp"
 
-class Actor;
+class Entity;
 
 class Ai {
 public:
-    virtual bool update(Actor* owner) = 0;
+    virtual bool update(Entity* owner) = 0;
+    virtual ~Ai() = default;
 };
 
 class AiPlayer final : public Ai {
 protected:
     /**
-     * @brief move self or attack other actor
+     * @brief move self or attack other entity
      *
      * @param pos position to move or attack
      * @return true if moved, false otherwise
      */
-    bool move_attack(Actor* owner, position_t pos);
+    bool move_attack(Entity* owner, position_t pos);
 
 public:
     AiPlayer() = default;
@@ -26,18 +27,18 @@ public:
      * @param owner
      * @return true if updated, false otherwise
      */
-    bool update(Actor* owner) override;
+    bool update(Entity* owner) override;
 };
 
 class AiEnemy final : public Ai {
 protected:
     /**
-     * @brief move self or attack other actor
+     * @brief move self or attack other entity
      *
      * @param pos position to move or attack
      * @return true if moved, false otherwise
      */
-    virtual bool move_attack(Actor* owner, position_t pos);
+    virtual bool move_attack(Entity* owner, position_t pos);
 
     // how many turns the monster chases the player
     // after losing his sight
@@ -46,5 +47,5 @@ protected:
 
 public:
     AiEnemy() = default;
-    bool update(Actor* owner) override;
+    bool update(Entity* owner) override;
 };

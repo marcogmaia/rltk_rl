@@ -1,15 +1,15 @@
 #pragma once
 
-class Actor;
+class Entity;
 
 class Attacker {
 private:
 public:
-    float power = 0.f;
+    float power = 0.F;
 
     // Attacker() = default;
-    Attacker(float power);
-    void attack(Actor* owner, Actor* target);
+    explicit Attacker(float power);
+    void attack(Entity* owner, Entity* target);
 };
 
 class AttackerPlayer : public Attacker {};  // ? idk if I'll use this1

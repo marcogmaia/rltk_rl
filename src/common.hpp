@@ -1,6 +1,7 @@
 #pragma once
 
 #include <compare>
+#include <cmath>
 #include "libtcod.hpp"
 
 struct position_t {
@@ -15,23 +16,26 @@ struct position_t {
 
     // copy constructor
     position_t(const position_t& rhs) = default;
+    ~position_t()                     = default;
 
-    position_t operator/(int div) {
+    position_t& operator=(const position_t& rhs) = default;
+
+    position_t operator/(int div) const {
         auto pt = position_t{x / div, y / div};
         return pt;
     }
 
-    position_t operator+(const position_t& rhs) {
+    position_t operator+(const position_t& rhs) const {
         auto pt = position_t{(x + rhs.x), (y + rhs.y)};
         return pt;
     }
 
-    position_t operator*(const position_t& rhs) {
+    position_t operator*(const position_t& rhs) const {
         auto pt = position_t{(x * rhs.x), (y * rhs.y)};
         return pt;
     }
 
-    position_t operator-(const position_t& rhs) {
+    position_t operator-(const position_t& rhs) const {
         auto pt = position_t{(x - rhs.x), (y - rhs.y)};
         return pt;
     }

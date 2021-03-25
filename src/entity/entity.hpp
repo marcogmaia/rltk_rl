@@ -10,23 +10,22 @@
 #include "attacker.hpp"
 
 
-constexpr size_t max_actor_name_len = 64;
+constexpr size_t max_entity_name_len = 64;
 
 /**
- * @brief  An actor is anything that can perform an action on the game world
+ * @brief  An entity is anything that can perform an action on the game world
  *
  */
-class Actor {
+class Entity {
 public:
-    int ch;  // ascii code
-    // char name[max_actor_name_len];
-    const char* name;
-    // std::string name;
     position_t position;
+    int ch;  // ascii code
+    std::string name;
+    // char name[max_entity_name_len];
     uint32_t fov_radius;
     TCODColor color;
 
-    bool blocks = true;  // can walk over this actor
+    bool blocks = true;  // can walk over this entity
 
     std::unique_ptr<Attacker> attacker;  // something that deals damage
 
@@ -37,14 +36,17 @@ public:
 
     std::unique_ptr<Ai> ai;  // something self-updating
 
-    Actor(const position_t& position, int ch = '@', const char* src_name = "",
-          uint32_t fov_rad = 8, const TCODColor& color = TCODColor::white);
+    Entity(const position_t& position, int ch = '@', const char* src_name = "",
+           uint32_t fov_rad = 8, const TCODColor& color = TCODColor::white);
+           
+    Entity(const position_t& position, int ch, const std::string& src_name,
+           uint32_t fov_rad, const TCODColor& color);
 
     //  copy constructor
-    Actor(const Actor& rhs) = delete;
+    Entity(const Entity& rhs) = delete;
 
-    ~Actor();
-    // ~Actor() = default;
+    ~Entity();
+    // ~Entity() = default;
 
     /**
      * @brief

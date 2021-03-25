@@ -38,7 +38,7 @@ private:
     void render_messages();
 
 public:
-    Gui();
+    Gui() noexcept;
     ~Gui();
     void render();
 

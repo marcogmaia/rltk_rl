@@ -2,16 +2,10 @@
 #include "gui.hpp"
 #include "engine.hpp"
 
-Gui::Gui()
-    : m_console(TCODConsole(engine::screen_width, PANEL_HEIGHT)) {
-    // m_console
-    //     = std::make_unique<TCODConsole>(engine::screen_width, PANEL_HEIGHT);
-    // mconsol
-}
+Gui::Gui() noexcept
+    : m_console(TCODConsole(engine::screen_width, PANEL_HEIGHT)) {}
 
-Gui::~Gui() {
-    // delete console;
-}
+Gui::~Gui() {}
 
 Gui::Message::Message(const char* text, const TCODColor& color)
     : text(text)
@@ -84,15 +78,15 @@ void Gui::render_mouse_look() {
 
     char buf[128] = {0};
     bool first    = true;
-    for(auto& actor : engine::actors) {
-        if(actor->position == mouse_pos) {
+    for(auto& entity : engine::entities) {
+        if(entity->position == mouse_pos) {
             if(!first) {
                 strcat(buf, ", ");
             }
             else {
                 first = false;
             }
-            strcat(buf, actor->name);
+            strcat(buf, entity->name.c_str());
         }
     }
     m_console.setDefaultForeground(TCODColor::lightGrey);

@@ -4,8 +4,8 @@
 #include "ai.hpp"
 #include "engine.hpp"
 
-// how to make the Actor class be self contained?
-// I want to remove the map other actors.
+// how to make the Entity class be self contained?
+// I want to remove the map other entities.
 //
 // No need, since this is a cpp file, they are already decoupled
 
@@ -58,18 +58,19 @@ static bool get_next_position(const TCOD_key_t& key, position_t* pos) {
 }
 
 
-bool AiPlayer::move_attack(Actor* owner, position_t target_pos) {
+bool AiPlayer::move_attack(Entity* owner, position_t target_pos) {
     auto& map = engine::map;
-    if(map->is_wall(target_pos))
+    if(map->is_wall(target_pos)) {
         return false;
-    // look for living actors to attack
-    for(auto& actor : engine::actors) {
-        if(owner == actor.get() || actor->is_dead()) {
+    }
+    // look for living entities to attack
+    for(auto& entity : engine::entities) {
+        if(owner == entity.get() || entity->is_dead()) {
             continue;
         }
-        if(actor->destructible) {
-            if(owner->attacker && actor->position == target_pos) {
-                owner->attacker->attack(owner, actor.get());
+        if(entity->destructible) {
+            if(owner->attacker && entity->position == target_pos) {
+                owner->attacker->attack(owner, entity.get());
                 return false;
             }
         }
@@ -78,9 +79,10 @@ bool AiPlayer::move_attack(Actor* owner, position_t target_pos) {
     return true;
 }
 
-bool AiPlayer::update(Actor* owner) {
-    if(owner->is_dead())
+bool AiPlayer::update(Entity* owner) {
+    if(owner->is_dead()) {
         return false;
+    }
     position_t dpos;
     auto got_pos    = get_next_position(engine::last_key, &dpos);
     auto target_pos = owner->position + dpos;
@@ -90,13 +92,13 @@ bool AiPlayer::update(Actor* owner) {
     return got_pos;
 }
 
-bool AiEnemy::move_attack(Actor* owner, position_t target) {
+bool AiEnemy::move_attack(Entity* owner, position_t target) {
     auto moved     = true;
     auto dpos      = target - owner->position;
     auto stepx     = dpos.x > 0 ? 1 : -1;
     auto stepy     = dpos.y > 0 ? 1 : -1;
     float distance = dpos.normalize();
-    if(distance >= 2.f) {
+    if(distance >= 2) {
         dpos.x = static_cast<int>(roundf(dpos.x / distance));
         dpos.y = static_cast<int>(roundf(dpos.y / distance));
         if(engine::map->can_walk(owner->position + dpos)) {
@@ -116,7 +118,7 @@ bool AiEnemy::move_attack(Actor* owner, position_t target) {
     return moved;
 }
 
-bool AiEnemy::update(Actor* owner) {
+bool AiEnemy::update(Entity* owner) {
     if(owner->is_dead()) {
         return false;
     }

@@ -2,16 +2,16 @@
 include_directories(".")
 
 set(
-    ACTOR_SRCS
+    ENTITY_SRCS
     "ai.cpp"
-    "actor.cpp"
+    "entity.cpp"
     "destructible.cpp"
     "attacker.cpp"
 )
 
 add_library(
-    actor
-    "${ACTOR_SRCS}"
+    entity
+    "${ENTITY_SRCS}"
 )
     
-target_link_libraries(actor LIBTCOD)
+target_link_libraries(entity LIBTCOD)

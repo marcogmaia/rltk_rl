@@ -74,21 +74,21 @@ void Map::add_enemy(position_t pos) {
     auto gen_orc = probability(80);
     if(gen_orc) {
         auto enemy
-            = std::make_unique<Actor>(pos, 'O', "Orc", 6, TCODColor::green);
+            = std::make_unique<Entity>(pos, 'O', "Orc", 6, TCODColor::green);
         enemy->ai       = std::make_unique<AiEnemy>();
         enemy->attacker = std::make_unique<Attacker>(3.f);
         enemy->destructible
             = std::make_unique<DestructibleEnemy>(10.f, 1.f, "dead orc");
-        engine::actors.emplace_back(std::move(enemy));
+        engine::entities.emplace_back(std::move(enemy));
     }
     else {
         auto enemy
-            = std::make_unique<Actor>(pos, 'T', "Troll", 6, TCODColor::orange);
+            = std::make_unique<Entity>(pos, 'T', "Troll", 6, TCODColor::orange);
         enemy->ai       = std::make_unique<AiEnemy>();
         enemy->attacker = std::make_unique<Attacker>(4.f);
         enemy->destructible
             = std::make_unique<DestructibleEnemy>(16.f, 1.f, "dead troll");
-        engine::actors.emplace_back(std::move(enemy));
+        engine::entities.emplace_back(std::move(enemy));
     }
 }
 
@@ -106,8 +106,8 @@ bool Map::is_in_fov(const position_t& pos) {
 
 bool Map::pos_is_empty(position_t pos) {
     bool is_empty = true;
-    for(auto& actor : engine::actors) {
-        if(pos == actor->position) {
+    for(auto& entity : engine::entities) {
+        if(pos == entity->position) {
             is_empty = false;
             break;
         }
@@ -121,8 +121,8 @@ bool Map::is_wall(position_t pos) const {
 }
 
 bool Map::is_occupied(position_t pos) const {
-    for(auto& actor : engine::actors) {
-        if(actor->blocks && actor->position == pos) {
+    for(auto& entity : engine::entities) {
+        if(entity->blocks && entity->position == pos) {
             return true;
         }
     }
@@ -139,7 +139,7 @@ void Map::set_property(position_t pos, bool transparent, bool walkable) {
     map.setProperties(pos.x, pos.y, transparent, walkable);
 }
 
-void Map::compute_fov(const Actor& player) {
+void Map::compute_fov(const Entity& player) {
     const auto& pos = player.position;
     map.computeFov(pos.x, pos.y, player.fov_radius, true, FOV_DIAMOND);
 }

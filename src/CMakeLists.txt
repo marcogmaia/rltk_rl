@@ -5,10 +5,10 @@
 include_directories(
     "."
     "include"
-    "actor"
+    "entity"
 )
 
-add_subdirectory("./actor")
+add_subdirectory("./entity")
 
 add_library(
     game
@@ -18,7 +18,7 @@ add_library(
     "gui.cpp"
 )
 
-target_link_libraries(game actor pthread fmt LIBTCOD)
+target_link_libraries(game entity pthread fmt LIBTCOD)
 
 # set(CMAKE_BUILD_TYPE RELEASE)
 set(CMAKE_BUILD_TYPE DEBUG)

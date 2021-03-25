@@ -6,7 +6,7 @@
 #include "libtcod.hpp"
 
 #include "common.hpp"
-#include "actor/actor.hpp"
+#include "entity/entity.hpp"
 
 
 struct tile_t {
@@ -78,7 +78,7 @@ public:
 
     void add_enemy(position_t pos);
 
-    void compute_fov(const Actor& player);
+    void compute_fov(const Entity& owner);
 
     const std::vector<rect_t>& get_rooms() const;
 

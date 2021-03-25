@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15.0)
 project(learning VERSION 0.1.0)
 
-set(BUILD_SHARED_LIBS ON)
+# set(BUILD_SHARED_LIBS ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(MYW_DISABLES "-Wno-attributes -Wno-unused-parameter")
@@ -20,6 +20,7 @@ set(CMAKE_BUILD_TYPE DEBUG)
 # set(CMAKE_BUILD_TYPE RELEASE)
 
 add_subdirectory(src)
+add_subdirectory(map_view)
 
 
 add_executable(

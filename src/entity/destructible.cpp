@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fmt/format.h>
 #include "destructible.hpp"
-#include "actor.hpp"
+#include "entity.hpp"
 #include "engine.hpp"
 
 Destructible::Destructible(float max_hp, float defense, const char* corpse_name)
@@ -10,7 +10,7 @@ Destructible::Destructible(float max_hp, float defense, const char* corpse_name)
     , defense(defense)
     , corpse_name(corpse_name) {}
 
-float Destructible::take_damage(Actor* owner, float damage) {
+float Destructible::take_damage(Entity* owner, float damage) {
     auto final_damage = damage - defense;
     if(final_damage < 0.f) {
         final_damage = 0.f;
@@ -30,9 +30,13 @@ float Destructible::take_damage(Actor* owner, float damage) {
     return final_damage;
 }
 
-void Destructible::die(Actor* owner) {
-    // std::cout << fmt::format("{} dies.\n", owner->name);
-    engine::gui.message(TCODColor::darkestRed, "{} dies.\n", owner->name);
+void Destructible::die(Entity* owner) {
+    if(owner == engine::player) {
+        engine::gui.message(TCODColor::darkestRed, "You died.\n", owner->name);
+    }
+    else {
+        engine::gui.message(TCODColor::darkestRed, "{} dies.\n", owner->name);
+    }
     owner->ch     = '%';
     owner->color  = TCODColor::darkRed;
     owner->name   = corpse_name;
@@ -45,7 +49,7 @@ DestructibleEnemy::DestructibleEnemy(float max_hp, float defense,
                                      const char* corpse_name)
     : Destructible(max_hp, defense, corpse_name) {}
 
-void DestructibleEnemy::die(Actor* owner) {
+void DestructibleEnemy::die(Entity* owner) {
     Destructible::die(owner);
 }
 
@@ -53,11 +57,6 @@ DestructiblePlayer::DestructiblePlayer(float max_hp, float defense,
                                        const char* corpse_name)
     : Destructible(max_hp, defense, corpse_name) {}
 
-void DestructiblePlayer::die(Actor* owner) {
-    // TODO death message
-    std::cout << fmt::format(
-        "The light slowly fades away as {} bleeds to the death... Now laying "
-        "on the ground is {} motionless.\n",
-        owner->name, owner->name);
+void DestructiblePlayer::die(Entity* owner) {
     Destructible::die(owner);
 }

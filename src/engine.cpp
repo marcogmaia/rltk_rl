@@ -7,11 +7,11 @@
 
 namespace engine {
 
-Actor* player;
-std::vector<std::unique_ptr<Actor>> actors;
+Entity* player;
+std::vector<std::unique_ptr<Entity>> entities;
 
 // TODO manage the actors render order
-std::list<Actor*> actor_render_list;
+std::list<Entity*> entity_render_list;
 
 std::unique_ptr<Map> map;
 game_status_t game_status = game_status_t::STARTUP;
@@ -45,7 +45,7 @@ void init() {
     init_charset();
 
     TCODConsole::initRoot(screen_width, screen_height, "Maia Learning", false,
-                          TCOD_renderer_t::TCOD_RENDERER_GLSL);
+                          TCOD_renderer_t::TCOD_RENDERER_SDL2);
     auto& console = *TCODConsole::root;
     console.setDefaultBackground(TCODColor::darkestGrey);
     // console.
@@ -54,7 +54,7 @@ void init() {
 }
 
 void init_game_map() {
-    actors.clear();
+    entities.clear();
     map.reset();
     map = std::make_unique<Map>(screen_width, screen_height - 7);
 
@@ -64,13 +64,13 @@ void init_game_map() {
         while(!map->can_walk(pos)) {
             pos = rooms[0].random_pos();
         }
-        auto uptr_player = std::make_unique<Actor>(pos, '@', "Player", 8);
+        auto uptr_player = std::make_unique<Entity>(pos, '@', "Player", 8);
         player           = uptr_player.get();
         player->ai       = std::make_unique<AiPlayer>();
-        player->attacker = std::make_unique<Attacker>(5.f);
+        player->attacker = std::make_unique<Attacker>(5.F);
         player->destructible
-            = std::make_unique<DestructiblePlayer>(100.f, 2.f, "ded");
-        actors.emplace_back(std::move(uptr_player));
+            = std::make_unique<DestructiblePlayer>(100.F, 2.F, "ded");
+        entities.emplace_back(std::move(uptr_player));
         map->compute_fov(*player);
     }
 }
@@ -90,14 +90,12 @@ bool get_key_mouse_event(TCOD_key_t* keypress, TCOD_mouse_t* mouse) {
 // nice candidate to parallel dispatch
 static void update_enemies() {
     // using parallel algorithms
-    auto update_actor = [](std::unique_ptr<Actor>& actor) {
-        if(actor.get() == player) {
-            return;
+    auto update_entity = [](std::unique_ptr<Entity>& entity) {
+        if(entity.get() != player) {
+            entity->update();
         }
-        actor->update();
     };
-    std::for_each(std::execution::par, actors.begin(), actors.end(),
-                  update_actor);
+    std::for_each(entities.begin(), entities.end(), update_entity);
 
     // TODO update all, then add to action_queue to perform the action in proper
     // order
@@ -143,16 +141,19 @@ void update() {
     handle_game_status();
 }
 
+static void entities_render() {
+    for(const auto& entity : entities) {
+        // only show entity in fov
+        if(map->is_in_fov(entity->position)) {
+            entity->render();
+        }
+    }
+}
+
 void render() {
     TCODConsole::root->clear();
     map->render();
-    // render_actors();
-    for(const auto& actor : actors) {
-        // only show actors in fov
-        if(map->is_in_fov(actor->position)) {
-            actor->render();
-        }
-    }
+    entities_render();
     player->render();
     // show player stats
     gui.render();

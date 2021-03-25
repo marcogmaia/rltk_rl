@@ -1,16 +1,17 @@
 #pragma once
 #include <string>
 
-class Actor;
+class Entity;
 
 class Destructible {
 public:
     float max_hp;             // maximum health points
     float hp;                 // current health points
     float defense;            // hit points deflected
-    const char* corpse_name;  // the actor's name once dead/destroyed
+    std::string corpse_name;  // the entity's name once dead/destroyed
 
     Destructible(float max_hp, float defense, const char* corpse_name);
+    virtual ~Destructible() = default;
 
     inline bool is_dead() {
         return hp <= 0;
@@ -19,23 +20,23 @@ public:
     /**
      * @brief
      *
-     * @param owner actor
+     * @param owner entity
      * @param damage to process
      * @return returns the damage taken
      */
-    float take_damage(Actor* owner, float damage);
+    float take_damage(Entity* owner, float damage);
 
-    virtual void die(Actor* owner);
+    virtual void die(Entity* owner);
 };
 
-class DestructiblePlayer : public Destructible {
+class DestructiblePlayer final : public Destructible {
 public:
     DestructiblePlayer(float max_hp, float defense, const char* corpse_name);
-    void die(Actor* owner) override;
+    void die(Entity* owner) override;
 };
 
-class DestructibleEnemy : public Destructible {
+class DestructibleEnemy final : public Destructible {
 public:
     DestructibleEnemy(float max_hp, float defense, const char* corpse_name);
-    void die(Actor* owner) override;
+    void die(Entity* owner) override;
 };

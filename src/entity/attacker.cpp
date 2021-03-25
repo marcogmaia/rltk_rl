@@ -1,13 +1,13 @@
 #include <iostream>
 #include <fmt/format.h>
-#include "actor.hpp"
+#include "entity.hpp"
 #include "attacker.hpp"
 #include "engine.hpp"
 
 Attacker::Attacker(float power)
     : power(power) {}
 
-void Attacker::attack(Actor* owner, Actor* target) {
+void Attacker::attack(Entity* owner, Entity* target) {
     if(target->destructible && !target->destructible->is_dead()) {
         if(owner == engine::player) {
             engine::gui.message(TCODColor::blue, "You attack the {}.\n",
