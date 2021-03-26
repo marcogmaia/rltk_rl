@@ -1,6 +1,5 @@
 #pragma once
 
-class Entity;
 
 class Attacker {
 private:
@@ -9,7 +8,7 @@ public:
 
     // Attacker() = default;
     explicit Attacker(float power);
-    void attack(Entity* owner, Entity* target);
+    // void attack(Entity* owner, Entity* target);
 };
 
 class AttackerPlayer : public Attacker {};  // ? idk if I'll use this1

@@ -3,15 +3,14 @@
 #include "libtcod.hpp"
 #include "game.hpp"
 #include "engine.hpp"
-#include <SDL2/SDL.h>
-
 
 void game() {
-    engine::init();
+    Engine engine;
+    engine.init();
     while(!TCODConsole::isWindowClosed()) {
-        engine::update();
-        engine::render();
         auto& console = *TCODConsole::root;
+        engine.update();
+        engine.render();
         console.flush();
     }
 

@@ -5,10 +5,30 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "game",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/learning",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "build",
+        },
+        {
+            "name": "map_view",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/map_view/map_view",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build/",

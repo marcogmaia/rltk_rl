@@ -4,7 +4,9 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/lib/libtcod/src/**",
-                "${workspaceFolder}/src"
+                "${workspaceFolder}/src",
+                // "${workspaceFolder}/src/entity",
+                "${workspaceFolder}/src/component"
             ],
             "browse": {
                 "path": [
