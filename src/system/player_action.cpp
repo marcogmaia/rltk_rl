@@ -1,10 +1,11 @@
-#include "position.hpp"
+
 #include "player_action.hpp"
+#include "move_attack.hpp"
 
 namespace radl {
 
 
-static position_t get_next_position(const TCOD_key_t& key) {
+static position_t get_next_position(const TCOD_key_t& key, bool* player_input) {
     int dy = 0;
     int dx = 0;
     switch(key.vk) {
@@ -41,18 +42,26 @@ static position_t get_next_position(const TCOD_key_t& key) {
         ++dy;
     } break;
     case TCODK_KP5: {
+        *player_input = true;
     };
     default:
         break;
     }
+    if(!*player_input) {
+        *player_input = dx != 0 || dy != 0;
+    }
     return position_t{dx, dy};
 }
 
-void process_input(entt::registry& reg, entt::entity& e, const TCOD_key_t& key) {
-    auto dpos = get_next_position(key);
+bool process_input(entt::registry& reg, entt::entity& e,
+                   const TCOD_key_t& key) {
+    bool player_input = false;
+    auto dpos         = get_next_position(key, &player_input);
+    move_attack(reg, e, dpos);
+    // auto& entpos = reg.get<position_t>(e);
+    // entpos += dpos;
 
-    auto& entpos = reg.get<position_t>(e);
-    entpos += dpos;
+    return player_input;
 }
 
 }  // namespace radl

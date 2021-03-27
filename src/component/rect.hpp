@@ -5,20 +5,26 @@
 namespace radl {
 
 struct rect_t {
-    position_t p1;
-    position_t p2;
+    int x;
+    int y;
+    int w;
+    int h;
+
+    inline int to_index(position_t pos) {
+        return pos.x + pos.y * w;
+    }
 };
 
-inline constexpr int width(const rect_t& rect) {
-    auto& p1 = rect.p1;
-    auto& p2 = rect.p1;
-    return std::abs(p2.x - p1.x);
-}
+// inline constexpr int width(const rect_t& rect) {
+//     auto& p1 = rect.p1;
+//     auto& p2 = rect.p1;
+//     return std::abs(p2.x - p1.x);
+// }
 
-inline constexpr int height(const rect_t& rect) {
-    auto& p1 = rect.p1;
-    auto& p2 = rect.p1;
-    return std::abs(p2.y - p1.y);
-}
+// inline constexpr int height(const rect_t& rect) {
+//     auto& p1 = rect.p1;
+//     auto& p2 = rect.p1;
+//     return std::abs(p2.y - p1.y);
+// }
 
 }  // namespace radl

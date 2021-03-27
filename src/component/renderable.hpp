@@ -6,4 +6,5 @@
 // the position we get directly from the position_t struct of the entity
 struct Renderable {
     TCODConsole* console;
+    radl::vchar_t vchar;
 };

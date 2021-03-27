@@ -1,7 +1,7 @@
 include_directories(
     # "include"
     "."
-    "./component"
+    # "./component"
     "./system"
 )
 
@@ -12,8 +12,8 @@ add_library(
     game
     "game.cpp"
     "engine.cpp"
-    # "map.cpp"
-    "system/move.cpp"
+    "map.cpp"
+    "system/move_attack.cpp"
     "system/player_action.cpp"
 )
 

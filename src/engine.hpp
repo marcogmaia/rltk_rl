@@ -6,9 +6,10 @@
 
 
 class Engine {
+    TCOD_key_t last_key;
     entt::registry reg;
     entt::entity player;
-
+    entt::entity map;
 
     enum game_status_t {
         STARTUP,

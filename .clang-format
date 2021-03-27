@@ -48,3 +48,7 @@ AlignTrailingComments: true
 ContinuationIndentWidth: 4
 
 AllowShortLambdasOnASingleLine: Empty
+
+# AlignAfterOpenBracket: AlwaysBreak
+# BinPackArguments: false
+# BinPackParameters: false
