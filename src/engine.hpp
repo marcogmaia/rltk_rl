@@ -4,12 +4,14 @@
 #include "entt/entt.hpp"
 #include "map.hpp"
 
+namespace radl {
+
+extern entt::registry reg;
+extern entt::entity player;
+extern entt::entity map;
 
 class Engine {
     TCOD_key_t last_key;
-    entt::registry reg;
-    entt::entity player;
-    entt::entity map;
 
     enum game_status_t {
         STARTUP,
@@ -24,3 +26,5 @@ public:
     void update();
     void render();
 };
+
+}  // namespace radl

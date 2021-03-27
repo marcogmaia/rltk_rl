@@ -10,7 +10,6 @@
 
 namespace radl {
 
-
 enum tile_type_t {
     wall,
     floor,
@@ -24,17 +23,22 @@ struct tile_t {
 };
 
 struct Map {
-    rect_t dimensions;
+    rect_t rect;
     std::vector<tile_t> tiles;
 
-    Map(const rect_t& dimension);
-
-    void fill(const rect_t& rect, const tile_t& tile);
-
     inline const tile_t& operator[](position_t pos) const {
-        return tiles[pos.x + pos.y * dimensions.w];
+        return tiles[pos.x + pos.y * rect.width()];
+    }
+
+    inline tile_t& at(position_t pos) {
+        return tiles[pos.x + pos.y * rect.width()];
+    }
+
+    inline const tile_t& at(int x, int y) const {
+        return tiles[x + y * rect.width()];
     }
 };
 
-
+Map make_test_map(const rect_t& dimension, const position_t& player_pos);
+Map new_map(const rect_t& rect, const position_t& player_pos);
 }  // namespace radl

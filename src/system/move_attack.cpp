@@ -30,6 +30,7 @@ bool move_attack(entt::registry& reg, entt::entity& ent,
     // ## 1. attack if enemy in the targeted pos
     if(is_occupied(target_pos)) {
         // attack
+        return false;
     }
     // ## 2. walk if tile is no occupied and walkable
     else if(map[target_pos].is_walkable) {
@@ -40,6 +41,7 @@ bool move_attack(entt::registry& reg, entt::entity& ent,
     // ## 3. do nothing if is wall
     // tenho que arrumar uma forma de farzer query com a tile direto, ou só
     // checo o mapa
+    return true;
 }
 
 }  // namespace radl

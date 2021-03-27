@@ -5,7 +5,7 @@
 #include "engine.hpp"
 
 void game() {
-    Engine engine;
+    radl::Engine engine;
     engine.init();
     while(!TCODConsole::isWindowClosed()) {
         auto& console = *TCODConsole::root;
