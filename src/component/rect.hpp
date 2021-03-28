@@ -12,11 +12,11 @@ struct rect_t {
     int x2;
     int y2;
 
-    inline bool intersect(const rect_t& rhs) {
+    inline bool intersect(const rect_t& rhs) const {
         return x1 <= rhs.x2 && x2 >= rhs.x1 && y1 <= rhs.y2 && y2 >= rhs.y1;
     }
 
-    inline position_t center() {
+    inline position_t center() const {
         return position_t{(x1 + x2) / 2, (y1 + y2) / 2};
     }
 
@@ -36,6 +36,10 @@ struct rect_t {
 
     inline std::string to_string() const {
         return fmt::format("[({}, {}), ({}, {})]", x1, y1, x2, y2);
+    }
+
+    inline bool is_inside(const rect_t& rhs) const {
+        return x1 > rhs.x1 && x2 < rhs.x2 && y1 > rhs.y1 && y2 < rhs.y2;
     }
 };
 

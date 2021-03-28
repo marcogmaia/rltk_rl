@@ -5,6 +5,8 @@
 
 namespace radl {
 
+using world::Map;
+
 bool move_attack(entt::registry& reg, entt::entity& ent,
                  const position_t& dpos) {
     auto& actual_pos = reg.get<position_t>(ent);

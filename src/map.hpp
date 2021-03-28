@@ -8,7 +8,7 @@
 #include "component/rect.hpp"
 #include "component/vchar.hpp"
 
-namespace radl {
+namespace radl::world {
 
 enum tile_type_t {
     wall,
@@ -25,6 +25,7 @@ struct tile_t {
 struct Map {
     rect_t rect;
     std::vector<tile_t> tiles;
+    std::vector<rect_t> rooms;
 
     inline const tile_t& operator[](position_t pos) const {
         return tiles[pos.x + pos.y * rect.width()];
@@ -34,6 +35,10 @@ struct Map {
         return tiles[pos.x + pos.y * rect.width()];
     }
 
+    inline tile_t& at(int x, int y) {
+        return tiles[x + y * rect.width()];
+    }
+
     inline const tile_t& at(int x, int y) const {
         return tiles[x + y * rect.width()];
     }
@@ -41,4 +46,4 @@ struct Map {
 
 Map make_test_map(const rect_t& dimension, const position_t& player_pos);
 Map new_map(const rect_t& rect, const position_t& player_pos);
-}  // namespace radl
+}  // namespace radl::world

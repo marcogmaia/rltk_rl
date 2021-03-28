@@ -6,15 +6,15 @@
 namespace radl {
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  * @param reg registry
  * @param ent entity
  * @param dpos delta position
- * @return true 
- * @return false 
+ * @return true
+ * @return false
  */
 bool move_attack(entt::registry& reg, entt::entity& ent,
                  const position_t& dpos);
 
-}
+}  // namespace radl

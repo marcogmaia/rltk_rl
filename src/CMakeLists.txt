@@ -6,7 +6,7 @@ include_directories(
 )
 
 # add_subdirectory("./component")
-# add_subdirectory("./system")
+add_subdirectory("./utils")
 find_package(spdlog REQUIRED)
 
 add_library(

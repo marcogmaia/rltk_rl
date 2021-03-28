@@ -14,6 +14,7 @@ namespace radl {
 entt::registry reg;
 entt::entity player;
 entt::entity map;
+using world::Map;
 
 static void charset_init() {
     // auto constexpr* font_file = "../assets/tiles.png";
@@ -32,7 +33,7 @@ static void player_factory(TCODConsole* console, const position_t& pos,
     reg.emplace<Renderable>(player, console, vchar);
 }
 
-static void map_factory(const Renderable& rend, const Map& map_obj) {
+static void map_factory(const Renderable& rend, const world::Map& map_obj) {
     reg.emplace<Renderable>(map, rend);
     reg.emplace<Map>(map, map_obj);
 }
@@ -71,8 +72,9 @@ void Engine::init() {
 
     position_t player_start_pos = position_t{width / 2, height / 2};
 
-    Map tmap = new_map(rect_t{0, 0, width, height}, player_start_pos);
-    map      = reg.create();
+    Map tmap = world::new_map(rect_t{0, 0, width, height}, player_start_pos);
+    player_start_pos = tmap.rooms[0].center();
+    map              = reg.create();
     map_factory(
         {TCODConsole::root, vchar_t{'x', TCODColor::white, TCODColor::white}},
         tmap);
