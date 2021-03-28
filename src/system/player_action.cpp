@@ -9,6 +9,48 @@ static position_t get_next_position(const TCOD_key_t& key, bool* player_input) {
     int dy = 0;
     int dx = 0;
     switch(key.vk) {
+    case TCODK_CHAR: {
+        switch(key.c) {
+        case 'k':
+        case 'K': {
+            --dy;
+        } break;
+        case 'j':
+        case 'J': {
+            ++dy;
+        } break;
+        case 'h':
+        case 'H': {
+            --dx;
+        } break;
+        case 'l':
+        case 'L': {
+            ++dx;
+        } break;
+        case 'y':
+        case 'Y': {
+            --dx;
+            --dy;
+        } break;
+        case 'u':
+        case 'U': {
+            ++dx;
+            --dy;
+        } break;
+        case 'b':
+        case 'B': {
+            --dx;
+            ++dy;
+        } break;
+        case 'n':
+        case 'N': {
+            ++dx;
+            ++dy;
+        } break;
+        default:
+            break;
+        }
+    } break;
     case TCODK_KP8:
     case TCODK_UP: {
         --dy;
