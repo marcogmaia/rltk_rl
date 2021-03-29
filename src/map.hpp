@@ -21,7 +21,7 @@ struct tile_t {
     bool is_transparent = false;
     bool is_walkable    = false;
     bool is_explored    = false;
-    bool is_visible     = false;
+    // bool is_visible     = false;
     tile_type_t type    = wall;
 };
 

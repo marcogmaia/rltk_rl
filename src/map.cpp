@@ -14,7 +14,7 @@ namespace {
 
 using namespace rltk::colors;
 auto walkable_tile = tile_t{
-    vchar_t{'#', WHITE, BLACK}, false, true, false, false, floor,
+    vchar_t{'#', WHITE, BLACK}, false, true, false, floor,
 };
 // tile_t walkable_tile;
 
@@ -52,7 +52,7 @@ void try_apply_room_to_map(Map& map, const rect_t& rect) {
     map.rooms.push_back(rect);
 }
 
-constexpr int max_rooms = 30;
+constexpr int max_rooms = 1000;
 constexpr int min_size  = 6;
 constexpr int max_size  = 12;
 

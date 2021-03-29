@@ -13,7 +13,6 @@ std::pair<T, T> operator+(const std::pair<T, T>& left,
 
 using position_t = std::pair<int, int>;
 
-
 // Position component
 // struct position_t {
 //     int x;

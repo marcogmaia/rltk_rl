@@ -1,11 +1,8 @@
 #include <engine.hpp>
 #include <fmt/format.h>
-#include "component/position.hpp"
-#include "component/movable.hpp"
-#include "component/vchar.hpp"
-#include "component/renderable.hpp"
-#include "component/player.hpp"
-#include "component/viewshed.hpp"
+#include "factories.hpp"
+
+#include "component/component.hpp"
 
 #include "system/player_action.hpp"
 #include "system/camera.hpp"
@@ -19,7 +16,7 @@ entt::registry reg;
 entt::entity player;
 entt::entity map;
 
-entt::observer observer;  //{reg, entt::collector.groupe<position_t, Player>()};
+entt::observer observer{reg, entt::collector.update<position_t>()};
 
 
 // void update_viewshed() {
@@ -31,26 +28,6 @@ entt::observer observer;  //{reg, entt::collector.groupe<position_t, Player>()};
 //     });
 // }
 
-void update_viewshed(entt::registry& r, entt::entity e) {
-    auto& [x, y] = r.get<position_t>(e);
-    spdlog::debug("position ({}, {})", x, y);
-}
-
-static void player_factory(const position_t& pos, const radl::vchar_t& vch) {
-    // FIXME only if marked as Player trigger this
-    reg.on_construct<position_t>().connect<&camera_update>();
-    reg.on_update<position_t>().connect<&camera_update>();
-
-    reg.on_construct<position_t>().connect<&update_viewshed>();
-    reg.on_update<position_t>().connect<&update_viewshed>();
-
-    reg.emplace<Player>(player);
-    reg.emplace<viewshed_t>(player);
-    reg.emplace<Movable>(player);
-    reg.emplace<Renderable>(player, Renderable{vch});
-    reg.emplace<position_t>(player, pos);
-    // TODO observer ?
-}
 
 static void map_factory(const Renderable& rend, const world::Map& map_obj) {
     reg.emplace<Renderable>(map, rend);
@@ -60,7 +37,6 @@ static void map_factory(const Renderable& rend, const world::Map& map_obj) {
 static void render_map(entt::registry& reg, entt::entity& ent) {
     const auto& [rend, map] = reg.get<Renderable, Map>(ent);
     auto& rect              = map.rect;
-
     for(int x = rect.x1; x < rect.x2; ++x) {
         for(int y = rect.y1; y < rect.y2; ++y) {
             auto& is_walkable = map.at(x, y).is_walkable;
@@ -84,19 +60,14 @@ void Engine::init() {
 #ifdef DEBUG
     spdlog::set_level(spdlog::level::debug);
 #endif
-
-
     fmt::print("initializing engine.\n");
     rltk_init();
-
-    Map tmap = world::new_map(rect_t{0, 0, width, height});
+    Map tmap = world::new_map(rect_t{0, 0, width * 4, height * 4});
     auto player_start_pos = tmap.rooms[0].center();
-    map              = reg.create();
+    map                   = reg.create();
     map_factory(Renderable{{'x', DARKEST_GREY, WHITE}}, tmap);
-
     player = reg.create();
-    player_factory(player_start_pos, {'@', YELLOW, BLACK});
-
+    player_factory(reg, player, player_start_pos, {'@', YELLOW, BLACK});
     update();
 }
 

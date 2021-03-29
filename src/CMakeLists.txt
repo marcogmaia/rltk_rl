@@ -1,17 +1,20 @@
+find_package(spdlog REQUIRED)
+
 include_directories(
     "."
 )
 
+
 add_subdirectory("./utils")
 add_subdirectory("./system")
 add_subdirectory("./component")
-find_package(spdlog REQUIRED)
 
 add_library(
     game
     "game.cpp"
     "engine.cpp"
     "map.cpp"
+    "factories.cpp"
 )
 
 target_link_libraries(
@@ -19,11 +22,11 @@ target_link_libraries(
     radl_utils
     game_system
     game_component
-    spdlog::spdlog
 )
-
+    
 target_link_libraries(
     game PUBLIC
+    spdlog::spdlog
     pthread
     tbb
     fmt

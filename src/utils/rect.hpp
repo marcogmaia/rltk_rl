@@ -16,6 +16,11 @@ struct rect_t {
         return x1 <= rhs.x2 && x2 >= rhs.x1 && y1 <= rhs.y2 && y2 >= rhs.y1;
     }
 
+    [[nodiscard]] inline bool contains(const position_t& rhs) const {
+        const auto& [x, y] = rhs;
+        return (x1 <= x && x < x2) && (y1 <= y && y < y2);
+    }
+
     [[nodiscard]] inline position_t center() const {
         return position_t{(x1 + x2) / 2, (y1 + y2) / 2};
     }
@@ -42,17 +47,5 @@ struct rect_t {
         return x1 > rhs.x1 && x2 < rhs.x2 && y1 > rhs.y1 && y2 < rhs.y2;
     }
 };
-
-// inline constexpr int width(const rect_t& rect) {
-//     auto& p1 = rect.p1;
-//     auto& p2 = rect.p1;
-//     return std::abs(p2.x - p1.x);
-// }
-
-// inline constexpr int height(const rect_t& rect) {
-//     auto& p1 = rect.p1;
-//     auto& p2 = rect.p1;
-//     return std::abs(p2.y - p1.y);
-// }
 
 }  // namespace radl
