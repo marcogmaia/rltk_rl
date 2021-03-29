@@ -15,10 +15,13 @@ enum tile_type_t {
     floor,
 };
 
+using namespace rltk::colors;
 struct tile_t {
+    vchar_t vchar       = {'#', WHITE, BLACK};
     bool is_transparent = false;
     bool is_walkable    = false;
     bool is_explored    = false;
+    bool is_visible     = false;
     tile_type_t type    = wall;
 };
 
@@ -28,6 +31,11 @@ struct Map {
     std::vector<rect_t> rooms;
 
     inline const tile_t& operator[](position_t pos) const {
+        auto& [x, y] = pos;
+        return tiles[x + y * rect.width()];
+    }
+
+    inline tile_t& operator[](position_t pos) {
         auto& [x, y] = pos;
         return tiles[x + y * rect.width()];
     }
@@ -48,6 +56,6 @@ struct Map {
 
 Map make_test_map(const rect_t& dimension, const position_t& player_pos);
 
-Map new_map(const rect_t& rect, const position_t& player_pos);
+Map new_map(const rect_t& rect);
 
 }  // namespace radl::world

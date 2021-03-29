@@ -10,7 +10,6 @@ using world::Map;
 bool move_attack(entt::registry& reg, entt::entity& ent,
                  const position_t& dpos) {
     // mark as dirty to trigger an screen update
-    rltk::console->dirty = true;
     auto& actual_pos     = reg.get<position_t>(ent);
     auto target_pos      = actual_pos + dpos;
 

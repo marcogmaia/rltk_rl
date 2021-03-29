@@ -8,6 +8,7 @@
 #include "component/viewshed.hpp"
 
 #include "system/player_action.hpp"
+#include "system/camera.hpp"
 
 #include "spdlog/spdlog.h"
 namespace radl {
@@ -36,13 +37,18 @@ void update_viewshed(entt::registry& r, entt::entity e) {
 }
 
 static void player_factory(const position_t& pos, const radl::vchar_t& vch) {
+    // FIXME only if marked as Player trigger this
+    reg.on_construct<position_t>().connect<&camera_update>();
+    reg.on_update<position_t>().connect<&camera_update>();
+
     reg.on_construct<position_t>().connect<&update_viewshed>();
     reg.on_update<position_t>().connect<&update_viewshed>();
+
     reg.emplace<Player>(player);
     reg.emplace<viewshed_t>(player);
     reg.emplace<Movable>(player);
-    reg.emplace<position_t>(player, pos);
     reg.emplace<Renderable>(player, Renderable{vch});
+    reg.emplace<position_t>(player, pos);
     // TODO observer ?
 }
 
@@ -83,16 +89,15 @@ void Engine::init() {
     fmt::print("initializing engine.\n");
     rltk_init();
 
-    // XXX I can remove this variable, and refactor the calls
-    position_t player_start_pos = position_t{width / 2, height / 2};
-
-    Map tmap = world::new_map(rect_t{0, 0, width, height}, player_start_pos);
-    player_start_pos = tmap.rooms[0].center();
+    Map tmap = world::new_map(rect_t{0, 0, width, height});
+    auto player_start_pos = tmap.rooms[0].center();
     map              = reg.create();
     map_factory(Renderable{{'x', DARKEST_GREY, WHITE}}, tmap);
 
     player = reg.create();
     player_factory(player_start_pos, {'@', YELLOW, BLACK});
+
+    update();
 }
 
 static void render_player(entt::registry& reg, entt::entity& player) {
@@ -105,16 +110,16 @@ static void render_player(entt::registry& reg, entt::entity& player) {
 void Engine::render() {
     using rltk::console;
     if(console->dirty) {
-        console->clear();
+        // console->clear();
         // render entire screen
         // render map
-        render_map(reg, map);
+        // render_map(reg, map);
         // render_map(reg, map);
         // render enemies
         // TODO make enemies
         // TODO render enemies
         // render player
-        render_player(reg, player);
+        // render_player(reg, player);
     }
 }
 

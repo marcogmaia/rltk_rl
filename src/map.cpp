@@ -12,7 +12,12 @@ namespace radl::world {
 
 namespace {
 
-auto walkable_tile = tile_t{false, true, false, floor};
+using namespace rltk::colors;
+auto walkable_tile = tile_t{
+    vchar_t{'#', WHITE, BLACK}, false, true, false, false, floor,
+};
+// tile_t walkable_tile;
+
 
 void fill(Map& map, const rect_t& rect, const tile_t& tile) {
     auto xi = std::min(rect.x1, rect.x2);
@@ -142,7 +147,7 @@ Map make_test_map(const rect_t& rect, const position_t& player_pos) {
 }
 
 
-Map new_map(const rect_t& rect, const position_t& player_pos) {
+Map new_map(const rect_t& rect) {
     Map map = {
         .rect  = rect,
         .tiles = std::vector<tile_t>(rect.area()),

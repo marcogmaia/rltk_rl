@@ -10,7 +10,7 @@ void game() {
     auto tick = [&](double ms) {
         engine.update();
         // render needs to be the last thing with this toolkit
-        engine.render();
+        // engine.render();
     };
     rltk::run(tick);
 }
