@@ -1,4 +1,5 @@
 lib/libtcod/
+lib/rltk/
 build/
 assets/
 .vscode/browse.*

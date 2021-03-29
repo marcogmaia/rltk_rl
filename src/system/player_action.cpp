@@ -1,107 +1,78 @@
 
 #include "player_action.hpp"
 #include "move_attack.hpp"
+#include "SFML/System.hpp"
 
 namespace radl {
 
 
-static position_t get_next_position(const TCOD_key_t& key, bool* player_input) {
-    int dy = 0;
+static position_t get_next_position(const sf::Event& ev, bool* player_input) {
     int dx = 0;
-    switch(key.vk) {
-    case TCODK_CHAR: {
-        switch(key.c) {
-        case 'k':
-        case 'K': {
-            --dy;
-        } break;
-        case 'j':
-        case 'J': {
-            ++dy;
-        } break;
-        case 'h':
-        case 'H': {
-            --dx;
-        } break;
-        case 'l':
-        case 'L': {
-            ++dx;
-        } break;
-        case 'y':
-        case 'Y': {
-            --dx;
-            --dy;
-        } break;
-        case 'u':
-        case 'U': {
-            ++dx;
-            --dy;
-        } break;
-        case 'b':
-        case 'B': {
-            --dx;
-            ++dy;
-        } break;
-        case 'n':
-        case 'N': {
-            ++dx;
-            ++dy;
-        } break;
-        default:
-            break;
-        }
-    } break;
-    case TCODK_KP8:
-    case TCODK_UP: {
+    int dy = 0;
+    if(ev.type != sf::Event::EventType::KeyPressed) {
+        return {dx, dy};
+    }
+
+    using sf::Keyboard;
+    switch(ev.key.code) {
+    case Keyboard::Numpad8:
+    case Keyboard::K: {
         --dy;
     } break;
-    case TCODK_KP2:
-    case TCODK_DOWN: {
+    case Keyboard::Numpad2:
+    case Keyboard::J: {
         ++dy;
     } break;
-    case TCODK_KP4:
-    case TCODK_LEFT: {
+    case Keyboard::Numpad4:
+    case Keyboard::H: {
         --dx;
     } break;
-    case TCODK_KP6:
-    case TCODK_RIGHT: {
+    case Keyboard::Numpad6:
+    case Keyboard::L: {
         ++dx;
     } break;
-    case TCODK_KP7: {
+    case Keyboard::Numpad7:
+    case Keyboard::Y: {
         --dx;
         --dy;
     } break;
-    case TCODK_KP9: {
+    case Keyboard::Numpad9:
+    case Keyboard::U: {
         ++dx;
         --dy;
     } break;
-    case TCODK_KP1: {
+    case Keyboard::Numpad1:
+    case Keyboard::B: {
         --dx;
         ++dy;
     } break;
-    case TCODK_KP3: {
+    case Keyboard::Numpad3:
+    case Keyboard::N: {
         ++dx;
         ++dy;
     } break;
-    case TCODK_KP5: {
+    case sf::Keyboard::Numpad5: {
         *player_input = true;
-    };
+    } break;
     default:
         break;
     }
+
     if(!*player_input) {
         *player_input = dx != 0 || dy != 0;
     }
     return position_t{dx, dy};
 }
 
-bool process_input(entt::registry& reg, entt::entity& e,
-                   const TCOD_key_t& key) {
+bool process_input(entt::registry& reg, entt::entity& e) {
     bool player_input = false;
-    auto dpos         = get_next_position(key, &player_input);
-    move_attack(reg, e, dpos);
-    // auto& entpos = reg.get<position_t>(e);
-    // entpos += dpos;
+    using rltk::key_event_queue;
+    while(!key_event_queue.empty()) {
+        auto ev = key_event_queue.front();
+        key_event_queue.pop();
+        auto dpos = get_next_position(ev, &player_input);
+        move_attack(reg, e, dpos);
+    }
 
     return player_input;
 }

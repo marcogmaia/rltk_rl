@@ -5,6 +5,7 @@ include_directories(
 set(
     UTILS_SRC
     "utils.cpp"
+    "rng.cpp"
 )
 
 add_library(
@@ -12,8 +13,5 @@ add_library(
     ${UTILS_SRC}
 )
 
-# target_link_libraries(game entity pthread fmt LIBTCOD)
-target_link_libraries(radl_utils PUBLIC fmt LIBTCOD)
+target_link_libraries(radl_utils PUBLIC fmt rltk)
 
-# set(CMAKE_BUILD_TYPE RELEASE)
-# set(CMAKE_BUILD_TYPE DEBUG)

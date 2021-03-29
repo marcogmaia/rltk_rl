@@ -1,24 +1,17 @@
 
-# include_directories(
-#     "."
-# )
+include_directories(
+    "."
+)
 
-# # add_subdirectory("./component")
+set(COMPONENT_SCRS
+    "attacker.cpp"
+    # "viewshed.cpp"
+    "attacker.cpp"
+)
 
-# add_library(
-#     game
-#     "game.cpp"
-#     "engine.cpp"
-#     "map.cpp"
-#     "gui.cpp"
-#     "camera.cpp"
-# )
+add_library(
+    game_component
+    ${COMPONENT_SCRS}
+)
 
-# set(COMP_SCRS
-#     "attacker.cpp"
-# )
-# # target_link_libraries(game entity pthread fmt LIBTCOD)
-
-# # set(CMAKE_BUILD_TYPE RELEASE)
-# # set(CMAKE_BUILD_TYPE DEBUG)
-
+target_link_libraries(game_component fmt)

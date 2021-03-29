@@ -10,8 +10,10 @@ extern entt::registry reg;
 extern entt::entity player;
 extern entt::entity map;
 
+
+extern entt::observer observer;
+
 class Engine {
-    TCOD_key_t last_key;
 
     enum game_status_t {
         STARTUP,

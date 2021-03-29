@@ -6,11 +6,13 @@
                 "${workspaceFolder}/lib/libtcod/src/**",
                 "${workspaceFolder}/src",
                 // "${workspaceFolder}/src/entity",
-                "${workspaceFolder}/src/component"
+                "${workspaceFolder}/src/component",
+                "${workspaceFolder}/lib/rltk"
             ],
             "browse": {
                 "path": [
                     "${workspaceFolder}/lib/libtcod/**",
+                    "${workspaceFolder}/lib/rltk/**",
                     "${workspaceFolder}/src/**"
                 ],
                 "limitSymbolsToIncludedHeaders": true,

@@ -96,7 +96,8 @@
         "variant": "cpp",
         "sdl.h": "c",
         "*.rh": "cpp",
-        "*.def": "cpp"
+        "*.def": "cpp",
+        "libtcod_int.h": "c"
     },
     "C_Cpp.default.intelliSenseMode": "linux-gcc-x64"
 }
