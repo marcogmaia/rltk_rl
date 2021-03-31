@@ -151,7 +151,7 @@ inline void line_func_cancellable(const int& x1, const int& y1, const int& x2,
     double y            = static_cast<double>(y1) + 0.5;
     const double dest_x = static_cast<double>(x2);
     const double dest_y = static_cast<double>(y2);
-    // XXX good enought for max distance 32
+    // XXX good enough for max distance 32
     const double n_steps = distance2d(x1, y1, x2, y2) * 2.41;
     const int steps      = static_cast<const int>(std::floor(n_steps) + 1);
     const double slope_x = (dest_x - x) / n_steps;
@@ -183,16 +183,16 @@ inline void bresenham(double x1, double y1, double x2, double y2,
     double y = y1;
 
     // Flag to check if swapping happens
-    int isSwaped = 0;
+    int is_swapped = 0;
 
     // Swap if needed
     if(abs(dy) > abs(dx)) {
         // swap dx and dy
         double tdx = dx;
-        dx        = dy;
-        dy        = tdx;
+        dx         = dy;
+        dy         = tdx;
 
-        isSwaped = 1;
+        is_swapped = 1;
     }
 
     // Decision parameter
@@ -208,7 +208,7 @@ inline void bresenham(double x1, double y1, double x2, double y2,
     for(int i = 0; i <= abs(dx); i++) {
         // Depending on decision parameter
         if(p <= 0) {
-            if(isSwaped == 0) {
+            if(is_swapped == 0) {
                 x = x + sx;
                 // putpixels(x, y);
                 if(!func(x, y)) {
@@ -263,8 +263,9 @@ void line_func_3d_cancellable(const int& x1, const int& y1, const int& z1,
         const bool keep_going = func(static_cast<int>(std::floor(x)),
                                      static_cast<int>(std::floor(y)),
                                      static_cast<int>(std::floor(z)));
-        if(!keep_going)
+        if(!keep_going) {
             return;
+        }
     }
 }
 }  // namespace radl

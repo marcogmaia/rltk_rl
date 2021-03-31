@@ -1,15 +1,17 @@
 include_directories(
     "."
 )
+
 set(
     GAMESYS_SRC
     "move_attack.cpp"
     # "visibility.cpp"
     "player_action.cpp"
     "camera.cpp"
-    )
+)
     
-    find_package(spdlog REQUIRED)
+# find_package(spdlog REQUIRED)
+
 add_library(
     game_system
     ${GAMESYS_SRC}

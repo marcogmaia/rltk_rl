@@ -8,6 +8,7 @@
 #include "utils/utils.hpp"
 #include "utils/rng.hpp"
 
+#include <ranges>
 namespace radl::world {
 
 namespace {
@@ -20,7 +21,8 @@ using namespace rltk::colors;
 
 // TODO all calls to corridor to use fill
 void fill(entt::registry& reg, Map& map, const rect_t& rect,
-          tile_characteristics_t interaction, tile_t tiletype, vchar_t vch) {
+          tile_characteristics_t interaction, const tile_t& tiletype,
+          vchar_t vch) {
     auto xi = std::min(rect.x1, rect.x2);
     auto xf = xi + rect.width();
     auto yi = std::min(rect.y1, rect.y2);
@@ -141,6 +143,15 @@ Map new_map(entt::registry& reg, const rect_t& rect) {
     create_random_rooms(reg, map);
     make_corridors_between_rooms(reg, map);
     return map;
+}
+
+auto is_occupied(entt::registry& reg, position_t target_pos) -> bool {
+    using namespace std::ranges;
+    auto& tile = Map::get_tile(reg, target_pos);
+    
+    return any_of(tile.entities, [&](const auto& ent) {
+        return reg.has<blocks_t>(ent);
+    });
 }
 
 }  // namespace radl::world

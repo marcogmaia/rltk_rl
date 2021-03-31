@@ -29,8 +29,9 @@ void internal_2d_sweep(const location_t_& position, const int& range,
 
     auto func = [&blocked, &is_transparent, &set_visible, &range, &start_x,
                  &start_y](int X, int Y) {
-        if(blocked)
+        if(blocked) {
             return false;
+        }
         float distance = distance2d(start_x, start_y, X, Y);
         if(distance <= range) {
             location_t_ pos = navigator_t::get_xy(X, Y);

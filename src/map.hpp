@@ -26,35 +26,11 @@ struct tile_t {
     std::list<entt::entity> entities;
 };
 
-// struct tile_t {
-//     bool is_transparent = false;
-//     bool is_walkable    = false;
-//     bool is_explored    = false;
-//     // bool is_visible     = false;
-//     tile_type_t type = wall;
-//     // vchar_t vchar    = {'#', WHITE, BLACK};
-//     // cada tile tem uma lista de entidades
-//     // std::vector<entt::entity> entities;
-
-//     inline vchar_t get_vch() {
-//         vchar_t vchar;
-//         vchar.foreground = WHITE;
-//         vchar.background = BLACK;
-//         switch(type) {
-//         case tile_type_t::floor: {
-//             vchar.glyph = glyph::BLOCK1;
-//         } break;
-//         case tile_type_t::wall: {
-//             vchar.glyph = glyph::SOLID1;
-//         } break;
-//         }
-//         return vchar;
-//     }
-// };
-
 struct visible_t {};
 
 struct explored_t {};
+
+struct blocks_t {};
 
 struct tile_characteristics_t {
     bool walkable    = false;
@@ -68,7 +44,7 @@ struct Map {
 
     std::vector<entt::entity> tiles;
 
-    inline const entt::entity& operator[](position_t pos) const {
+    [[nodiscard]] inline const entt::entity& operator[](position_t pos) const {
         auto& [x, y] = pos;
         return tiles[x + y * rect.width()];
     }
@@ -87,12 +63,20 @@ struct Map {
         return tiles[x + y * rect.width()];
     }
 
-    inline const entt::entity& at(int x, int y) const {
+    [[nodiscard]] inline const entt::entity& at(int x, int y) const {
         return tiles[x + y * rect.width()];
     }
 
-    inline tile_t& get_tile(entt::registry& reg, position_t pos) {
-        auto tent  = at(pos);
+    static inline Map& get_map(entt::registry& reg) {
+        auto map_view = reg.view<Map>();
+        auto& map     = map_view.get(map_view.front());
+        return map;
+    }
+
+
+    static inline tile_t& get_tile(entt::registry& reg, position_t pos) {
+        auto& map  = get_map(reg);
+        auto& tent = map.at(pos);
         auto& tile = reg.get<tile_t>(tent);
         return tile;
     }
@@ -119,6 +103,9 @@ struct Map {
         }
     }
 };
+
+
+auto is_occupied(entt::registry& reg, position_t target_pos) -> bool;
 
 Map make_test_map(const rect_t& dimension, const position_t& player_pos);
 

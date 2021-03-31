@@ -10,11 +10,11 @@ namespace radl {
  *
  * @param reg registry
  * @param ent entity
- * @param dpos delta position
+ * @param delta_pos delta position
  * @return true
  * @return false
  */
 bool move_attack(entt::registry& reg, entt::entity& ent,
-                 const position_t& dpos);
+                 const position_t& delta_pos);
 
 }  // namespace radl

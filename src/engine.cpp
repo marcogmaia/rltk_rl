@@ -1,14 +1,18 @@
-#include <engine.hpp>
+#include <memory>
+#include "engine.hpp"
 #include <fmt/format.h>
 #include "factories.hpp"
 
 #include "component/component.hpp"
-
 #include "system/player_action.hpp"
 #include "system/camera.hpp"
+#include "utils/rng.hpp"
 
 #include "spdlog/spdlog.h"
+
+
 namespace radl {
+
 using namespace world;
 using namespace rltk::colors;
 
@@ -19,6 +23,7 @@ entt::entity map;
 
 entt::observer observer{reg, entt::collector.group<position_t, player_t>()};
 
+std::unique_ptr<rltk::virtual_terminal> view_console;
 
 constexpr int width  = 96;
 constexpr int height = 48;
@@ -26,19 +31,34 @@ static void rltk_init() {
     auto constexpr* font_file = "../assets";
     rltk::init(rltk::config_simple(font_file, width, height,
                                    "Maia Roguelike learning", "16x16", false));
+    //    rltk::console->set_alpha(50);
+    // view_console = std::make_unique<rltk::virtual_terminal>(
+    //     rltk::config.root_font, 0, 0);
+
+
+    // sf::Vector2u size_pixels = main_window->getSize();
+    // view
+    // view_console->resize_pixels(size_pixels.x, size_pixels.y);
 }
 
 void add_enemies() {
-    // const auto& wmap = reg.get<world::Map>(map);
-    auto wmap = reg.get<Map>(map);
-    for(const auto& room : wmap.rooms) {
+    constexpr uint32_t max_enemies_pex_room = 4;
+
+    auto& rng = rng::rng;
+
+    auto w_map = reg.get<Map>(map);
+    for(const auto& room : w_map.rooms) {
+        auto num_enemies = rng.range(0, max_enemies_pex_room);
+        for(int i = 0; i < num_enemies; ++i) {
+        }
         auto enemy = reg.create();
         reg.emplace<renderable_t>(enemy, vchar_t{'O', GREEN, BLACK});
         auto pos = room.center();
         reg.emplace<position_t>(enemy, pos);
+        reg.emplace<blocks_t>(enemy);
         reg.emplace<destructible_t>(enemy);
         // add to tile
-        auto& tile_ent = wmap.at(pos);
+        auto& tile_ent = w_map.at(pos);
         auto& tile     = reg.get<tile_t>(tile_ent);
         tile.entities.push_back(enemy);
     }
@@ -78,8 +98,6 @@ void Engine::init() {
 //         // render entire screen
 //         // render map
 //         // render enemies
-//         // TODO make enemies
-//         // TODO render enemies
 //         // render player
 //         // render_player(reg, player);
 //         // }

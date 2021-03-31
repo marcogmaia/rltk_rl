@@ -7,6 +7,7 @@ namespace radl {
 using namespace world;
 
 
+
 bool move_attack(entt::registry& reg, entt::entity& ent,
                  const position_t& delta_pos) {
     // mark as dirty to trigger an screen update
@@ -14,31 +15,23 @@ bool move_attack(entt::registry& reg, entt::entity& ent,
     auto target_pos  = actual_pos + delta_pos;
 
     // maybe check if occupies vicinity, or add vicinity component
-    auto view_pos    = reg.view<destructible_t, renderable_t, position_t>();
-    auto is_occupied = [&view_pos, &actual_pos](position_t target_pos) -> bool {
-        for(auto e : view_pos) {
-            const auto& pos = view_pos.get<position_t>(e);
-            if(target_pos == pos) {
-                return true;
-            }
-        }
-        return false;
-    };
+
 
     auto map_ent           = reg.view<Map>()[0];
-    auto& map        = reg.get<Map>(map_ent);
+    auto& map              = reg.get<Map>(map_ent);
     auto target_tile       = map[target_pos];
     auto target_tile_chars = reg.get<tile_characteristics_t>(target_tile);
 
-    // ## 1. attack if enemy in the targeted pos
-    if(is_occupied(target_pos)) {
+    // ## 1. attack if enemy is in the targeted pos
+    if(radl::world::is_occupied(reg, target_pos)) {
+    // if(is_occupied(reg, target_pos)) {
         // attack
-        // return false;
+        return false;
     }
     // ## 2. walk if tile is no occupied and walkable
     else if(target_tile_chars.walkable) {
         // walk
-        auto &tile = map.get_tile(reg, actual_pos);
+        auto& tile = map.get_tile(reg, actual_pos);
         tile.entities.remove(ent);
         // tile.entities.push_back(ent);
         reg.emplace_or_replace<position_t>(ent, target_pos);

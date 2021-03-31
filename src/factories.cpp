@@ -11,6 +11,7 @@ void player_factory(entt::registry& reg, entt::entity ent,
     reg.emplace<movable_t>(ent);
     reg.emplace<renderable_t>(ent, renderable_t{vch});
     reg.emplace<position_t>(ent, pos);
+    reg.emplace<blocks_t>(ent);
     reg.emplace<player_t>(ent);
     // TODO observer ? why ?
 }

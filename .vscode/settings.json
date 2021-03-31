@@ -119,5 +119,11 @@
         "!toml",
         "!yaml",
         "cpp"
+    ],
+    "cSpell.words": [
+        "Bresenham's",
+        "bgsfml",
+        "fgsfml",
+        "sfml"
     ]
 }

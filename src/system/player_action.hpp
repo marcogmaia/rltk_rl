@@ -8,6 +8,6 @@
 
 namespace radl {
 
-bool process_input(entt::registry&, entt::entity& e);
+bool process_input(entt::registry&, entt::entity e);
 
 }

@@ -3,20 +3,18 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/lib/libtcod/src/**",
                 "${workspaceFolder}/src",
-                // "${workspaceFolder}/src/entity",
-                "${workspaceFolder}/src/component",
+                // "${workspaceFolder}/src/system",
+                // "${workspaceFolder}/src/utils",
+                // "${workspaceFolder}/src/component",
                 "${workspaceFolder}/lib/rltk"
             ],
             "browse": {
                 "path": [
-                    "${workspaceFolder}/lib/libtcod/**",
-                    "${workspaceFolder}/lib/rltk/**",
-                    "${workspaceFolder}/src/**"
+                    "${workspaceFolder}/lib/rltk/",
+                    "${workspaceFolder}/src/"
                 ],
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db"
+                "limitSymbolsToIncludedHeaders": true
             },
             "defines": [],
             "compilerPath": "/usr/bin/g++",

@@ -13,6 +13,8 @@ namespace radl {
 
 namespace {
 
+// XXX groups for multicomponents are faster than views
+
 struct nav_helper {
     static int get_x(const position_t& pos) {
         return pos.first;
@@ -26,7 +28,7 @@ struct nav_helper {
 };
 
 void fov_update(entt::registry& reg, const position_t& ent_pos,
-                world::viewshed_t& vshed, world::Map& map) {
+                world::viewshed_t& viewshed, world::Map& map) {
     using namespace world;
     // resets the visibility
     reg.clear<visible_t>();
@@ -51,7 +53,7 @@ void fov_update(entt::registry& reg, const position_t& ent_pos,
     };
 
     radl::visibility_sweep_2d<position_t, nav_helper>(
-        ent_pos, vshed.range, set_visibility, is_transparent);
+        ent_pos, viewshed.range, set_visibility, is_transparent);
 }
 
 }  // namespace
@@ -104,7 +106,7 @@ void camera_update(entt::registry& reg, entt::entity ent) {
 
     // render visible tiles
     auto visible_view = reg.view<tile_t, visible_t, position_t>();
-    for(auto& ent : visible_view) {
+    for(const auto& ent : visible_view) {
         auto [pos, tile, vch] = reg.get<position_t, tile_t, vchar_t>(ent);
         const auto& [x, y]    = pos;
         auto renderpos        = position_t{x - xi, y - yi};
