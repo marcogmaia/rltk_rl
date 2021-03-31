@@ -13,20 +13,25 @@ namespace radl::world {
 namespace {
 
 using namespace rltk::colors;
-auto walkable_tile = tile_t{
-    vchar_t{'#', WHITE, BLACK}, false, true, false, floor,
-};
+// auto walkable_tile = tile_t{
+//     true, true, false, floor, /* vchar_t{'#', WHITE, BLACK}, */
+// };
 // tile_t walkable_tile;
 
-
-void fill(Map& map, const rect_t& rect, const tile_t& tile) {
+// TODO all calls to corridor to use fill
+void fill(Map& map, const rect_t& rect, tile_characteristics_t interaction,
+          tile_t tiletype, vchar_t vch) {
     auto xi = std::min(rect.x1, rect.x2);
     auto xf = xi + rect.width();
     auto yi = std::min(rect.y1, rect.y2);
     auto yf = yi + rect.height();
     for(int x = xi; x < xf; ++x) {
         for(int y = yi; y < yf; ++y) {
-            map.tiles[x + y * map.rect.width()] = tile;
+            auto ent = map.at(x, y);
+            map.reg.emplace_or_replace<tile_characteristics_t>(ent,
+                                                               interaction);
+            map.reg.emplace_or_replace<tile_t>(ent, tiletype);
+            map.reg.emplace_or_replace<vchar_t>(ent, vch);
         }
     }
 }
@@ -48,11 +53,23 @@ void try_apply_room_to_map(Map& map, const rect_t& rect) {
         }
     }
     // ## if everything is ok, create room
-    fill(map, rect, walkable_tile);
+    fill(map, rect,
+         tile_characteristics_t{
+             true,
+             true,
+         },
+         tile_t{
+             tile_type_t::floor,
+         },
+         vchar_t{
+             '.',
+             WHITE,
+             BLACK,
+         });
     map.rooms.push_back(rect);
 }
 
-constexpr int max_rooms = 1000;
+constexpr int max_rooms = 30 * 4;
 constexpr int min_size  = 6;
 constexpr int max_size  = 12;
 
@@ -73,13 +90,17 @@ void corridor_horizontal(Map& map, int x1, int x2, int y) {
     auto xi = std::min(x1, x2);
     auto xf = std::max(x1, x2);
     for(int x = xi; x <= xf; ++x) {
-        tile_t tile{
-            .is_transparent = true,
-            .is_walkable    = true,
-            .is_explored    = false,
-            .type           = tile_type_t::floor,
-        };
-        map.at(x, y) = tile;
+        auto ent                            = map.at(x, y);
+        tile_characteristics_t new_interact = {true, true};
+        map.reg.emplace_or_replace<tile_characteristics_t>(ent, new_interact);
+        map.reg.emplace_or_replace<tile_t>(ent, tile_t{
+                                                    tile_type_t::floor,
+                                                });
+        map.reg.emplace_or_replace<vchar_t>(ent, vchar_t{
+                                                     '.',
+                                                     WHITE,
+                                                     BLACK,
+                                                 });
     }
 }
 
@@ -87,18 +108,22 @@ void corridor_vertical(Map& map, int y1, int y2, int x) {
     auto yi = std::min(y1, y2);
     auto yf = std::max(y1, y2);
     for(int y = yi; y <= yf; ++y) {
-        tile_t tile{
-            .is_transparent = true,
-            .is_walkable    = true,
-            .is_explored    = false,
-            .type           = tile_type_t::floor,
-        };
-        map.at(x, y) = tile;
+        auto ent                            = map.at(x, y);
+        tile_characteristics_t new_interact = {true, true};
+        map.reg.emplace_or_replace<tile_characteristics_t>(ent, new_interact);
+        map.reg.emplace_or_replace<tile_t>(ent, tile_t{
+                                                    tile_type_t::floor,
+                                                });
+        map.reg.emplace_or_replace<vchar_t>(ent, vchar_t{
+                                                     '.',
+                                                     WHITE,
+                                                     BLACK,
+                                                 });
     }
 }
 
 
-void make_corridors_between_rooms(radl::world::Map& map) {
+void make_corridors_between_rooms(Map& map) {
     // make corridor with adjacent pairs in rooms vector
     adjacent_pairs(map.rooms.begin(), map.rooms.end(),
                    [&](rect_t& r1, rect_t& r2) {
@@ -118,41 +143,9 @@ void make_corridors_between_rooms(radl::world::Map& map) {
 
 }  // namespace
 
-Map make_test_map(const rect_t& rect, const position_t& player_pos) {
-    Map map = {
-        .rect  = rect,
-        .tiles = std::vector<tile_t>(rect.area()),
-        .rooms = std::vector<rect_t>(),
-    };
-    auto& tiles = map.tiles;
-
-    fill(map, {rect.x1 + 1, rect.y1 + 1, rect.x2 - 1, rect.y2 - 1},
-         walkable_tile);
-
-    // fill randomly with walls 33% chance
-    // auto& rng = *TCODRandom::getInstance();
-    for(auto& tile : tiles) {
-        if(tile.is_walkable) {
-            auto chance = rng::rng.range(1, 3);
-            if(chance == 1) {
-                tile.is_walkable = false;
-                tile.type        = wall;
-            }
-        }
-    }
-    auto& player_start_tile       = map.at(player_pos);
-    player_start_tile.is_walkable = true;
-    player_start_tile.type        = floor;
-    return map;
-}
-
-
 Map new_map(const rect_t& rect) {
-    Map map = {
-        .rect  = rect,
-        .tiles = std::vector<tile_t>(rect.area()),
-        .rooms = std::vector<rect_t>(),
-    };
+    Map map;
+    map.init(rect);
     create_random_rooms(map);
     make_corridors_between_rooms(map);
     return map;

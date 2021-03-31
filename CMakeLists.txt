@@ -7,7 +7,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(MYW_DISABLES "-Wno-attributes -Wno-unused-parameter")
 # set(MYW_DISABLES "-Wno-attributes ")
 
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall  ${MYW_DISABLES} -g -DDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -Wall ${MYW_DISABLES} -DDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall ${MYW_DISABLES} -DNDEBUG")
 
 # include(CTest)

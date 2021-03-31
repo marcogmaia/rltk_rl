@@ -3,13 +3,13 @@
 #include "component/position.hpp"
 #include "map.hpp"
 #include "entt/entt.hpp"
+
+#include <set>
 namespace radl::world {
 
-// TODO FoV
 struct viewshed_t {
-    std::vector<position_t>
-        visible_coordinates;  // visible positions in the map
-    int range = 16;           // range of visibility
+    int range = 8;  // range of visibility
+    std::vector<position_t> visible_coordinates;
 };
 
 // void update_viewshed(entt::registry& r, entt::entity e) ;

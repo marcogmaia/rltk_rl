@@ -4,13 +4,13 @@
 // #include "entity.hpp"
 // #include "engine.hpp"
 
-// Destructible::Destructible(float max_hp, float defense, const char* corpse_name)
+// destructible_t::destructible_t(float max_hp, float defense, const char* corpse_name)
 //     : max_hp(max_hp)
 //     , hp(max_hp)
 //     , defense(defense)
 //     , corpse_name(corpse_name) {}
 
-// float Destructible::take_damage(Entity* owner, float damage) {
+// float destructible_t::take_damage(Entity* owner, float damage) {
 //     auto final_damage = damage - defense;
 //     if(final_damage < 0.f) {
 //         final_damage = 0.f;
@@ -30,7 +30,7 @@
 //     return final_damage;
 // }
 
-// void Destructible::die(Entity* owner) {
+// void destructible_t::die(Entity* owner) {
 //     if(owner == engine::player) {
 //         engine::gui.message(TCODColor::darkestRed, "You died.\n", owner->name);
 //     }
@@ -47,16 +47,16 @@
 
 // DestructibleEnemy::DestructibleEnemy(float max_hp, float defense,
 //                                      const char* corpse_name)
-//     : Destructible(max_hp, defense, corpse_name) {}
+//     : destructible_t(max_hp, defense, corpse_name) {}
 
 // void DestructibleEnemy::die(Entity* owner) {
-//     Destructible::die(owner);
+//     destructible_t::die(owner);
 // }
 
 // DestructiblePlayer::DestructiblePlayer(float max_hp, float defense,
 //                                        const char* corpse_name)
-//     : Destructible(max_hp, defense, corpse_name) {}
+//     : destructible_t(max_hp, defense, corpse_name) {}
 
 // void DestructiblePlayer::die(Entity* owner) {
-//     Destructible::die(owner);
+//     destructible_t::die(owner);
 // }

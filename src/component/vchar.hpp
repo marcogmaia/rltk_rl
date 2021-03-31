@@ -7,6 +7,15 @@
 
 namespace radl {
 
+namespace glyph {
+constexpr uint32_t BLOCK1 = 176;
+constexpr uint32_t BLOCK2 = 177;
+constexpr uint32_t BLOCK3 = 178;
+
+constexpr uint32_t SOLID1 = 219;
+
+}  // namespace glyph
+
 using vchar_t = rltk::vchar;
 
 /*

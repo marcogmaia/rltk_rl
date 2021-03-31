@@ -4,6 +4,6 @@
 
 // To render anything we need to know the position, colors and console
 // the position we get directly from the position_t struct of the entity
-struct Renderable {
+struct renderable_t {
     radl::vchar_t vchar;
 };

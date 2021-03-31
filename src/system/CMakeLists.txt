@@ -4,7 +4,7 @@ include_directories(
 set(
     GAMESYS_SRC
     "move_attack.cpp"
-    "visibility.cpp"
+    # "visibility.cpp"
     "player_action.cpp"
     "camera.cpp"
     )

@@ -11,4 +11,4 @@
 #pragma once
 
 // Tag for the player component
-struct Player {};
+struct player_t {};

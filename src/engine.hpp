@@ -8,6 +8,7 @@ namespace radl {
 
 extern entt::registry reg;
 extern entt::entity player;
+// extern world::Map map;
 extern entt::entity map;
 
 
@@ -26,7 +27,7 @@ class Engine {
 public:
     void init();
     void update();
-    void render();
+    // void render();
 };
 
 }  // namespace radl

@@ -3,26 +3,26 @@
 
 // class Entity;
 
-struct Destructible {
+struct destructible_t {
     float max_hp;             // maximum health points
     float hp;                 // current health points
     float defense;            // hit points deflected
     std::string corpse_name;  // the entity's name once dead/destroyed
 
-    // Destructible(float max_hp, float defense, const char* corpse_name);
-    // virtual ~Destructible() = default;
+    // destructible_t(float max_hp, float defense, const char* corpse_name);
+    // virtual ~destructible_t() = default;
 };
 
-inline bool is_dead(Destructible& dstb) {
+inline bool is_dead(destructible_t& dstb) {
     return dstb.hp <= 0;
 }
-// class DestructiblePlayer final : public Destructible {
+// class DestructiblePlayer final : public destructible_t {
 // public:
 //     DestructiblePlayer(float max_hp, float defense, const char* corpse_name);
 //     void die(Entity* owner) override;
 // };
 
-// class DestructibleEnemy final : public Destructible {
+// class DestructibleEnemy final : public destructible_t {
 // public:
 //     DestructibleEnemy(float max_hp, float defense, const char* corpse_name);
 //     void die(Entity* owner) override;

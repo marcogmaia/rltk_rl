@@ -1,3 +1,3 @@
 #pragma once
 
-struct Movable {};
+struct movable_t {};

@@ -1,4 +1,13 @@
 {
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "**/.hg/store/**": true,
+        "**/lib/libtcod/**": true,
+        "**/lib/rltk/**": true,
+        "**/roguebasin/**": true,
+    },
     // "cmake.buildArgs": [],
     // "cmake.buildEnvironment": {},
     "cmake.platform": "linux",

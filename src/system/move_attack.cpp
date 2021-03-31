@@ -5,13 +5,14 @@
 
 namespace radl {
 
-using world::Map;
+using namespace world;
+
 
 bool move_attack(entt::registry& reg, entt::entity& ent,
                  const position_t& dpos) {
     // mark as dirty to trigger an screen update
-    auto& actual_pos     = reg.get<position_t>(ent);
-    auto target_pos      = actual_pos + dpos;
+    auto& actual_pos = reg.get<position_t>(ent);
+    auto target_pos  = actual_pos + dpos;
 
     auto view_pos = reg.view<position_t>();
 
@@ -27,6 +28,8 @@ bool move_attack(entt::registry& reg, entt::entity& ent,
 
     auto map_ent    = reg.view<Map>()[0];
     const auto& map = reg.get<Map>(map_ent);
+    auto target_tile = map[target_pos];
+    auto target_tile_chars = map.reg.get<tile_characteristics_t>(target_tile);
 
     // ## 1. attack if enemy in the targeted pos
     if(is_occupied(target_pos)) {
@@ -34,9 +37,8 @@ bool move_attack(entt::registry& reg, entt::entity& ent,
         return false;
     }
     // ## 2. walk if tile is no occupied and walkable
-    else if(map[target_pos].is_walkable) {
+    else if(target_tile_chars.walkable) {
         // walk
-        // actual_pos = target_pos;
         reg.emplace_or_replace<position_t>(ent, target_pos);
     }
 

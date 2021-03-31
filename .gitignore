@@ -1,5 +1,11 @@
+roguebasin/
 lib/libtcod/
 lib/rltk/
 build/
 assets/
 .vscode/browse.*
+
+
+backblue.gif
+fade.gif
+index.html

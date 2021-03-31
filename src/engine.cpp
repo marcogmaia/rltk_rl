@@ -14,39 +14,34 @@ using namespace rltk::colors;
 
 entt::registry reg;
 entt::entity player;
+// world::Map map;
 entt::entity map;
 
-entt::observer observer{reg, entt::collector.update<position_t>()};
+entt::observer observer{reg, entt::collector.group<position_t, player_t>()};
 
 
-// void update_viewshed() {
-//     observer.each([](auto ent) {
-//         auto& vshed  = reg.get<viewshed_t>(ent);
-//         auto& [x, y] = reg.get<position_t>(ent);
-//         spdlog::debug("range view: {}", vshed.range);
-//         spdlog::debug("pos: ({}, {})", x, y);
-//     });
+// static void map_factory(const renderable_t& rend, const world::Map& map_obj)
+// {
+//     reg.emplace<renderable_t>(map, rend);
+//     reg.emplace<Map>(map, map_obj);
 // }
 
-
-static void map_factory(const Renderable& rend, const world::Map& map_obj) {
-    reg.emplace<Renderable>(map, rend);
-    reg.emplace<Map>(map, map_obj);
-}
-
-static void render_map(entt::registry& reg, entt::entity& ent) {
-    const auto& [rend, map] = reg.get<Renderable, Map>(ent);
-    auto& rect              = map.rect;
-    for(int x = rect.x1; x < rect.x2; ++x) {
-        for(int y = rect.y1; y < rect.y2; ++y) {
-            auto& is_walkable = map.at(x, y).is_walkable;
-            auto fg           = is_walkable ? GREY : DARK_GREY;
-            auto bg           = is_walkable ? GREY : BLACK;
-            auto ch = is_walkable ? vchar_t{'.', fg, bg} : vchar_t{'#', fg, bg};
-            rltk::console->set_char(x, y, ch);
-        }
-    }
-}
+// static void render_map(entt::registry& reg, world::Map& map) {
+//     using namespace world;
+//     // const auto& map = reg.get<Map>(ent_map);
+//     // auto group_vis = map.reg.group<visible_t>();
+//     // auto gp = map.reg.view<position_t>();
+//     auto v = map.reg.view<position_t, tile_t>();
+//     for(auto ent : v) {
+//         auto [pos, ttype] = map.reg.get<position_t, tile_t>(ent);
+//         auto [x, y]       = pos;
+//         vchar_t vch       = {glyph::BLOCK1, WHITE, BLACK};
+//         if(ttype.type == tile_type_t::wall) {
+//             vch = {'#', BLACK, BLACK};
+//         }
+//         rltk::console->set_char(x, y, vch);
+//     }
+// }
 
 constexpr int width  = 96;
 constexpr int height = 48;
@@ -56,43 +51,56 @@ static void rltk_init() {
                                    "Maia Roguelike learning", "16x16", false));
 }
 
+// void add_enemies() {
+//     auto wmap = reg.get<world::Map>(map);
+//     for(auto& room : wmap.rooms) {
+//         auto enemy = reg.create();
+//         reg.emplace<renderable_t>(enemy, vchar_t{'O', GREEN, BLACK});
+//         reg.emplace<position_t>(enemy, room.center());
+//         // reg.emplace<destructible_t>(enemy);
+//     }
+// }
+
 void Engine::init() {
 #ifdef DEBUG
     spdlog::set_level(spdlog::level::debug);
 #endif
-    fmt::print("initializing engine.\n");
+    spdlog::info("Initializing engine.");
     rltk_init();
-    Map tmap = world::new_map(rect_t{0, 0, width * 4, height * 4});
-    auto player_start_pos = tmap.rooms[0].center();
-    map                   = reg.create();
-    map_factory(Renderable{{'x', DARKEST_GREY, WHITE}}, tmap);
+
+    auto map_obj          = new_map(rect_t{0, 0, width, height});
+    auto player_start_pos = map_obj.rooms[0].center();
+
+    map = reg.create();
+    reg.emplace<world::Map>(map, std::move(map_obj));
     player = reg.create();
     player_factory(reg, player, player_start_pos, {'@', YELLOW, BLACK});
+    // TODO enemies
+    // add_enemies();
     update();
 }
 
-static void render_player(entt::registry& reg, entt::entity& player) {
-    const auto& [pos, rend] = reg.get<position_t, Renderable>(player);
-    auto& [x, y]            = pos;
-    using rltk::console;
-    console->set_char(x, y, rend.vchar);
-}
+// static void render_player(entt::registry& reg, entt::entity& player) {
+//     const auto& [pos, rend] = reg.get<position_t, renderable_t>(player);
+//     auto& [x, y]            = pos;
+//     using rltk::console;
+//     console->set_char(x, y, rend.vchar);
+// }
 
-void Engine::render() {
-    using rltk::console;
-    if(console->dirty) {
-        // console->clear();
-        // render entire screen
-        // render map
-        // render_map(reg, map);
-        // render_map(reg, map);
-        // render enemies
-        // TODO make enemies
-        // TODO render enemies
-        // render player
-        // render_player(reg, player);
-    }
-}
+// void Engine::render() {
+//     using rltk::console;
+//     if(console->dirty) {
+//         // console->clear();
+//         // render entire screen
+//         // render map
+//         // render enemies
+//         // TODO make enemies
+//         // TODO render enemies
+//         // render player
+//         // render_player(reg, player);
+//         // }
+//     }
+// }
 
 void Engine::update() {
     // XXX resizeable console
