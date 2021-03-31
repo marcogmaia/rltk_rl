@@ -68,7 +68,7 @@ void Engine::init() {
     spdlog::info("Initializing engine.");
     rltk_init();
 
-    auto map_obj          = new_map(rect_t{0, 0, width, height});
+    auto map_obj          = new_map(rect_t{0, 0, width * 4, height * 4});
     auto player_start_pos = map_obj.rooms[0].center();
 
     map = reg.create();

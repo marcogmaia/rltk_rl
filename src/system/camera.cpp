@@ -84,17 +84,21 @@ void camera_update(entt::registry& reg, entt::entity ent) {
         console->term_width,
         console->term_height,
     };
+
     // print all explored
-    auto explored_view
-        = map.reg.view<tile_t, position_t, explored_t, vchar_t>();
-    for(auto& ent : explored_view) {
-        auto [pos, vch] = map.reg.get<position_t, vchar_t>(ent);
-        auto [x, y]     = pos;
-        auto renderpos  = position_t{x - xi, y - yi};
-        if(!render_viewport.contains(renderpos)) {
-            continue;
+    for(int x = xi; x < xf; ++x) {
+        for(int y = yi; y < yf; ++y) {
+            if(!map.rect.contains({x, y})) {
+                continue;
+            }
+            auto tile = map[{x, y}];
+            if(!map.reg.has<explored_t>(tile)) {
+                continue;
+            }
+            auto vch       = map.reg.get<vchar_t>(tile);
+            auto renderpos = position_t{x - xi, y - yi};
+            console->set_char(renderpos.first, renderpos.second, vch);
         }
-        console->set_char(renderpos.first, renderpos.second, vch);
     }
 
     // render visible tiles
