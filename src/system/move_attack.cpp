@@ -8,10 +8,10 @@ using namespace world;
 
 
 bool move_attack(entt::registry& reg, entt::entity& ent,
-                 const position_t& dpos) {
+                 const position_t& delta_pos) {
     // mark as dirty to trigger an screen update
     auto& actual_pos = reg.get<position_t>(ent);
-    auto target_pos  = actual_pos + dpos;
+    auto target_pos  = actual_pos + delta_pos;
 
     // maybe check if occupies vicinity, or add vicinity component
     auto view_pos    = reg.view<destructible_t, renderable_t, position_t>();
@@ -46,8 +46,8 @@ bool move_attack(entt::registry& reg, entt::entity& ent,
     }
 
     // ## 3. do nothing if is wall
-    // XXX tenho que arrumar uma forma de farzer query com a tile direto, ou só
-    // checo o mapa
+    // XXX tenho que arrumar uma forma de fazer a query com a tile direto, ou só
+    reg.emplace_or_replace<player_t>(ent);
     return true;
 }
 

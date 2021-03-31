@@ -57,6 +57,8 @@ void Engine::init() {
     map = reg.create();
     reg.emplace<world::Map>(map, std::move(map_obj));
     player = reg.create();
+    reg.on_construct<player_t>().connect<&camera_update>();
+    reg.on_update<player_t>().connect<&camera_update>();
     player_factory(reg, player, player_start_pos, {'@', YELLOW, BLACK});
     add_enemies();
     update();
@@ -85,17 +87,17 @@ void Engine::init() {
 // }
 
 void Engine::update() {
-    static bool first_run = true;
-    if(first_run) {
-        camera_update(reg, player);
-        first_run = false;
-    }
+    // static bool first_run = true;
+    // if(first_run) {
+    //     camera_update(reg, player);
+    //     first_run = false;
+    // }
     // XXX trigger redraw when sfml resize
     // update player
     auto player_has_input = radl::process_input(reg, player);
     if(player_has_input) {
         // TODO update world
-        camera_update(reg, player);
+        // camera_update(reg, player);
     }
     // update_viewshed();
 }

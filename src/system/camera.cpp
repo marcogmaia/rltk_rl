@@ -60,18 +60,18 @@ void camera_update(entt::registry& reg, entt::entity ent) {
     using rltk::console;
     console->clear();
     using namespace world;
-    const auto& [player_pos, rend, vshed]
+    const auto& [player_pos, rend, viewshed]
         = reg.get<position_t, renderable_t, viewshed_t>(ent);
     const auto& [px, py] = player_pos;
 
-    auto vmap = reg.view<world::Map>();
-    if(vmap.empty()) {
+    auto view_map = reg.view<world::Map>();
+    if(view_map.empty()) {
         spdlog::error("entity with map vmap, doesn't exist");
         return;
     }
-    auto& map = vmap.get(vmap.front());
+    auto& map = view_map.get(view_map.front());
 
-    fov_update(reg, player_pos, vshed, map);
+    fov_update(reg, player_pos, viewshed, map);
 
     auto xi = px - console->term_width / 2;
     auto xf = px + console->term_width / 2;
