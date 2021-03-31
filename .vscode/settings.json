@@ -108,5 +108,16 @@
         "*.def": "cpp",
         "libtcod_int.h": "c"
     },
-    "C_Cpp.default.intelliSenseMode": "linux-gcc-x64"
+    "C_Cpp.default.intelliSenseMode": "linux-gcc-x64",
+    "cSpell.enableFiletypes": [
+        "!c",
+        "!haskell",
+        "!java",
+        "!plaintext",
+        "!python",
+        "!rust",
+        "!toml",
+        "!yaml",
+        "cpp"
+    ]
 }

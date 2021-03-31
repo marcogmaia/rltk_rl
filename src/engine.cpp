@@ -20,29 +20,6 @@ entt::entity map;
 entt::observer observer{reg, entt::collector.group<position_t, player_t>()};
 
 
-// static void map_factory(const renderable_t& rend, const world::Map& map_obj)
-// {
-//     reg.emplace<renderable_t>(map, rend);
-//     reg.emplace<Map>(map, map_obj);
-// }
-
-// static void render_map(entt::registry& reg, world::Map& map) {
-//     using namespace world;
-//     // const auto& map = reg.get<Map>(ent_map);
-//     // auto group_vis = map.reg.group<visible_t>();
-//     // auto gp = map.reg.view<position_t>();
-//     auto v = map.reg.view<position_t, tile_t>();
-//     for(auto ent : v) {
-//         auto [pos, ttype] = map.reg.get<position_t, tile_t>(ent);
-//         auto [x, y]       = pos;
-//         vchar_t vch       = {glyph::BLOCK1, WHITE, BLACK};
-//         if(ttype.type == tile_type_t::wall) {
-//             vch = {'#', BLACK, BLACK};
-//         }
-//         rltk::console->set_char(x, y, vch);
-//     }
-// }
-
 constexpr int width  = 96;
 constexpr int height = 48;
 static void rltk_init() {
@@ -51,15 +28,21 @@ static void rltk_init() {
                                    "Maia Roguelike learning", "16x16", false));
 }
 
-// void add_enemies() {
-//     auto wmap = reg.get<world::Map>(map);
-//     for(auto& room : wmap.rooms) {
-//         auto enemy = reg.create();
-//         reg.emplace<renderable_t>(enemy, vchar_t{'O', GREEN, BLACK});
-//         reg.emplace<position_t>(enemy, room.center());
-//         // reg.emplace<destructible_t>(enemy);
-//     }
-// }
+void add_enemies() {
+    // const auto& wmap = reg.get<world::Map>(map);
+    auto wmap = reg.get<Map>(map);
+    for(const auto& room : wmap.rooms) {
+        auto enemy = reg.create();
+        reg.emplace<renderable_t>(enemy, vchar_t{'O', GREEN, BLACK});
+        auto pos = room.center();
+        reg.emplace<position_t>(enemy, pos);
+        reg.emplace<destructible_t>(enemy);
+        // add to tile
+        auto& tile_ent = wmap.at(pos);
+        auto& tile     = reg.get<tile_t>(tile_ent);
+        tile.entities.push_back(enemy);
+    }
+}
 
 void Engine::init() {
 #ifdef DEBUG
@@ -68,15 +51,14 @@ void Engine::init() {
     spdlog::info("Initializing engine.");
     rltk_init();
 
-    auto map_obj          = new_map(rect_t{0, 0, width * 4, height * 4});
+    auto map_obj          = new_map(reg, rect_t{0, 0, width * 4, height * 4});
     auto player_start_pos = map_obj.rooms[0].center();
 
     map = reg.create();
     reg.emplace<world::Map>(map, std::move(map_obj));
     player = reg.create();
     player_factory(reg, player, player_start_pos, {'@', YELLOW, BLACK});
-    // TODO enemies
-    // add_enemies();
+    add_enemies();
     update();
 }
 
@@ -103,11 +85,17 @@ void Engine::init() {
 // }
 
 void Engine::update() {
-    // XXX resizeable console
+    static bool first_run = true;
+    if(first_run) {
+        camera_update(reg, player);
+        first_run = false;
+    }
+    // XXX trigger redraw when sfml resize
     // update player
     auto player_has_input = radl::process_input(reg, player);
     if(player_has_input) {
         // TODO update world
+        camera_update(reg, player);
     }
     // update_viewshed();
 }

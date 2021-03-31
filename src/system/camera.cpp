@@ -25,18 +25,18 @@ struct nav_helper {
     }
 };
 
-void fov_update(const position_t& ent_pos, world::viewshed_t& vshed,
-                world::Map& map) {
+void fov_update(entt::registry& reg, const position_t& ent_pos,
+                world::viewshed_t& vshed, world::Map& map) {
     using namespace world;
     // resets the visibility
-    map.reg.clear<visible_t>();
+    reg.clear<visible_t>();
 
     auto set_visibility = [&](position_t reveal_pos) {
         if(map.rect.contains(reveal_pos)) {
             auto ent = map.at(reveal_pos);
-            map.reg.emplace_or_replace<visible_t>(ent);
-            if(!map.reg.has<explored_t>(ent)) {
-                map.reg.emplace_or_replace<explored_t>(ent);
+            reg.emplace_or_replace<visible_t>(ent);
+            if(!reg.has<explored_t>(ent)) {
+                reg.emplace_or_replace<explored_t>(ent);
             }
         }
     };
@@ -44,7 +44,7 @@ void fov_update(const position_t& ent_pos, world::viewshed_t& vshed,
     auto is_transparent = [&](position_t check_pos) {
         if(map.rect.contains(check_pos)) {
             auto ent   = map.at(check_pos);
-            auto chars = map.reg.get<tile_characteristics_t>(ent);
+            auto chars = reg.get<tile_characteristics_t>(ent);
             return chars.transparent;
         }
         return false;
@@ -64,14 +64,14 @@ void camera_update(entt::registry& reg, entt::entity ent) {
         = reg.get<position_t, renderable_t, viewshed_t>(ent);
     const auto& [px, py] = player_pos;
 
-    auto ent_map = reg.view<world::Map>().front();
-    if(!reg.valid(ent_map)) {
-        spdlog::error("entity with map ent_map, doesn't exist");
+    auto vmap = reg.view<world::Map>();
+    if(vmap.empty()) {
+        spdlog::error("entity with map vmap, doesn't exist");
         return;
     }
-    auto& map = reg.get<world::Map>(ent_map);
+    auto& map = vmap.get(vmap.front());
 
-    fov_update(player_pos, vshed, map);
+    fov_update(reg, player_pos, vshed, map);
 
     auto xi = px - console->term_width / 2;
     auto xf = px + console->term_width / 2;
@@ -92,45 +92,58 @@ void camera_update(entt::registry& reg, entt::entity ent) {
                 continue;
             }
             auto tile = map[{x, y}];
-            if(!map.reg.has<explored_t>(tile)) {
+            if(!reg.has<explored_t>(tile)) {
                 continue;
             }
-            auto vch       = map.reg.get<vchar_t>(tile);
+            auto vch       = reg.get<vchar_t>(tile);
+            vch.foreground = DARKEST_GREY;
             auto renderpos = position_t{x - xi, y - yi};
             console->set_char(renderpos.first, renderpos.second, vch);
         }
     }
 
     // render visible tiles
-    auto visible_view = map.reg.view<tile_t, visible_t, position_t>();
+    auto visible_view = reg.view<tile_t, visible_t, position_t>();
     for(auto& ent : visible_view) {
-        auto [pos, ttype, vch] = map.reg.get<position_t, tile_t, vchar_t>(ent);
-        const auto& [x, y]     = pos;
-        auto renderpos         = position_t{x - xi, y - yi};
+        auto [pos, tile, vch] = reg.get<position_t, tile_t, vchar_t>(ent);
+        const auto& [x, y]    = pos;
+        auto renderpos        = position_t{x - xi, y - yi};
         if(!render_viewport.contains(renderpos)) {
             continue;
         }
         auto vch_print = vch;
         color_t fg;
-        if(ttype.type == tile_type_t::wall) {
+        if(tile.type == tile_type_t::wall) {
             fg = LimeGreen;
         }
-        else if(ttype.type == tile_type_t::floor) {
+        else if(tile.type == tile_type_t::floor) {
             fg = SkyBlue;
         }
         vch_print.foreground = fg;
         console->set_char(renderpos.first, renderpos.second, vch_print);
+
+        // render all entities in this tile
+        for(auto& tile_ent : tile.entities) {
+            const auto& rend = reg.get<renderable_t>(tile_ent);
+            console->set_char(renderpos.first, renderpos.second, rend.vchar);
+        }
+
+
         // console->set_char(x - xi, y - yi, vch_print);
     }
 
-    // auto enemy_view = reg.view<position_t, renderable_t>();
+    // // auto group = registry.group<position>(entt::get<velocity,
+    // renderable>); const auto& enemy_view
+    //     = reg.view<destructible_t, renderable_t, position_t>();
     // for(auto ent : enemy_view) {
-    //     const auto& [pos, dstb]
-    //         = reg.get<position_t, renderable_t>(ent);
-    //     auto& vch = rend.vchar;
-    //     if(map.visible_coordinates.contains(pos)) {
-    //         console->set_char(px - xi, py - yi, vch);
+    //     const auto& [pos, rend] = reg.get<position_t, renderable_t>(ent);
+    //     const auto& [x, y]      = pos;
+    //     auto renderpos          = position_t{x - xi, y - yi};
+    //     if(!render_viewport.contains(renderpos)) {
+    //         continue;
     //     }
+    //     const auto& vch = rend.vchar;
+    //     console->set_char(renderpos.first, renderpos.second, vch);
     // }
 
 
