@@ -6,8 +6,9 @@ set(
     GAMESYS_SRC
     "move_attack.cpp"
     # "visibility.cpp"
-    "player_action.cpp"
     "camera.cpp"
+    "player_action.cpp"
+   
 )
     
 # find_package(spdlog REQUIRED)

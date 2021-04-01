@@ -1,7 +1,7 @@
 #include <memory>
 #include "engine.hpp"
 #include <fmt/format.h>
-#include "factories.hpp"
+#include "core/factories.hpp"
 
 #include "component/component.hpp"
 #include "system/player_action.hpp"

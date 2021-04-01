@@ -3,9 +3,9 @@
 #include "component/position.hpp"
 #include "component/viewshed.hpp"
 #include "rltk/rltk.hpp"
-#include "map.hpp"
+#include "core/map.hpp"
 #include "spdlog/spdlog.h"
-#include "camera.hpp"
+#include "system/camera.hpp"
 #include "system/visibility.hpp"
 
 #include <ranges>
@@ -126,6 +126,7 @@ void camera_update(entt::registry& reg, entt::entity ent) {
         return true;
     };
 
+
     // print all explored
     for(int x = xci; x < xcf; ++x) {
         for(int y = yci; y < ycf; ++y) {
@@ -180,41 +181,18 @@ void camera_update(entt::registry& reg, entt::entity ent) {
     }
 
 
-    update_vicinity();
-
-    // auto enemy_view = reg.view<enemy_t, position_t, renderable_t>();
-    // for(auto ent : enemy_view) {
-    //     auto& rend      = enemy_view.get<renderable_t>(ent);
-    //     auto& enemy_pos = enemy_view.get<position_t>(ent);
-    //     auto [x, y]     = enemy_pos;
-    //     auto contains   = std::ranges::any_of(viewshed.visible_coordinates,
-    //                                         [&](const position_t& v_pos) {
-    //                                             return enemy_pos == v_pos;
-    //                                         });
-    //     if(contains) {
-    //         auto renderpos = position_t{x - xi, y - yi};
-    //         if(render_viewport.contains(renderpos)) {
-    //             console->set_char(renderpos.first, renderpos.second,
-    //                               rend.vchar);
-    //         }
-    //     }
-    // }
-
-
-    // // auto group = registry.group<position>(entt::get<velocity,
-    // renderable>); const auto& enemy_view
-    //     = reg.view<destructible_t, renderable_t, position_t>();
-    // for(auto ent : enemy_view) {
-    //     const auto& [pos, rend] = reg.get<position_t, renderable_t>(ent);
-    //     const auto& [x, y]      = pos;
-    //     auto renderpos          = position_t{x - xi, y - yi};
-    //     if(!render_viewport.contains(renderpos)) {
-    //         continue;
-    //     }
-    //     const auto& vch = rend.vchar;
-    //     console->set_char(renderpos.first, renderpos.second, vch);
-    // }
-
+    // update_vicinity();
+    auto f_test = [&](entt::entity& ent) {
+        auto rend     = reg.try_get<renderable_t>(ent);
+        if(!rend) return;
+        auto epos     = reg.get<position_t>(ent);
+        auto [ex, ey] = epos;
+        auto rpos     = render_pos(ex, ey);
+        auto [rx, ry] = rpos;
+        console->set_char(rx, ry, rend->vchar);
+    };
+    
+    std::ranges::for_each(get_entities_vicinity(), f_test);
 
     // render player
     // rend.vchar.background = color_t;

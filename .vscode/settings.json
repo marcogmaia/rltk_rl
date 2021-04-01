@@ -8,6 +8,18 @@
         "**/lib/rltk/**": true,
         "**/roguebasin/**": true,
     },
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/boost/**":true,
+        "**/qt/**":true,
+        "**/qt{,4,5}/**":true
+    },
+    "files.insertFinalNewline": true,
+    "C_Cpp.intelliSenseCachePath": "${workspaceFolder}/.vscode",
     "cmake.platform": "linux",
     "cmake.parallelJobs": 0,
     "cmake.buildDirectory": "${workspaceFolder}/build",
@@ -17,12 +29,6 @@
     "cmake.debugConfig": {
         "MIMode": "gdb",
     },
-    "C_Cpp.intelliSenseCachePath": "${workspaceFolder}/.vscode",
-    "C_Cpp.intelliSenseCacheSize": 5120,
-    "C_Cpp.intelliSenseMemoryLimit": 8192,
-    "C_Cpp.intelliSenseEngine": "Default",
-    "C_Cpp.intelliSenseEngineFallback": "Enabled",
-    "C_Cpp.autocompleteAddParentheses": false,
     "clangtidy.buildPath": "${workspaceFolder}/build",
     "clangtidy.sourcePath": "${workspaceFolder}/src",
     "clangtidy.parallelTasks": 0,
@@ -106,9 +112,10 @@
         "valarray": "cpp",
         "variant": "cpp",
         "sdl.h": "c",
-        "libtcod_int.h": "c"
+        "libtcod_int.h": "c",
+        "cassert": "cpp",
+        "cfloat": "cpp"
     },
-    "C_Cpp.default.intelliSenseMode": "linux-gcc-x64",
     "cSpell.enableFiletypes": [
         "!c",
         "!haskell",
@@ -122,10 +129,20 @@
     ],
     "cSpell.words": [
         "Bresenham's",
+        "Unsets",
         "bgsfml",
+        "cpool",
+        "cpools",
+        "crend",
         "fgsfml",
+        "gdata",
+        "pdata",
         "rpos",
         "sfml",
         "vmap"
-    ]
+    ],
+    "C_Cpp.intelliSenseEngineFallback": "Disabled",
+    "C_Cpp.default.systemIncludePath": [
+        // ""
+    ],
 }

@@ -9,9 +9,9 @@ set(
 )
 
 add_library(
-    radl_utils
+    game_utils
     ${UTILS_SRC}
 )
 
-target_link_libraries(radl_utils PUBLIC fmt rltk)
+target_link_libraries(game_utils PUBLIC fmt rltk)
 

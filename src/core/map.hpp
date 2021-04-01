@@ -130,4 +130,6 @@ Map make_test_map(const rect_t& dimension, const position_t& player_pos);
 
 Map new_map(entt::registry& reg, const rect_t& rect);
 
+std::vector<entt::entity> get_entities_vicinity() ;
+
 }  // namespace radl::world

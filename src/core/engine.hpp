@@ -2,11 +2,9 @@
 #include <memory>
 #include <list>
 #include "entt/entt.hpp"
-#include "map.hpp"
+#include "core/map.hpp"
 
 namespace radl::engine {
-
-
 
 extern entt::observer observer;
 extern entt::registry reg;

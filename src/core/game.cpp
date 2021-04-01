@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fmt/format.h>
 #include "rltk/rltk.hpp"
-#include "game.hpp"
-#include "engine.hpp"
+#include "core/game.hpp"
+#include "core/engine.hpp"
 
 using namespace radl;
 

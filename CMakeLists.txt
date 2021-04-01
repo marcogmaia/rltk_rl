@@ -13,6 +13,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall ${MYW_DISABLES} -DNDEBUG")
 # include(CTest)
 # enable_testing()
 
+find_package(spdlog REQUIRED)
+
 add_subdirectory("lib/rltk")
 include_directories("lib/rltk")
 
@@ -20,15 +22,20 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_BUILD_TYPE DEBUG)
 # set(CMAKE_BUILD_TYPE RELEASE)
 
-add_subdirectory(src)
+include_directories("./src")
+# add_subdirectory(src)
+add_subdirectory("./src/core")
+add_subdirectory("./src/utils")
+add_subdirectory("./src/system")
+add_subdirectory("./src/component")
 # add_subdirectory(map_view)
 
 add_executable(
     ${PROJECT_NAME}
-    "src/main.cpp"
+    "src/core/main.cpp"
 )
 
-target_link_libraries(${PROJECT_NAME} game tbb pthread)
+target_link_libraries(${PROJECT_NAME} game_core tbb pthread)
 
 # set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 # set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

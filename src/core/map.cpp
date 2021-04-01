@@ -1,12 +1,14 @@
-#include <iostream>
+#include <ranges>
 #include <algorithm>
 
 #include "spdlog/spdlog.h"
+#include "component/component.hpp"
 
 #include "rltk/rltk.hpp"
 #include "map.hpp"
 #include "utils/utils.hpp"
 #include "utils/rng.hpp"
+#include "core/engine.hpp"
 
 #include <ranges>
 namespace radl::world {
@@ -148,10 +150,37 @@ Map new_map(entt::registry& reg, const rect_t& rect) {
 auto is_occupied(entt::registry& reg, position_t target_pos) -> bool {
     using namespace std::ranges;
     auto& tile = Map::get_tile(reg, target_pos);
-    
+
     return any_of(tile.entities, [&](const auto& ent) {
         return reg.has<blocks_t>(ent);
     });
 }
+
+std::vector<entt::entity> get_entities_vicinity() {
+    using engine::reg;
+    using rltk::console;
+    auto map               = reg.get<Map>(engine::map);
+    auto pos               = reg.get<position_t>(engine::player);
+    auto& [px, py]         = pos;
+    constexpr int max_size = 32;
+    position_t p1          = {px - max_size, py - max_size};
+    position_t p2          = {px + max_size, py + max_size};
+    auto& [xui, yui]       = p1;
+    auto& [xuf, yuf]       = p2;
+
+    std::vector<entt::entity> entities(256);
+    for(int x = xui; x < xuf; ++x) {
+        for(int y = yui; y < yuf; ++y) {
+            // render only valid and visible positions
+            if(!map.rect.contains({x, y}) || !reg.has<visible_t>(map[{x, y}])) {
+                continue;
+            }
+            auto tile = Map::get_tile(reg, map, position_t{x, y});
+            std::ranges::copy(tile.entities, std::back_inserter(entities));
+        }
+    }
+    return entities;
+}
+
 
 }  // namespace radl::world

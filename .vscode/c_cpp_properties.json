@@ -10,8 +10,8 @@
                 "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db",
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "${workspaceFolder}/lib/rltk/**",
-                    "${workspaceFolder}/src/**"
+                    "${workspaceFolder}/lib/rltk/",
+                    "${workspaceFolder}/src/"
                 ]
             },
             "defines": [
@@ -20,7 +20,7 @@
             "compilerPath": "/usr/bin/g++",
             "cStandard": "c17",
             "cppStandard": "c++20",
-            "intelliSenseMode": "gcc-x64",
+            "intelliSenseMode": "linux-gcc-x64",
             "compileCommands": "${workspaceFolder}/build/compile_commands.json"
         }
     ],

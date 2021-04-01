@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "component/position.hpp"
-#include "map.hpp"
+#include "core/map.hpp"
 #include "entt/entt.hpp"
 
 #include <set>
