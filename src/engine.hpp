@@ -6,28 +6,27 @@
 
 namespace radl {
 
+
+namespace engine {
+
+extern entt::observer observer;
 extern entt::registry reg;
 extern entt::entity player;
 // extern world::Map map;
 extern entt::entity map;
 
-
-extern entt::observer observer;
-
-class Engine {
-
-    enum game_status_t {
-        STARTUP,
-        IDLE,
-        NEW_TURN,
-        VICTORY,
-        DEFEAT,
-    };
-
-public:
-    void init();
-    void update();
-    // void render();
+enum game_status_t {
+    STARTUP,
+    IDLE,
+    NEW_TURN,
+    VICTORY,
+    DEFEAT,
 };
+
+void init();
+void update();
+// void render();
+
+}  // namespace engine
 
 }  // namespace radl

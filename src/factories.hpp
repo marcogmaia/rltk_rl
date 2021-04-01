@@ -7,14 +7,13 @@
 
 namespace radl {
 
-void player_factory(entt::registry& reg, entt::entity ent,
-                    const position_t& pos, const radl::vchar_t& vch);
-// entt::entity make_enemy(entt::registry& reg, const entt::entity& ent) {
-//     entt::entity e = reg.create();
-//     // TODO factories
-//     reg.emplace<>(ent)
-//         return ent;
-// }
+namespace engine::factory {
 
+void player_factory(entt::entity ent, const position_t& pos,
+                    const vchar_t& vch);
+
+void enemy_factory(world::Map& map, const position_t& pos, vchar_t vch);
+
+}  // namespace engine::factory
 
 }  // namespace radl

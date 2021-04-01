@@ -13,12 +13,14 @@
 
 namespace radl {
 
+namespace engine {
+
 using namespace world;
 using namespace rltk::colors;
+// using namespace factory;
 
 entt::registry reg;
 entt::entity player;
-// world::Map map;
 entt::entity map;
 
 entt::observer observer{reg, entt::collector.group<position_t, player_t>()};
@@ -31,14 +33,6 @@ static void rltk_init() {
     auto constexpr* font_file = "../assets";
     rltk::init(rltk::config_simple(font_file, width, height,
                                    "Maia Roguelike learning", "16x16", false));
-    //    rltk::console->set_alpha(50);
-    // view_console = std::make_unique<rltk::virtual_terminal>(
-    //     rltk::config.root_font, 0, 0);
-
-
-    // sf::Vector2u size_pixels = main_window->getSize();
-    // view
-    // view_console->resize_pixels(size_pixels.x, size_pixels.y);
 }
 
 void add_enemies() {
@@ -50,21 +44,25 @@ void add_enemies() {
     for(const auto& room : w_map.rooms) {
         auto num_enemies = rng.range(0, max_enemies_pex_room);
         for(int i = 0; i < num_enemies; ++i) {
+            int rand_x          = rng.range(room.x1, room.x2 - 1);
+            int rand_y          = rng.range(room.y1, room.y2 - 1);
+            position_t rand_pos = {rand_x, rand_y};
+            if(!is_occupied(reg, rand_pos)) {
+                factory::enemy_factory(w_map, rand_pos,
+                                       vchar_t{'O', GREEN, BLACK});
+                // auto enemy = reg.create();
+                // reg.emplace<renderable_t>(enemy, vchar_t{'O', GREEN, BLACK});
+                // reg.emplace<position_t>(enemy, rand_pos);
+                // reg.emplace<blocks_t>(enemy);
+                // reg.emplace<destructible_t>(enemy);
+                // auto& tile = Map::get_tile(reg, w_map, rand_pos);
+                // tile.entities.push_back(enemy);
+            }
         }
-        auto enemy = reg.create();
-        reg.emplace<renderable_t>(enemy, vchar_t{'O', GREEN, BLACK});
-        auto pos = room.center();
-        reg.emplace<position_t>(enemy, pos);
-        reg.emplace<blocks_t>(enemy);
-        reg.emplace<destructible_t>(enemy);
-        // add to tile
-        auto& tile_ent = w_map.at(pos);
-        auto& tile     = reg.get<tile_t>(tile_ent);
-        tile.entities.push_back(enemy);
     }
 }
 
-void Engine::init() {
+void init() {
 #ifdef DEBUG
     spdlog::set_level(spdlog::level::debug);
 #endif
@@ -79,7 +77,8 @@ void Engine::init() {
     player = reg.create();
     reg.on_construct<player_t>().connect<&camera_update>();
     reg.on_update<player_t>().connect<&camera_update>();
-    player_factory(reg, player, player_start_pos, {'@', YELLOW, BLACK});
+    factory::player_factory(player, player_start_pos,
+                            vchar_t{'@', YELLOW, BLACK});
     add_enemies();
     update();
 }
@@ -104,7 +103,7 @@ void Engine::init() {
 //     }
 // }
 
-void Engine::update() {
+void update() {
     // static bool first_run = true;
     // if(first_run) {
     //     camera_update(reg, player);
@@ -119,5 +118,7 @@ void Engine::update() {
     }
     // update_viewshed();
 }
+
+}  // namespace engine
 
 }  // namespace radl

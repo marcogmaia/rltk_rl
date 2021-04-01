@@ -5,10 +5,10 @@
 #include "engine.hpp"
 
 void game() {
-    radl::Engine engine;
-    engine.init();
+    using namespace radl;
+    engine::init();
     auto tick = [&](double ms) {
-        engine.update();
+        engine::update();
         // render needs to be the last thing with this toolkit
         // engine.render();
     };

@@ -74,6 +74,19 @@ struct Map {
     }
 
 
+    static inline tile_t& get_tile(entt::registry& reg, Map& map,
+                                   position_t pos) {
+        auto& tent = map.at(pos);
+        auto& tile = reg.get<tile_t>(tent);
+        return tile;
+    }
+
+    static inline tile_t& get_tile(entt::registry& reg, entt::entity tile_ent,
+                                   position_t pos) {
+        auto& tile = reg.get<tile_t>(tile_ent);
+        return tile;
+    }
+
     static inline tile_t& get_tile(entt::registry& reg, position_t pos) {
         auto& map  = get_map(reg);
         auto& tent = map.at(pos);

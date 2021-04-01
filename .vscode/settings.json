@@ -17,7 +17,6 @@
     "cmake.debugConfig": {
         "MIMode": "gdb",
     },
-    "C_Cpp.intelliSenseCachePath": "${workspaceFolder}/.vscode",
     "C_Cpp.intelliSenseCacheSize": 5120,
     "C_Cpp.intelliSenseMemoryLimit": 8192,
     "C_Cpp.intelliSenseEngine": "Default",
