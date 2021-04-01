@@ -11,21 +11,18 @@
 #include "spdlog/spdlog.h"
 
 
-namespace radl {
-
-namespace engine {
+namespace radl::engine {
 
 using namespace world;
 using namespace rltk::colors;
 // using namespace factory;
+std::queue<sf::Event> event_queue;
 
 entt::registry reg;
 entt::entity player;
 entt::entity map;
 
 entt::observer observer{reg, entt::collector.group<position_t, player_t>()};
-
-std::unique_ptr<rltk::virtual_terminal> view_console;
 
 constexpr int width  = 96;
 constexpr int height = 48;
@@ -38,7 +35,7 @@ static void rltk_init() {
 void add_enemies() {
     constexpr uint32_t max_enemies_pex_room = 4;
 
-    auto& rng = rng::rng;
+    using rng::rng;
 
     auto w_map = reg.get<Map>(map);
     for(const auto& room : w_map.rooms) {
@@ -47,19 +44,25 @@ void add_enemies() {
             int rand_x          = rng.range(room.x1, room.x2 - 1);
             int rand_y          = rng.range(room.y1, room.y2 - 1);
             position_t rand_pos = {rand_x, rand_y};
+            // TODO se pá posso fazer essa parada de ocupado com context
+            // variables, mas não sei ainda como funcionam
             if(!is_occupied(reg, rand_pos)) {
-                factory::enemy_factory(w_map, rand_pos,
-                                       vchar_t{'O', GREEN, BLACK});
-                // auto enemy = reg.create();
-                // reg.emplace<renderable_t>(enemy, vchar_t{'O', GREEN, BLACK});
-                // reg.emplace<position_t>(enemy, rand_pos);
-                // reg.emplace<blocks_t>(enemy);
-                // reg.emplace<destructible_t>(enemy);
-                // auto& tile = Map::get_tile(reg, w_map, rand_pos);
-                // tile.entities.push_back(enemy);
+                auto chance = rng.range(1, 3);
+                if(chance == 1) {
+                    factory::enemy_factory(w_map, rand_pos,
+                                           vchar_t{'g', DARK_GREEN, BLACK});
+                }
+                else {
+                    factory::enemy_factory(w_map, rand_pos,
+                                           vchar_t{'O', GREEN, BLACK});
+                }
             }
         }
     }
+}
+
+static void test_func(entt::registry& reg, entt::entity ent) {
+    spdlog::warn("wtf ._ .");
 }
 
 void init() {
@@ -68,57 +71,42 @@ void init() {
 #endif
     spdlog::info("Initializing engine.");
     rltk_init();
+    reg.on_construct<game_status_t>().connect<&test_func>();
+    reg.set<game_status_t>(game_status_t::STARTUP);
 
-    auto map_obj          = new_map(reg, rect_t{0, 0, width * 4, height * 4});
-    auto player_start_pos = map_obj.rooms[0].center();
-
-    map = reg.create();
-    reg.emplace<world::Map>(map, std::move(map_obj));
-    player = reg.create();
     reg.on_construct<player_t>().connect<&camera_update>();
     reg.on_update<player_t>().connect<&camera_update>();
-    factory::player_factory(player, player_start_pos,
-                            vchar_t{'@', YELLOW, BLACK});
-    add_enemies();
+
     update();
 }
 
-// static void render_player(entt::registry& reg, entt::entity& player) {
-//     const auto& [pos, rend] = reg.get<position_t, renderable_t>(player);
-//     auto& [x, y]            = pos;
-//     using rltk::console;
-//     console->set_char(x, y, rend.vchar);
-// }
-
-// void Engine::render() {
-//     using rltk::console;
-//     if(console->dirty) {
-//         // console->clear();
-//         // render entire screen
-//         // render map
-//         // render enemies
-//         // render player
-//         // render_player(reg, player);
-//         // }
-//     }
-// }
-
 void update() {
-    // static bool first_run = true;
-    // if(first_run) {
-    //     camera_update(reg, player);
-    //     first_run = false;
-    // }
-    // XXX trigger redraw when sfml resize
-    // update player
-    auto player_has_input = radl::process_input(reg, player);
-    if(player_has_input) {
-        // TODO update world
-        // camera_update(reg, player);
+    static auto& gamestatus = reg.ctx<game_status_t>();
+    switch(gamestatus) {
+    case game_status_t::STARTUP: {
+        auto map_obj = new_map(reg, rect_t{0, 0, width * 4, height * 4});
+        auto player_start_pos = map_obj.rooms[0].center();
+        map                   = reg.create();
+        reg.emplace<world::Map>(map, std::move(map_obj));
+        player = reg.create();
+        factory::player_factory(player, player_start_pos,
+                                vchar_t{'@', YELLOW, BLACK});
+        add_enemies();
+        gamestatus = game_status_t::IDLE;
+    } break;
+    case game_status_t::IDLE: {
+        auto player_has_input = radl::process_input(reg, player);
+        if(player_has_input) {
+            gamestatus = game_status_t::NEW_TURN;
+        }
+    } break;
+    case game_status_t::NEW_TURN: {
+        // run everything else
+        gamestatus = game_status_t::IDLE;
+    } break;
+    default:
+        break;
     }
-    // update_viewshed();
 }
 
-}  // namespace engine
-
-}  // namespace radl
+}  // namespace radl::engine

@@ -4,16 +4,15 @@
 #include "entt/entt.hpp"
 #include "map.hpp"
 
-namespace radl {
+namespace radl::engine {
 
 
-namespace engine {
 
 extern entt::observer observer;
 extern entt::registry reg;
 extern entt::entity player;
-// extern world::Map map;
 extern entt::entity map;
+extern std::queue<sf::Event> event_queue;
 
 enum game_status_t {
     STARTUP,
@@ -28,5 +27,3 @@ void update();
 // void render();
 
 }  // namespace engine
-
-}  // namespace radl

@@ -3,6 +3,7 @@
 #include "move_attack.hpp"
 #include "SFML/System.hpp"
 #include "spdlog/spdlog.h"
+#include "engine.hpp"
 
 #include "system/camera.hpp"
 namespace radl {
@@ -79,9 +80,9 @@ static position_t get_next_position(const sf::Event& ev, bool* player_input) {
 bool process_input(entt::registry& reg, entt::entity e) {
     bool player_input = false;
     using rltk::my_event_queue;
-    while(!my_event_queue.empty()) {
-        auto ev = my_event_queue.front();
-        my_event_queue.pop();
+    while(!engine::event_queue.empty()) {
+        auto ev = engine::event_queue.front();
+        engine::event_queue.pop();
         handle_screen_resize(ev, reg, e);
         auto delta_pos = get_next_position(ev, &player_input);
         move_attack(reg, e, delta_pos);

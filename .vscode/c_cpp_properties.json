@@ -2,12 +2,21 @@
     "configurations": [
         {
             "name": "roguelike",
-            "includePath": [],
+            "includePath": [
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/lib/rltk"
+            ],
             "browse": {
-                "limitSymbolsToIncludedHeaders": false,
-                "path": []
+                "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db",
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "${workspaceFolder}/lib/rltk/**",
+                    "${workspaceFolder}/src/**"
+                ]
             },
-            "defines": [],
+            "defines": [
+                "SPDLOG_FMT_EXTERNAL"
+            ],
             "compilerPath": "/usr/bin/g++",
             "cStandard": "c17",
             "cppStandard": "c++20",

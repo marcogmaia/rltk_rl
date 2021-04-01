@@ -20,8 +20,13 @@ enum tile_type_t {
     floor,
 };
 
+struct tile_characteristics_t {
+    bool walkable    = false;
+    bool transparent = false;
+};
 struct tile_t {
     tile_type_t type;
+    // tile_characteristics_t characteristics;
     // list because I don't want realocations
     std::list<entt::entity> entities;
 };
@@ -32,16 +37,17 @@ struct explored_t {};
 
 struct blocks_t {};
 
-struct tile_characteristics_t {
-    bool walkable    = false;
-    bool transparent = false;
-};
+
 
 struct Map {
     rect_t rect;
 
     std::vector<rect_t> rooms;
 
+    // cada posição no vetor é uma posição fixa no mapa
+    // preciso arrumar um jeito depois das posições se auto ajustarem
+    // cada entidade aqui vai apontar de volta pra posição em que ela ocupa
+    // não tô vendo muita vantagem em continuar deixando as entidades aqui
     std::vector<entt::entity> tiles;
 
     [[nodiscard]] inline const entt::entity& operator[](position_t pos) const {

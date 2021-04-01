@@ -17,16 +17,17 @@
     "cmake.debugConfig": {
         "MIMode": "gdb",
     },
+    "C_Cpp.intelliSenseCachePath": "${workspaceFolder}/.vscode",
     "C_Cpp.intelliSenseCacheSize": 5120,
     "C_Cpp.intelliSenseMemoryLimit": 8192,
     "C_Cpp.intelliSenseEngine": "Default",
     "C_Cpp.intelliSenseEngineFallback": "Enabled",
+    "C_Cpp.autocompleteAddParentheses": false,
     "clangtidy.buildPath": "${workspaceFolder}/build",
     "clangtidy.sourcePath": "${workspaceFolder}/src",
     "clangtidy.parallelTasks": 0,
     "files.associations": {
         "*.ipp": "cpp",
-        "*.tcc": "cpp",
         "fstream": "cpp",
         "istream": "cpp",
         "ostream": "cpp",
@@ -105,8 +106,6 @@
         "valarray": "cpp",
         "variant": "cpp",
         "sdl.h": "c",
-        "*.rh": "cpp",
-        "*.def": "cpp",
         "libtcod_int.h": "c"
     },
     "C_Cpp.default.intelliSenseMode": "linux-gcc-x64",
@@ -125,6 +124,8 @@
         "Bresenham's",
         "bgsfml",
         "fgsfml",
-        "sfml"
+        "rpos",
+        "sfml",
+        "vmap"
     ]
 }

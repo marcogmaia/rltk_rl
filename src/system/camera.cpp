@@ -8,6 +8,8 @@
 #include "camera.hpp"
 #include "system/visibility.hpp"
 
+#include <ranges>
+
 
 namespace radl {
 
@@ -32,11 +34,14 @@ void fov_update(entt::registry& reg, const position_t& ent_pos,
     using namespace world;
     // resets the visibility
     reg.clear<visible_t>();
+    // dont need a viewshed with positions, when can get all visible_t
+    // componenets, and they have the entity have the position
 
     auto set_visibility = [&](position_t reveal_pos) {
         if(map.rect.contains(reveal_pos)) {
             auto ent = map.at(reveal_pos);
             reg.emplace_or_replace<visible_t>(ent);
+            // viewshed.visible_coordinates.push_back(reveal_pos);
             if(!reg.has<explored_t>(ent)) {
                 reg.emplace_or_replace<explored_t>(ent);
             }
@@ -71,14 +76,15 @@ void camera_update(entt::registry& reg, entt::entity ent) {
         spdlog::error("entity with map vmap, doesn't exist");
         return;
     }
-    auto& map = view_map.get(view_map.front());
+    // auto& map = view_map.get(view_map.front());
+    auto& map = reg.get<world::Map>(engine::map);
 
     fov_update(reg, player_pos, viewshed, map);
 
-    auto xi = px - console->term_width / 2;
-    auto xf = px + console->term_width / 2;
-    auto yi = py - console->term_height / 2;
-    auto yf = py + console->term_height / 2;
+    auto xci = px - console->term_width / 2;
+    auto xcf = px + console->term_width / 2;
+    auto yci = py - console->term_height / 2;
+    auto ycf = py + console->term_height / 2;
 
     rect_t render_viewport = {
         0,
@@ -87,9 +93,43 @@ void camera_update(entt::registry& reg, entt::entity ent) {
         console->term_height,
     };
 
+    auto render_pos = [&](int xr, int yr) -> position_t {
+        return position_t{xr - xci, yr - yci};
+    };
+
+    auto update_vicinity = [&]() -> bool {
+        constexpr int max_size = 32;
+        position_t p1          = {px - max_size, py - max_size};
+        position_t p2          = {px + max_size, py + max_size};
+        auto& [xui, yui]       = p1;
+        auto& [xuf, yuf]       = p2;
+
+        for(int x = xui; x < xuf; ++x) {
+            for(int y = yui; y < yuf; ++y) {
+                // render only valid and visible positions
+                if(!map.rect.contains({x, y})
+                   || !reg.has<visible_t>(map[{x, y}])) {
+                    continue;
+                }
+                auto tile = map.get_tile(reg, map, position_t{x, y});
+                for(auto& et : tile.entities) {
+                    auto rend = reg.try_get<renderable_t>(et);
+                    if(!rend) {
+                        continue;
+                    }
+                    // auto abs_rpos = reg.get<position_t>(et);
+                    auto&& rpos = render_pos(x, y);
+                    console->set_char(rpos.first, rpos.second, rend->vchar);
+                }
+            }
+        }
+        return true;
+    };
+
     // print all explored
-    for(int x = xi; x < xf; ++x) {
-        for(int y = yi; y < yf; ++y) {
+    for(int x = xci; x < xcf; ++x) {
+        for(int y = yci; y < ycf; ++y) {
+            // if(!should_update({x,y})) continue;
             if(!map.rect.contains({x, y})) {
                 continue;
             }
@@ -99,17 +139,22 @@ void camera_update(entt::registry& reg, entt::entity ent) {
             }
             auto vch       = reg.get<vchar_t>(tile);
             vch.foreground = DARKEST_GREY;
-            auto renderpos = position_t{x - xi, y - yi};
+            auto renderpos = render_pos(x, y);
             console->set_char(renderpos.first, renderpos.second, vch);
         }
     }
+    // if(in updatable range)
+    // if pos is visible print pos
+    // pick the highest z level entity in tile and print
+
 
     // render visible tiles
-    auto visible_view = reg.view<tile_t, visible_t, position_t>();
-    for(const auto& ent : visible_view) {
-        auto [pos, tile, vch] = reg.get<position_t, tile_t, vchar_t>(ent);
-        const auto& [x, y]    = pos;
-        auto renderpos        = position_t{x - xi, y - yi};
+    auto visible_view = reg.view<tile_t, position_t, vchar_t, visible_t>();
+    for(auto ent : visible_view) {
+        auto [tile, pos, vch]
+            = visible_view.get<tile_t, position_t, vchar_t>(ent);
+        auto [x, y]    = pos;
+        auto renderpos = position_t{x - xci, y - yci};
         if(!render_viewport.contains(renderpos)) {
             continue;
         }
@@ -131,8 +176,30 @@ void camera_update(entt::registry& reg, entt::entity ent) {
         }
 
 
-        // console->set_char(x - xi, y - yi, vch_print);
+        console->set_char(x - xci, y - yci, vch_print);
     }
+
+
+    update_vicinity();
+
+    // auto enemy_view = reg.view<enemy_t, position_t, renderable_t>();
+    // for(auto ent : enemy_view) {
+    //     auto& rend      = enemy_view.get<renderable_t>(ent);
+    //     auto& enemy_pos = enemy_view.get<position_t>(ent);
+    //     auto [x, y]     = enemy_pos;
+    //     auto contains   = std::ranges::any_of(viewshed.visible_coordinates,
+    //                                         [&](const position_t& v_pos) {
+    //                                             return enemy_pos == v_pos;
+    //                                         });
+    //     if(contains) {
+    //         auto renderpos = position_t{x - xi, y - yi};
+    //         if(render_viewport.contains(renderpos)) {
+    //             console->set_char(renderpos.first, renderpos.second,
+    //                               rend.vchar);
+    //         }
+    //     }
+    // }
+
 
     // // auto group = registry.group<position>(entt::get<velocity,
     // renderable>); const auto& enemy_view
@@ -152,7 +219,7 @@ void camera_update(entt::registry& reg, entt::entity ent) {
     // render player
     // rend.vchar.background = color_t;
     auto player_vch = rend.vchar;
-    console->set_char(px - xi, py - yi, player_vch);
+    console->set_char(px - xci, py - yci, player_vch);
 }
 
 }  // namespace radl
