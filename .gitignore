@@ -1,9 +1,11 @@
 roguebasin/
+
 lib/libtcod/
 lib/rltk/
 build/
 assets/
 .vscode/browse.*
+.vscode/ipch
 
 
 backblue.gif

@@ -1,20 +1,18 @@
 {
     "configurations": [
         {
-            "name": "Linux",
+            "name": "roguelike",
             "includePath": [
                 "${workspaceFolder}/src",
-                // "${workspaceFolder}/src/system",
-                // "${workspaceFolder}/src/utils",
-                // "${workspaceFolder}/src/component",
                 "${workspaceFolder}/lib/rltk"
             ],
             "browse": {
+                "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db",
+                "limitSymbolsToIncludedHeaders": false,
                 "path": [
-                    "${workspaceFolder}/lib/rltk/",
-                    "${workspaceFolder}/src/"
-                ],
-                "limitSymbolsToIncludedHeaders": true
+                    "${workspaceFolder}/lib/rltk/**",
+                    "${workspaceFolder}/src/**"
+                ]
             },
             "defines": [],
             "compilerPath": "/usr/bin/g++",
