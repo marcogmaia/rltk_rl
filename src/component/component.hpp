@@ -1,4 +1,4 @@
-// #pragma once
+#pragma once
 #include "component/ai.hpp"
 #include "component/attacker.hpp"
 #include "component/destructible.hpp"

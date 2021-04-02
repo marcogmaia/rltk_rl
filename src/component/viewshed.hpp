@@ -12,7 +12,7 @@ namespace {
 }
 struct viewshed_t {
     int range = default_range;  // range of visibility
-    std::vector<position_t> visible_coordinates;
+    // std::vector<position_t> visible_coordinates;
 };
 
 // void update_viewshed(entt::registry& r, entt::entity e) ;

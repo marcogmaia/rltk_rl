@@ -1,6 +1,5 @@
 #include <memory>
 #include "engine.hpp"
-#include <fmt/format.h>
 #include "core/factories.hpp"
 
 #include "component/component.hpp"
@@ -20,9 +19,9 @@ std::queue<sf::Event> event_queue;
 
 entt::registry reg;
 entt::entity player;
-entt::entity map;
+// entt::entity map;
 
-entt::observer observer{reg, entt::collector.group<position_t, player_t>()};
+// entt::observer observer{reg, entt::collector.group<position_t, player_t>()};
 
 constexpr int width  = 96;
 constexpr int height = 48;
@@ -37,23 +36,21 @@ void add_enemies() {
 
     using rng::rng;
 
-    auto w_map = reg.get<Map>(map);
+    auto& w_map = reg.ctx<Map>();
     for(const auto& room : w_map.rooms) {
         auto num_enemies = rng.range(0, max_enemies_pex_room);
         for(int i = 0; i < num_enemies; ++i) {
             int rand_x          = rng.range(room.x1, room.x2 - 1);
             int rand_y          = rng.range(room.y1, room.y2 - 1);
             position_t rand_pos = {rand_x, rand_y};
-            // TODO se pá posso fazer essa parada de ocupado com context
-            // variables, mas não sei ainda como funcionam
             if(!is_occupied(reg, rand_pos)) {
                 auto chance = rng.range(1, 3);
                 if(chance == 1) {
-                    factory::enemy_factory(w_map, rand_pos,
+                    factory::enemy_factory(rand_pos,
                                            vchar_t{'g', DARK_GREEN, BLACK});
                 }
                 else {
-                    factory::enemy_factory(w_map, rand_pos,
+                    factory::enemy_factory(rand_pos,
                                            vchar_t{'O', GREEN, BLACK});
                 }
             }
@@ -86,8 +83,7 @@ void update() {
     case game_status_t::STARTUP: {
         auto map_obj = new_map(reg, rect_t{0, 0, width * 4, height * 4});
         auto player_start_pos = map_obj.rooms[0].center();
-        map                   = reg.create();
-        reg.emplace<world::Map>(map, std::move(map_obj));
+        reg.set<Map>(map_obj);
         player = reg.create();
         factory::player_factory(player, player_start_pos,
                                 vchar_t{'@', YELLOW, BLACK});

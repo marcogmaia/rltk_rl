@@ -13,7 +13,11 @@
 
 namespace radl::world {
 
+namespace {
+
 using namespace rltk::colors;
+
+}
 
 enum tile_type_t {
     wall,
@@ -36,7 +40,6 @@ struct visible_t {};
 struct explored_t {};
 
 struct blocks_t {};
-
 
 
 struct Map {
@@ -73,16 +76,8 @@ struct Map {
         return tiles[x + y * rect.width()];
     }
 
-    static inline Map& get_map(entt::registry& reg) {
-        auto map_view = reg.view<Map>();
-        auto& map     = map_view.get(map_view.front());
-        return map;
-    }
-
-
-    static inline tile_t& get_tile(entt::registry& reg, Map& map,
-                                   position_t pos) {
-        auto& tent = map.at(pos);
+    static inline tile_t& get_tile(entt::registry& reg, position_t pos) {
+        auto& tent = reg.ctx<Map>().at(pos);
         auto& tile = reg.get<tile_t>(tent);
         return tile;
     }
@@ -93,15 +88,7 @@ struct Map {
         return tile;
     }
 
-    static inline tile_t& get_tile(entt::registry& reg, position_t pos) {
-        auto& map  = get_map(reg);
-        auto& tent = map.at(pos);
-        auto& tile = reg.get<tile_t>(tent);
-        return tile;
-    }
-
     inline void init(entt::registry& reg, const rect_t& r) {
-        // m_reg     = reg;
         rect      = r;
         auto area = r.area();
         tiles.resize(area);
@@ -130,6 +117,8 @@ Map make_test_map(const rect_t& dimension, const position_t& player_pos);
 
 Map new_map(entt::registry& reg, const rect_t& rect);
 
-std::vector<entt::entity> get_entities_vicinity() ;
+std::vector<entt::entity>* get_entities_near_player();
+
+void query_entities_near_player();
 
 }  // namespace radl::world

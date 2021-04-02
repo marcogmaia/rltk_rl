@@ -1,5 +1,6 @@
 #include <ranges>
 #include <algorithm>
+#include <memory>
 
 #include "spdlog/spdlog.h"
 #include "component/component.hpp"
@@ -16,12 +17,7 @@ namespace radl::world {
 namespace {
 
 using namespace rltk::colors;
-// auto walkable_tile = tile_t{
-//     true, true, false, floor, /* vchar_t{'#', WHITE, BLACK}, */
-// };
-// tile_t walkable_tile;
 
-// TODO all calls to corridor to use fill
 void fill(entt::registry& reg, Map& map, const rect_t& rect,
           tile_characteristics_t interaction, const tile_t& tiletype,
           vchar_t vch) {
@@ -156,30 +152,40 @@ auto is_occupied(entt::registry& reg, position_t target_pos) -> bool {
     });
 }
 
-std::vector<entt::entity> get_entities_vicinity() {
+std::unique_ptr<std::vector<entt::entity>> active_entities_near_player
+    = std::make_unique<std::vector<entt::entity>>();
+/**
+ * @brief Get the entities near the player
+ *
+ * @return std::vector<entt::entity>*
+ */
+std::vector<entt::entity>* get_entities_near_player() {
+    return active_entities_near_player.get();
+}
+
+void query_entities_near_player() {
+    constexpr int max_size = 32;
     using engine::reg;
     using rltk::console;
-    auto map               = reg.get<Map>(engine::map);
-    auto pos               = reg.get<position_t>(engine::player);
-    auto& [px, py]         = pos;
-    constexpr int max_size = 32;
-    position_t p1          = {px - max_size, py - max_size};
-    position_t p2          = {px + max_size, py + max_size};
-    auto& [xui, yui]       = p1;
-    auto& [xuf, yuf]       = p2;
+    auto& map        = reg.ctx<Map>();
+    auto pos         = reg.get<position_t>(engine::player);
+    auto& [px, py]   = pos;
+    position_t p1    = {px - max_size, py - max_size};
+    position_t p2    = {px + max_size, py + max_size};
+    auto& [xui, yui] = p1;
+    auto& [xuf, yuf] = p2;
 
-    std::vector<entt::entity> entities(256);
     for(int x = xui; x < xuf; ++x) {
         for(int y = yui; y < yuf; ++y) {
-            // render only valid and visible positions
-            if(!map.rect.contains({x, y}) || !reg.has<visible_t>(map[{x, y}])) {
+            if(!map.rect.contains({x, y})) {
                 continue;
             }
-            auto tile = Map::get_tile(reg, map, position_t{x, y});
-            std::ranges::copy(tile.entities, std::back_inserter(entities));
+            auto tile = Map::get_tile(reg, position_t{x, y});
+            std::ranges::copy(
+                tile.entities,
+                std::back_inserter(*active_entities_near_player.get()));
         }
     }
-    return entities;
 }
 
 

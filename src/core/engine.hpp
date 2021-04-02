@@ -6,10 +6,9 @@
 
 namespace radl::engine {
 
-extern entt::observer observer;
+// extern entt::observer observer;
 extern entt::registry reg;
 extern entt::entity player;
-extern entt::entity map;
 extern std::queue<sf::Event> event_queue;
 
 enum game_status_t {

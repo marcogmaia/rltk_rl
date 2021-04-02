@@ -8,18 +8,9 @@
         "**/lib/rltk/**": true,
         "**/roguebasin/**": true,
     },
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "**/boost/**":true,
-        "**/qt/**":true,
-        "**/qt{,4,5}/**":true
-    },
     "files.insertFinalNewline": true,
     "C_Cpp.intelliSenseCachePath": "${workspaceFolder}/.vscode",
+    "C_Cpp.intelliSenseCacheSize": 512,
     "cmake.platform": "linux",
     "cmake.parallelJobs": 0,
     "cmake.buildDirectory": "${workspaceFolder}/build",
@@ -114,7 +105,8 @@
         "sdl.h": "c",
         "libtcod_int.h": "c",
         "cassert": "cpp",
-        "cfloat": "cpp"
+        "cfloat": "cpp",
+        "*.tcc": "cpp"
     },
     "cSpell.enableFiletypes": [
         "!c",
@@ -125,7 +117,7 @@
         "!rust",
         "!toml",
         "!yaml",
-        "cpp"
+        "!cpp"
     ],
     "cSpell.words": [
         "Bresenham's",

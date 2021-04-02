@@ -21,8 +21,9 @@ void player_factory(entt::entity ent, const position_t& pos,
 }
 
 
-void enemy_factory(world::Map& map, const position_t& pos, vchar_t vch) {
-    auto& tile = Map::get_tile(reg, map, pos);
+void enemy_factory(const position_t& pos, vchar_t vch) {
+    auto& map  = reg.ctx<Map>();
+    auto& tile = Map::get_tile(reg, pos);
     auto enemy = reg.create();
     reg.emplace<renderable_t>(enemy, vch);
     reg.emplace<position_t>(enemy, pos);

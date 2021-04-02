@@ -1,7 +1,5 @@
-#include "component/renderable.hpp"
 #include "component/component.hpp"
-#include "component/position.hpp"
-#include "component/viewshed.hpp"
+
 #include "rltk/rltk.hpp"
 #include "core/map.hpp"
 #include "spdlog/spdlog.h"
@@ -30,8 +28,9 @@ struct nav_helper {
 };
 
 void fov_update(entt::registry& reg, const position_t& ent_pos,
-                world::viewshed_t& viewshed, world::Map& map) {
+                world::viewshed_t& viewshed) {
     using namespace world;
+    auto &map = reg.ctx<Map>();
     // resets the visibility
     reg.clear<visible_t>();
     // dont need a viewshed with positions, when can get all visible_t
@@ -39,11 +38,11 @@ void fov_update(entt::registry& reg, const position_t& ent_pos,
 
     auto set_visibility = [&](position_t reveal_pos) {
         if(map.rect.contains(reveal_pos)) {
-            auto ent = map.at(reveal_pos);
-            reg.emplace_or_replace<visible_t>(ent);
-            // viewshed.visible_coordinates.push_back(reveal_pos);
-            if(!reg.has<explored_t>(ent)) {
-                reg.emplace_or_replace<explored_t>(ent);
+            auto ent_tile = map.at(reveal_pos);
+            // set visibility on tile
+            reg.emplace_or_replace<visible_t>(ent_tile);
+            if(!reg.has<explored_t>(ent_tile)) {
+                reg.emplace_or_replace<explored_t>(ent_tile);
             }
         }
     };
@@ -71,15 +70,14 @@ void camera_update(entt::registry& reg, entt::entity ent) {
         = reg.get<position_t, renderable_t, viewshed_t>(ent);
     const auto& [px, py] = player_pos;
 
-    auto view_map = reg.view<world::Map>();
-    if(view_map.empty()) {
-        spdlog::error("entity with map vmap, doesn't exist");
-        return;
-    }
-    // auto& map = view_map.get(view_map.front());
-    auto& map = reg.get<world::Map>(engine::map);
+    // if(view_map.empty()) {
+    //     spdlog::error("entity with map vmap, doesn't exist");
+    //     return;
+    // }
 
-    fov_update(reg, player_pos, viewshed, map);
+    
+
+    fov_update(reg, player_pos, viewshed);
 
     auto xci = px - console->term_width / 2;
     auto xcf = px + console->term_width / 2;
@@ -97,36 +95,7 @@ void camera_update(entt::registry& reg, entt::entity ent) {
         return position_t{xr - xci, yr - yci};
     };
 
-    auto update_vicinity = [&]() -> bool {
-        constexpr int max_size = 32;
-        position_t p1          = {px - max_size, py - max_size};
-        position_t p2          = {px + max_size, py + max_size};
-        auto& [xui, yui]       = p1;
-        auto& [xuf, yuf]       = p2;
-
-        for(int x = xui; x < xuf; ++x) {
-            for(int y = yui; y < yuf; ++y) {
-                // render only valid and visible positions
-                if(!map.rect.contains({x, y})
-                   || !reg.has<visible_t>(map[{x, y}])) {
-                    continue;
-                }
-                auto tile = map.get_tile(reg, map, position_t{x, y});
-                for(auto& et : tile.entities) {
-                    auto rend = reg.try_get<renderable_t>(et);
-                    if(!rend) {
-                        continue;
-                    }
-                    // auto abs_rpos = reg.get<position_t>(et);
-                    auto&& rpos = render_pos(x, y);
-                    console->set_char(rpos.first, rpos.second, rend->vchar);
-                }
-            }
-        }
-        return true;
-    };
-
-
+    auto &map = reg.ctx<Map>();
     // print all explored
     for(int x = xci; x < xcf; ++x) {
         for(int y = yci; y < ycf; ++y) {
@@ -144,10 +113,10 @@ void camera_update(entt::registry& reg, entt::entity ent) {
             console->set_char(renderpos.first, renderpos.second, vch);
         }
     }
-    // if(in updatable range)
+
+    // TODO if(in updatable range)
     // if pos is visible print pos
     // pick the highest z level entity in tile and print
-
 
     // render visible tiles
     auto visible_view = reg.view<tile_t, position_t, vchar_t, visible_t>();
@@ -169,33 +138,26 @@ void camera_update(entt::registry& reg, entt::entity ent) {
         }
         vch_print.foreground = fg;
         console->set_char(renderpos.first, renderpos.second, vch_print);
-
-        // render all entities in this tile
-        for(auto& tile_ent : tile.entities) {
-            const auto& rend = reg.get<renderable_t>(tile_ent);
-            console->set_char(renderpos.first, renderpos.second, rend.vchar);
-        }
-
-
         console->set_char(x - xci, y - yci, vch_print);
     }
 
-
-    // update_vicinity();
+    // render visible enemies
     auto f_test = [&](entt::entity& ent) {
-        auto rend     = reg.try_get<renderable_t>(ent);
-        if(!rend) return;
+        auto enemy = reg.has<enemy_t>(ent);
+        if(!enemy)
+            return;
+        // do update and if visible render
+        auto rend     = reg.get<renderable_t>(ent);
         auto epos     = reg.get<position_t>(ent);
         auto [ex, ey] = epos;
         auto rpos     = render_pos(ex, ey);
         auto [rx, ry] = rpos;
-        console->set_char(rx, ry, rend->vchar);
+        if(reg.has<visible_t>(map.at(epos)))
+            console->set_char(rx, ry, rend.vchar);
     };
-    
-    std::ranges::for_each(get_entities_vicinity(), f_test);
+    query_entities_near_player();
+    std::ranges::for_each(*get_entities_near_player(), f_test);
 
-    // render player
-    // rend.vchar.background = color_t;
     auto player_vch = rend.vchar;
     console->set_char(px - xci, py - yci, player_vch);
 }

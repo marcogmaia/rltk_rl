@@ -7,7 +7,6 @@ namespace radl {
 using namespace world;
 
 
-
 bool move_attack(entt::registry& reg, entt::entity& ent,
                  const position_t& delta_pos) {
     // mark as dirty to trigger an screen update
@@ -17,14 +16,13 @@ bool move_attack(entt::registry& reg, entt::entity& ent,
     // maybe check if occupies vicinity, or add vicinity component
 
 
-    auto map_ent           = reg.view<Map>()[0];
-    auto& map              = reg.get<Map>(map_ent);
+    auto& map              = reg.ctx<Map>();
     auto target_tile       = map[target_pos];
     auto target_tile_chars = reg.get<tile_characteristics_t>(target_tile);
 
     // ## 1. attack if enemy is in the targeted pos
     if(radl::world::is_occupied(reg, target_pos)) {
-    // if(is_occupied(reg, target_pos)) {
+        // if(is_occupied(reg, target_pos)) {
         // attack
         return false;
     }
