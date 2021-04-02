@@ -10,7 +10,7 @@
     },
     "files.insertFinalNewline": true,
     "C_Cpp.intelliSenseCachePath": "${workspaceFolder}/.vscode",
-    "C_Cpp.intelliSenseCacheSize": 512,
+    "C_Cpp.intelliSenseCacheSize": 5192,
     "cmake.platform": "linux",
     "cmake.parallelJobs": 0,
     "cmake.buildDirectory": "${workspaceFolder}/build",
