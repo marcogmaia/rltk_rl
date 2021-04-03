@@ -19,18 +19,15 @@ namespace {
 using namespace rltk::colors;
 
 void fill(entt::registry& reg, Map& map, const rect_t& rect,
-          tile_characteristics_t interaction, const tile_t& tiletype,
-          vchar_t vch) {
+          tile_characteristics_t interaction, const tile_type_t& tiletype) {
     auto xi = std::min(rect.x1, rect.x2);
     auto xf = xi + rect.width();
     auto yi = std::min(rect.y1, rect.y2);
     auto yf = yi + rect.height();
     for(int x = xi; x < xf; ++x) {
         for(int y = yi; y < yf; ++y) {
-            auto ent = map.at(x, y);
-            reg.emplace_or_replace<tile_characteristics_t>(ent, interaction);
-            reg.emplace_or_replace<tile_t>(ent, tiletype);
-            reg.emplace_or_replace<vchar_t>(ent, vch);
+            auto& tile = map.at(x, y);
+            tile       = {tiletype, interaction};
         }
     }
 }
@@ -57,18 +54,11 @@ void try_apply_room_to_map(entt::registry& reg, Map& map, const rect_t& rect) {
              true,
              true,
          },
-         tile_t{
-             tile_type_t::floor,
-         },
-         vchar_t{
-             glyph::BLOCK1,
-             WHITE,
-             BLACK,
-         });
+         tile_type_t::floor);
     map.rooms.push_back(rect);
 }
 
-constexpr int max_rooms = 30 * 4;
+constexpr int max_rooms = 30;
 constexpr int min_size  = 6;
 constexpr int max_size  = 12;
 
@@ -89,30 +79,16 @@ void corridor_horizontal(entt::registry& reg, Map& map, int x1, int x2, int y) {
     auto xi                           = std::min(x1, x2);
     auto xf                           = std::max(x1, x2);
     tile_characteristics_t tile_chars = {true, true};
-    auto vch                          = vchar_t{
-        glyph::BLOCK1,
-        WHITE,
-        BLACK,
-    };
-    auto tile = tile_t{
-        tile_type_t::floor,
-    };
-    fill(reg, map, rect_t{xi, y, xf + 1, y + 1}, tile_chars, tile, vch);
+    auto ttype                        = tile_type_t::floor;
+    fill(reg, map, rect_t{xi, y, xf + 1, y + 1}, tile_chars, ttype);
 }
 
 void corridor_vertical(entt::registry& reg, Map& map, int y1, int y2, int x) {
     auto yi                           = std::min(y1, y2);
     auto yf                           = std::max(y1, y2);
     tile_characteristics_t tile_chars = {true, true};
-    auto vch                          = vchar_t{
-        glyph::BLOCK1,
-        WHITE,
-        BLACK,
-    };
-    auto tile = tile_t{
-        tile_type_t::floor,
-    };
-    fill(reg, map, rect_t{x, yi, x + 1, yf + 1}, tile_chars, tile, vch);
+    auto ttype                        = tile_type_t::floor;
+    fill(reg, map, rect_t{x, yi, x + 1, yf + 1}, tile_chars, ttype);
 }
 
 void make_corridors_between_rooms(entt::registry& reg, Map& map) {
@@ -143,15 +119,6 @@ Map new_map(entt::registry& reg, const rect_t& rect) {
     return map;
 }
 
-auto is_occupied(entt::registry& reg, position_t target_pos) -> bool {
-    using namespace std::ranges;
-    auto& tile = Map::get_tile(reg, target_pos);
-
-    return any_of(tile.entities, [&](const auto& ent) {
-        return reg.has<blocks_t>(ent);
-    });
-}
-
 std::unique_ptr<std::vector<entt::entity>> active_entities_near_player
     = std::make_unique<std::vector<entt::entity>>();
 /**
@@ -164,28 +131,33 @@ std::vector<entt::entity>* get_entities_near_player() {
 }
 
 void query_entities_near_player() {
+    active_entities_near_player->clear();
     constexpr int max_size = 32;
     using engine::reg;
     using rltk::console;
-    auto& map        = reg.ctx<Map>();
-    auto pos         = reg.get<position_t>(engine::player);
-    auto& [px, py]   = pos;
-    position_t p1    = {px - max_size, py - max_size};
-    position_t p2    = {px + max_size, py + max_size};
-    auto& [xui, yui] = p1;
-    auto& [xuf, yuf] = p2;
+    auto pos       = reg.get<position_t>(engine::player);
+    auto& [px, py] = pos;
+    position_t p1  = {px - max_size, py - max_size};
+    position_t p2  = {px + max_size, py + max_size};
 
-    for(int x = xui; x < xuf; ++x) {
-        for(int y = yui; y < yuf; ++y) {
-            if(!map.rect.contains({x, y})) {
-                continue;
+    rect_t active_rect = rect_create(p1, p2);
+
+    reg.view<viewshed_t, position_t, renderable_t>().each(
+        [&active_rect](entt::entity ent, viewshed_t& vshed,
+                       const position_t& e_pos, renderable_t& rend) {
+            if(active_rect.contains(e_pos)) {
+                active_entities_near_player->push_back(ent);
             }
-            auto tile = Map::get_tile(reg, position_t{x, y});
-            std::ranges::copy(
-                tile.entities,
-                std::back_inserter(*active_entities_near_player.get()));
-        }
-    }
+        });
+}
+
+
+bool is_occupied(entt::registry& reg, position_t target_pos) {
+    return std::ranges::any_of(*active_entities_near_player.get(),
+                               [&](auto& ent) {
+                                   auto active_pos = reg.get<position_t>(ent);
+                                   return active_pos == target_pos;
+                               });
 }
 
 

@@ -48,4 +48,16 @@ struct rect_t {
     }
 };
 
+inline rect_t rect_create(const position_t& p1, const position_t& p2) {
+    return rect_t{p1.first, p1.second, p2.first, p2.second};
+}
+
+// inline rect_t rect_create(position_t p1, position_t p2) {
+//     return rect_t{p1.first, p1.second, p2.first, p2.second};
+// }
+
+// inline rect_t rect_create(position_t&& p1, position_t&& p2) {
+//     return rect_t{p1.first, p1.second, p2.first, p2.second};
+// }
+
 }  // namespace radl

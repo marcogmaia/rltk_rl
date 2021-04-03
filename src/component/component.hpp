@@ -1,4 +1,8 @@
 #pragma once
+#include "entt/entt.hpp"
+using entt::entity;
+using entt::registry;
+
 #include "component/ai.hpp"
 #include "component/attacker.hpp"
 #include "component/destructible.hpp"

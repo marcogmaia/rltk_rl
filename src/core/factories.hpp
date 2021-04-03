@@ -1,7 +1,6 @@
 #pragma once
 
 #include "entt/entt.hpp"
-// #include "attacker.hpp"
 #include "component/component.hpp"
 
 

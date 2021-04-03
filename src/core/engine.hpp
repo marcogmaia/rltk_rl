@@ -22,5 +22,6 @@ enum game_status_t {
 void init();
 void update();
 // void render();
+void terminate();
 
 }  // namespace engine

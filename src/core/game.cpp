@@ -38,4 +38,5 @@ void run() {
 void game() {
     engine::init();
     run();
+    engine::terminate();
 }

@@ -6,6 +6,15 @@ namespace radl {
 
 using namespace world;
 
+namespace {
+void walk(entt::registry& reg, entt::entity ent, const position_t& actual_pos,
+          const position_t& target_pos) {
+    // auto& map  = reg.ctx<Map>();
+    // auto& tile = map.get_tile(reg, actual_pos);
+    // tile_t tile = map[actual_pos];
+    reg.replace<position_t>(ent, target_pos);
+}
+}  // namespace
 
 bool move_attack(entt::registry& reg, entt::entity& ent,
                  const position_t& delta_pos) {
@@ -14,11 +23,8 @@ bool move_attack(entt::registry& reg, entt::entity& ent,
     auto target_pos  = actual_pos + delta_pos;
 
     // maybe check if occupies vicinity, or add vicinity component
-
-
-    auto& map              = reg.ctx<Map>();
-    auto target_tile       = map[target_pos];
-    auto target_tile_chars = reg.get<tile_characteristics_t>(target_tile);
+    auto& map = reg.ctx<Map>();
+    const auto& target_tile_chars = map[{target_pos}].characteristics;
 
     // ## 1. attack if enemy is in the targeted pos
     if(radl::world::is_occupied(reg, target_pos)) {
@@ -28,17 +34,11 @@ bool move_attack(entt::registry& reg, entt::entity& ent,
     }
     // ## 2. walk if tile is no occupied and walkable
     else if(target_tile_chars.walkable) {
-        // walk
-        auto& tile = map.get_tile(reg, actual_pos);
-        tile.entities.remove(ent);
-        // tile.entities.push_back(ent);
-        reg.emplace_or_replace<position_t>(ent, target_pos);
-        map.get_tile(reg, actual_pos).entities.push_back(ent);
+        walk(reg, ent, actual_pos, target_pos);
     }
 
     // ## 3. do nothing if is wall
-    // XXX tenho que arrumar uma forma de fazer a query com a tile direto, ou só
-    reg.emplace_or_replace<player_t>(ent);
+    reg.replace<player_t>(ent);
     return true;
 }
 

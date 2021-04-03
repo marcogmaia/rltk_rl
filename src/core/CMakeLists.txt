@@ -9,16 +9,16 @@ add_library(
 
 target_link_libraries(
     game_core PRIVATE
-    game_utils
-    game_system
-    game_component
+    "game_utils"
+    "game_system"
+    "game_component"
 )
     
 target_link_libraries(
     game_core PUBLIC
-    spdlog::spdlog
-    pthread
-    tbb
-    fmt
-    rltk
+    "spdlog::spdlog"
+    "pthread"
+    "tbb"
+    "fmt"
+    "rltk"
 )

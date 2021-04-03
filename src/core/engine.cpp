@@ -58,21 +58,13 @@ void add_enemies() {
     }
 }
 
-static void test_func(entt::registry& reg, entt::entity ent) {
-    spdlog::warn("wtf ._ .");
-}
-
 void init() {
 #ifdef DEBUG
     spdlog::set_level(spdlog::level::debug);
 #endif
     spdlog::info("Initializing engine.");
     rltk_init();
-    reg.on_construct<game_status_t>().connect<&test_func>();
     reg.set<game_status_t>(game_status_t::STARTUP);
-
-    reg.on_construct<player_t>().connect<&camera_update>();
-    reg.on_update<player_t>().connect<&camera_update>();
 
     update();
 }
@@ -81,13 +73,16 @@ void update() {
     static auto& gamestatus = reg.ctx<game_status_t>();
     switch(gamestatus) {
     case game_status_t::STARTUP: {
-        auto map_obj = new_map(reg, rect_t{0, 0, width * 4, height * 4});
+        auto map_obj          = new_map(reg, rect_t{0, 0, width, height});
         auto player_start_pos = map_obj.rooms[0].center();
         reg.set<Map>(map_obj);
         player = reg.create();
         factory::player_factory(player, player_start_pos,
                                 vchar_t{'@', YELLOW, BLACK});
         add_enemies();
+        query_entities_near_player();
+        fov_update(reg, player);
+        camera_update(reg, player);
         gamestatus = game_status_t::IDLE;
     } break;
     case game_status_t::IDLE: {
@@ -97,12 +92,25 @@ void update() {
         }
     } break;
     case game_status_t::NEW_TURN: {
-        // run everything else
+        query_entities_near_player();
+        fov_update(reg, player);
+        fov_update_parallel(*get_entities_near_player());
+        
+        // run everything else (systems ?)
+        // XXX test!
+        // on visible destruct remove visible from enemies!!!!!
+        ai_sys(reg, player);
+
+        camera_update(reg, player);
         gamestatus = game_status_t::IDLE;
     } break;
     default:
         break;
     }
+}
+
+void terminate() {
+    reg.clear();
 }
 
 }  // namespace radl::engine

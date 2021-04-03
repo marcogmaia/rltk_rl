@@ -5,11 +5,9 @@
 #include <list>
 #include <set>
 
-#include "rltk/rltk.hpp"
-
 #include "utils/rect.hpp"
-#include "component/vchar.hpp"
 #include "entt/entity/registry.hpp"
+#include "component/vchar.hpp"
 
 namespace radl::world {
 
@@ -27,19 +25,45 @@ enum tile_type_t {
 struct tile_characteristics_t {
     bool walkable    = false;
     bool transparent = false;
-};
-struct tile_t {
-    tile_type_t type;
-    // tile_characteristics_t characteristics;
-    // list because I don't want realocations
-    std::list<entt::entity> entities;
+    bool explored    = false;
 };
 
-struct visible_t {};
+struct active_t {};
 
-struct explored_t {};
+// struct explored_t {};
 
 struct blocks_t {};
+
+struct tile_t {
+    tile_type_t type;
+    tile_characteristics_t characteristics;
+
+    inline vchar_t get_vchar() const {
+        vchar_t vch = {
+            '\0',
+            DARKEST_GREY,
+            BLACK,
+        };
+
+        switch(type) {
+        case tile_type_t::wall:
+            vch.glyph = glyph::SOLID1;
+            break;
+        case tile_type_t::floor:
+            vch.glyph = glyph::BLOCK1;
+            break;
+        default:
+            break;
+        }
+        return vch;
+    }
+    // position_t position;
+    // tile_characteristics_t characteristics;
+    // list because I don't want realocations
+    // std::list<entt::entity> entities;
+};
+
+// struct visible_t {};
 
 
 struct Map {
@@ -51,41 +75,31 @@ struct Map {
     // preciso arrumar um jeito depois das posições se auto ajustarem
     // cada entidade aqui vai apontar de volta pra posição em que ela ocupa
     // não tô vendo muita vantagem em continuar deixando as entidades aqui
-    std::vector<entt::entity> tiles;
+    // FIXME replace entity for tile_t, the position will no longer contain the
+    // entities
+    std::vector<tile_t> tiles;
 
-    [[nodiscard]] inline const entt::entity& operator[](position_t pos) const {
+    [[nodiscard]] inline const tile_t& operator[](position_t pos) const {
         auto& [x, y] = pos;
         return tiles[x + y * rect.width()];
     }
 
-    inline entt::entity& operator[](position_t pos) {
+    inline tile_t& operator[](position_t pos) {
         auto& [x, y] = pos;
         return tiles[x + y * rect.width()];
     }
 
-    inline entt::entity& at(position_t pos) {
+    inline tile_t& at(position_t pos) {
         auto& [x, y] = pos;
         return tiles[x + y * rect.width()];
     }
 
-    inline entt::entity& at(int x, int y) {
+    inline tile_t& at(int x, int y) {
         return tiles[x + y * rect.width()];
     }
 
-    [[nodiscard]] inline const entt::entity& at(int x, int y) const {
+    [[nodiscard]] inline const tile_t at(int x, int y) const {
         return tiles[x + y * rect.width()];
-    }
-
-    static inline tile_t& get_tile(entt::registry& reg, position_t pos) {
-        auto& tent = reg.ctx<Map>().at(pos);
-        auto& tile = reg.get<tile_t>(tent);
-        return tile;
-    }
-
-    static inline tile_t& get_tile(entt::registry& reg, entt::entity tile_ent,
-                                   position_t pos) {
-        auto& tile = reg.get<tile_t>(tile_ent);
-        return tile;
     }
 
     inline void init(entt::registry& reg, const rect_t& r) {
@@ -93,18 +107,26 @@ struct Map {
         auto area = r.area();
         tiles.resize(area);
 
+        tile_t initial_tile{
+            .type = tile_type_t::wall,
+            .characteristics{
+                false,
+                false,
+            },
+        };
+
         for(int x = 0; x < r.width(); ++x) {
             for(int y = 0; y < r.height(); ++y) {
-                auto tile                = reg.create();
-                tiles[x + y * r.width()] = tile;
-                reg.emplace<position_t>(tile, position_t{x, y});
-                reg.emplace<tile_t>(tile, tile_type_t::wall);
-                reg.emplace<tile_characteristics_t>(tile);
-                reg.emplace<vchar_t>(tile, vchar_t{
-                                               glyph::SOLID1,
-                                               WHITE,
-                                               BLACK,
-                                           });
+                // auto tile                = reg.create();
+                tiles[x + y * r.width()] = initial_tile;
+                // reg.emplace<position_t>(tile, position_t{x, y});
+                // reg.emplace<tile_t>(tile, tile_type_t::wall);
+                // reg.emplace<tile_characteristics_t>(tile);
+                // reg.emplace<vchar_t>(tile, vchar_t{
+                //                                glyph::SOLID1,
+                //                                WHITE,
+                //                                BLACK,
+                //                            });
             }
         }
     }
@@ -120,5 +142,5 @@ Map new_map(entt::registry& reg, const rect_t& rect);
 std::vector<entt::entity>* get_entities_near_player();
 
 void query_entities_near_player();
-
+// void update_enemies_visibility(entt::registry& reg, entt::entity ent);
 }  // namespace radl::world

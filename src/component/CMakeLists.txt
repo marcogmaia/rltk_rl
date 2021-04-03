@@ -5,10 +5,11 @@ include_directories(
 
 set(COMPONENT_SCRS
     "attacker.cpp"
-    # "viewshed.cpp"
+    "viewshed.cpp"
     "attacker.cpp"
     "destructible.cpp"
     "viewshed.cpp"
+    "ai.cpp"
 )
 
 add_library(
@@ -18,4 +19,4 @@ add_library(
 
 
 
-target_link_libraries(game_component spdlog::spdlog)
+target_link_libraries(game_component tbb spdlog::spdlog)

@@ -11,7 +11,7 @@
                 "cwd": "${workspaceFolder}/build/"
             },
             "args": [],
-            "problemMatcher": "$gcc",
+            "problemMatcher": ["$gcc"],
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -29,7 +29,7 @@
                 "kind": "test",
                 "isDefault": true
             },
-            "problemMatcher": []
+            "problemMatcher": ["$gcc"]
         }
     ]
 }

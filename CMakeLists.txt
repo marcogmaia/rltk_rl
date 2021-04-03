@@ -2,15 +2,16 @@ cmake_minimum_required(VERSION 3.15.0)
 project(learning VERSION 0.1.0)
 
 set(BUILD_SHARED_LIBS ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
+# set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
 
 set(MYW_DISABLES "-Wno-attributes -Wno-unused-parameter")
 # set(MYW_DISABLES "-Wno-attributes ")
 
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -Wall ${MYW_DISABLES} -DDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -Wall ${MYW_DISABLES} -DNDEBUG")
+set(COMMON_FLAGS "-fdiagnostics-color=always")
+set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -Wall ${MYW_DISABLES} -DDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}-O2 -Wall ${MYW_DISABLES} -DNDEBUG")
 # set(CMAKE_BUILD_TYPE DEBUG)
-set(CMAKE_BUILD_TYPE RELEASE)
+# set(CMAKE_BUILD_TYPE RELEASE)
 
 # include(CTest)
 # enable_testing()

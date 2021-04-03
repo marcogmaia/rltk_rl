@@ -1,5 +1,5 @@
 {
-    "files.watcherExclude": {
+     "files.watcherExclude": {
         "**/.git/objects/**": true,
         "**/.git/subtree-cache/**": true,
         "**/node_modules/**": true,
@@ -106,7 +106,8 @@
         "libtcod_int.h": "c",
         "cassert": "cpp",
         "cfloat": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "*.inc": "cpp"
     },
     "cSpell.enableFiletypes": [
         "!c",
