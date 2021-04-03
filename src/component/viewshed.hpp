@@ -1,17 +1,28 @@
 #pragma once
 #include <algorithm>
 #include <execution>
+#include <unordered_set>
 #include <vector>
 #include "component/position.hpp"
 #include "core/map.hpp"
 #include "entt/entt.hpp"
 
-#include <set>
+namespace std {
+template <>
+struct hash<radl::position_t> {
+    std::size_t operator()(const radl::position_t& pos) const {
+        return (hash<int>()(pos.first) ^ (hash<int>()(pos.second) << 1)) >> 1;
+    }
+};
+}  // namespace std
+
 namespace radl::world {
 
 namespace {
 constexpr int default_range = 8;
 }
+
+
 struct viewshed_t {
     int range = default_range;  // range of visibility
     std::vector<position_t> visible_coordinates;

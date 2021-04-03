@@ -3,25 +3,29 @@ project(learning VERSION 0.1.0)
 
 set(BUILD_SHARED_LIBS ON)
 # set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
+find_package(spdlog REQUIRED)
 
-set(MYW_DISABLES "-Wno-attributes -Wno-unused-parameter")
+set(MYW_DISABLES "-Wextra -Wno-attributes -Wno-unused-parameter  -Wno-ignored-qualifiers")
 # set(MYW_DISABLES "-Wno-attributes ")
 
-set(COMMON_FLAGS "-fdiagnostics-color=always")
-set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -Wall ${MYW_DISABLES} -DDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}-O2 -Wall ${MYW_DISABLES} -DNDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -Wall ${MYW_DISABLES} -DDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}-O2 -Wall ${MYW_DISABLES} -DNDEBUG")
 # set(CMAKE_BUILD_TYPE DEBUG)
 # set(CMAKE_BUILD_TYPE RELEASE)
 
 # include(CTest)
 # enable_testing()
 
-find_package(spdlog REQUIRED)
+
 
 add_subdirectory("lib/rltk")
 include_directories("lib/rltk")
 
 set(CMAKE_CXX_STANDARD 20)
+
+set(USER_CODE_FLAGS "-fdiagnostics-color=always ")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${USER_CODE_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${USER_CODE_FLAGS}")
 
 include_directories("./src")
 # add_subdirectory(src)

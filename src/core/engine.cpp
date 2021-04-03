@@ -26,7 +26,8 @@ entt::entity player;
 constexpr int width  = 96;
 constexpr int height = 48;
 static void rltk_init() {
-    auto constexpr* font_file = "../assets";
+    // using namespace entt::literals;
+    constexpr auto font_file =  "../assets" ;
     rltk::init(rltk::config_simple(font_file, width, height,
                                    "Maia Roguelike learning", "16x16", false));
 }
@@ -95,11 +96,11 @@ void update() {
         query_entities_near_player();
         fov_update(reg, player);
         fov_update_parallel(*get_entities_near_player());
-        
+
         // run everything else (systems ?)
         // XXX test!
         // on visible destruct remove visible from enemies!!!!!
-        ai_sys(reg, player);
+        ai_sys(reg);
 
         camera_update(reg, player);
         gamestatus = game_status_t::IDLE;

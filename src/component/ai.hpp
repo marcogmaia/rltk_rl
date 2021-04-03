@@ -6,7 +6,7 @@ namespace radl {
 
 struct ai_t {};
 
-void ai_sys(entt::registry& reg, entt::entity ent);
+void ai_sys(entt::registry& reg);
 
 
 }  // namespace radl

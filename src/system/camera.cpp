@@ -60,8 +60,8 @@ void camera_update(entt::registry& reg, entt::entity ent) {
 
     // render visible tiles and enemies
     // auto& ents_near = *get_entities_near_player();
-    auto pvshed     = reg.get<viewshed_t>(engine::player);
-    auto g_enemy    = reg.group<enemy_t, renderable_t, position_t>();
+    auto pvshed  = reg.get<viewshed_t>(engine::player);
+    auto g_enemy = reg.group<enemy_t, renderable_t, position_t>();
     for(auto& v_pos : pvshed.visible_coordinates) {
         const auto& tile = map.at(v_pos);
         vchar_t tile_vch = tile.get_vchar();
@@ -80,7 +80,7 @@ void camera_update(entt::registry& reg, entt::entity ent) {
 
     // parallel check and render enemy
     auto& vcoords                = pvshed.visible_coordinates;
-    auto render_enemy_if_visible = [&](position_t& v_pos) {
+    auto render_enemy_if_visible = [&](const position_t& v_pos) {
         g_enemy.each([&](auto ent, renderable_t& e_rend, position_t& e_pos) {
             if(v_pos == e_pos) {
                 auto [rx, ry] = render_pos(e_pos.first, e_pos.second);
