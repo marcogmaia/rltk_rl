@@ -45,8 +45,8 @@ void fov_update(entt::registry& reg, entt::entity ent) {
     auto set_visibility = [&](position_t reveal_pos) {
         if(map.rect.contains(reveal_pos)) {
             auto& reveal_tile = map.at(reveal_pos);
-            vshed.visible_coordinates.emplace_back(reveal_pos);
-            // vshed.visible_coordinates.insert(reveal_pos);
+            // vshed.visible_coordinates.emplace_back(reveal_pos);
+            vshed.visible_coordinates.insert(reveal_pos);
             if(ent == engine::player) {
                 reveal_tile.characteristics.explored = true;
             }

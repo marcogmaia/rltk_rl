@@ -76,10 +76,6 @@ static position_t get_next_position(const sf::Event& ev, bool* player_input) {
     return position_t{dx, dy};
 }
 
-static void clear(std::queue<sf::Event>& q) {
-    std::queue<sf::Event> empty;
-    std::swap(q, empty);
-}
 
 bool process_input(entt::registry& reg, entt::entity e) {
     bool player_input = false;
@@ -87,24 +83,30 @@ bool process_input(entt::registry& reg, entt::entity e) {
     if(!engine::event_queue.empty()) {
         auto ev = engine::event_queue.front();
         engine::event_queue.pop();
+        if(ev.type != sf::Event::EventType::KeyPressed) {
+            return false;
+        }
         handle_screen_resize(ev, reg, e);
         auto delta_pos = get_next_position(ev, &player_input);
         if(delta_pos != position_t{0, 0}) {
             move_attack(reg, e, delta_pos);
         }
-        // engine::event_queue.
-        if(engine::event_queue.size() > 4) {
-            engine::event_queue.pop();
-            engine::event_queue.pop();
-        }
-        // clear(engine::event_queue);
     }
     return player_input;
 }
 
-void walk(entt::entity ent, const position_t& target_pos) {
+namespace {
+std::mutex walk_mutex;
+}
+
+void walk(entt::entity ent, const position_t& src_pos,
+          const position_t& target_pos) {
     using engine::reg;
+    std::lock_guard guard(walk_mutex);
     if(!world::is_occupied(reg, target_pos)) {
+        auto& map = reg.ctx<world::Map>();
+        map[src_pos].entities_here.remove(ent);
+        map[target_pos].entities_here.push_front(ent);
         reg.get<world::viewshed_t>(ent).dirty = true;
         reg.replace<position_t>(ent, target_pos);
     }
@@ -129,7 +131,7 @@ bool move_attack(entt::registry& reg, entt::entity& ent,
     }
     // ## 2. walk if tile is no occupied and walkable
     else if(target_tile_chars.walkable) {
-        walk(ent, target_pos);
+        walk(ent, actual_pos, target_pos);
     }
 
     // ## 3. do nothing if is wall

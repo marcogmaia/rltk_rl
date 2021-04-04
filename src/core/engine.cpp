@@ -87,22 +87,25 @@ void update() {
         gamestatus = game_status_t::IDLE;
     } break;
     case game_status_t::IDLE: {
-        auto player_has_input = radl::process_input(reg, player);
-        if(player_has_input) {
-            gamestatus = game_status_t::NEW_TURN;
+        while(!engine::event_queue.empty()) {
+            auto player_has_input = radl::process_input(reg, player);
+            if(player_has_input) {
+                query_entities_near_player();
+                fov_update(reg, player);
+                fov_update_parallel(get_entities_near_player());
+                ai_enemy(reg);
+            }
+
+            // run everything else (systems ?)
+            // XXX test!
+            // on visible destruct remove visible from enemies!!!!!
         }
+        // if(player_has_input) {
+        // TODO move switch from process_input to here.
+        gamestatus = game_status_t::NEW_TURN;
+        // }
     } break;
     case game_status_t::NEW_TURN: {
-        query_entities_near_player();
-        fov_update(reg, player);
-        fov_update_parallel(get_entities_near_player());
-
-        // run everything else (systems ?)
-        // XXX test!
-        // on visible destruct remove visible from enemies!!!!!
-        ai_enemy(reg);
-   
-
         camera_update(reg, player);
         gamestatus = game_status_t::IDLE;
     } break;

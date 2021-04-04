@@ -26,7 +26,7 @@ constexpr int default_range = 8;
 
 struct viewshed_t {
     int range = default_range;  // range of visibility
-    std::vector<position_t> visible_coordinates;
+    std::unordered_set<position_t> visible_coordinates;
     bool dirty = true;
 };
 

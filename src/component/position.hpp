@@ -13,6 +13,13 @@ std::pair<T, T> operator+(const std::pair<T, T>& left,
 
 using position_t = std::pair<int, int>;
 
+// struct position_t {
+//     int x;
+//     int y;
+//     // mas nem precisa da referência, pois a posição já pode achar a tile!
+//     // world::tile_t *tile;
+// };
+
 // Position component
 // struct position_t {
 //     int x;

@@ -14,8 +14,10 @@ namespace radl::world {
 namespace {
 
 using namespace rltk::colors;
+using entt::entity;
+using entt::registry;
 
-}
+}  // namespace
 
 enum tile_type_t {
     wall,
@@ -26,17 +28,21 @@ struct tile_characteristics_t {
     bool walkable    = false;
     bool transparent = false;
     bool explored    = false;
+    bool is_visible  = false;
 };
 
-struct active_t {};
+// struct active_t {};
 
 // struct explored_t {};
 
-struct blocks_t {};
+
+// struct blocks_t {};
 
 struct tile_t {
-    tile_type_t type;
+    tile_type_t type = wall;
     tile_characteristics_t characteristics;
+    std::list<entity> entities_here;
+    // entity characteristics;
 
     inline vchar_t get_vchar() const {
         vchar_t vch = {
@@ -75,7 +81,6 @@ struct Map {
     // preciso arrumar um jeito depois das posições se auto ajustarem
     // cada entidade aqui vai apontar de volta pra posição em que ela ocupa
     // não tô vendo muita vantagem em continuar deixando as entidades aqui
-    // FIXME replace entity for tile_t, the position will no longer contain the
     // entities
     std::vector<tile_t> tiles;
 
@@ -107,28 +112,12 @@ struct Map {
         auto area = r.area();
         tiles.resize(area);
 
-        tile_t initial_tile{
-            .type = tile_type_t::wall,
-            .characteristics{
-                false,
-                false,
-            },
-        };
 
-        for(int x = 0; x < r.width(); ++x) {
-            for(int y = 0; y < r.height(); ++y) {
-                // auto tile                = reg.create();
-                tiles[x + y * r.width()] = initial_tile;
-                // reg.emplace<position_t>(tile, position_t{x, y});
-                // reg.emplace<tile_t>(tile, tile_type_t::wall);
-                // reg.emplace<tile_characteristics_t>(tile);
-                // reg.emplace<vchar_t>(tile, vchar_t{
-                //                                glyph::SOLID1,
-                //                                WHITE,
-                //                                BLACK,
-                //                            });
-            }
-        }
+        // for(int x = 0; x < r.width(); ++x) {
+        //     for(int y = 0; y < r.height(); ++y) {
+        //         // tiles[x + y * r.width()];
+        //     }
+        // }
     }
 };
 

@@ -160,7 +160,7 @@ public:  // methods
         m_Start->h
             = m_Start->m_UserState.GoalDistanceEstimate(m_Goal->m_UserState);
         m_Start->f      = m_Start->g + m_Start->h;
-        m_Start->parent = m_Start;
+        m_Start->parent = 0;
 
         // Push the start node on the Open list
 

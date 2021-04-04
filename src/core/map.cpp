@@ -19,15 +19,16 @@ namespace {
 using namespace rltk::colors;
 
 void fill(entt::registry& reg, Map& map, const rect_t& rect,
-          tile_characteristics_t interaction, const tile_type_t& tiletype) {
+          tile_characteristics_t characteristics, const tile_type_t& tiletype) {
     auto xi = std::min(rect.x1, rect.x2);
     auto xf = xi + rect.width();
     auto yi = std::min(rect.y1, rect.y2);
     auto yf = yi + rect.height();
     for(int x = xi; x < xf; ++x) {
         for(int y = yi; y < yf; ++y) {
-            auto& tile = map.at(x, y);
-            tile       = {tiletype, interaction};
+            auto& tile           = map.at(x, y);
+            tile.type            = tiletype;
+            tile.characteristics = characteristics;
         }
     }
 }

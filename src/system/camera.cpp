@@ -19,7 +19,7 @@ void camera_update(entt::registry& reg, entt::entity ent) {
     auto& map = reg.ctx<Map>();
 
     console->clear();
-    const auto& [player_pos, rend, viewshed]
+    const auto& [player_pos, rend, pvshed]
         = reg.get<position_t, renderable_t, viewshed_t>(ent);
     const auto& [px, py] = player_pos;
 
@@ -51,7 +51,6 @@ void camera_update(entt::registry& reg, entt::entity ent) {
     }
 
     // render visible tiles
-    auto pvshed = reg.get<viewshed_t>(engine::player);
     for(auto& v_pos : pvshed.visible_coordinates) {
         const auto& tile = map.at(v_pos);
         vchar_t tile_vch = tile.get_vchar();
@@ -65,20 +64,21 @@ void camera_update(entt::registry& reg, entt::entity ent) {
         console->set_char(rx, ry, tile_vch);
     }
 
-    // parallel check and render enemy
-    auto& vcoords                = pvshed.visible_coordinates;
-    auto e_group = reg.group<being_t, position_t>();
-    auto render_enemy_if_visible = [&](const position_t& v_pos) {
-        for(auto&& [ent, e_, e_pos]: e_group.each()) {
-            if(v_pos == e_pos) {
-                auto [rx, ry]      = render_pos(e_pos.first, e_pos.second);
-                const auto& e_rend = reg.get<renderable_t>(ent);
+    // search entities in visible positions and print them
+    std::for_each(
+        std::execution::par_unseq, std::begin(pvshed.visible_coordinates),
+        std::end(pvshed.visible_coordinates), [&](const position_t& vpos) {
+            const auto& ents = map[vpos].entities_here;
+            for(const auto& ent : ents) {
+                if(!reg.all_of<being_t, renderable_t, position_t>(ent)) {
+                    continue;
+                }
+                const auto& e_rend   = reg.get<renderable_t>(ent);
+                const auto& e_pos    = reg.get<position_t>(ent);
+                const auto& [rx, ry] = render_pos(e_pos.first, e_pos.second);
                 console->set_char(rx, ry, e_rend.vchar);
             }
-        }
-    };
-    std::for_each(std::execution::par_unseq, vcoords.begin(), vcoords.end(),
-                  render_enemy_if_visible);
+        });
 
     // render player
     auto player_vch = rend.vchar;
