@@ -152,23 +152,21 @@ void query_entities_near_player() {
         });
 }
 
-
+// XXX change this in the future, now we are only using entities that blocks the
+// path
 bool is_occupied(entt::registry& reg, position_t target_pos) {
-    return std::ranges::any_of(*active_entities_near_player.get(),
-                               [&](entity ent) {
-                                   auto ent_pos = reg.get<position_t>(ent);
-                                   return ent_pos == target_pos;
-                               });
-    return false;
+    return reg.ctx<Map>().at(target_pos).entities_here.size() > 0;
 }
 
 void map_entity_walk(entity ent, const position_t& src_pos,
                      const position_t& dst_pos) {
     using engine::reg;
-    reg.replace<position_t>(ent, dst_pos);
     auto& map = reg.ctx<world::Map>();
     map[src_pos].entities_here.remove(ent);
-    map[dst_pos].entities_here.push_front(ent);
+    map[dst_pos].entities_here.push_back(ent);
+    reg.patch<position_t>(ent, [=](position_t& pos) {
+        pos = dst_pos;
+    });
 }
 
 }  // namespace radl::world

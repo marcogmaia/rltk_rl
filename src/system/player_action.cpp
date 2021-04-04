@@ -88,21 +88,19 @@ bool process_input(entt::registry& reg, entt::entity e) {
         }
         handle_screen_resize(ev, reg, e);
         auto delta_pos = get_next_position(ev, &player_input);
-        // if(delta_pos != position_t{0, 0}) {
         move_attack(reg, e, delta_pos);
-        // }
     }
     return player_input;
 }
 
-// namespace {
-// std::mutex walk_mutex;
-// }
+namespace {
+std::mutex walk_mutex;
+}
 
 void walk(entt::entity ent, const position_t& src_pos,
           const position_t& target_pos) {
     using engine::reg;
-    // std::lock_guard guard(walk_mutex);
+    std::lock_guard guard(walk_mutex);
     if(!world::is_occupied(reg, target_pos) && (src_pos != target_pos)) {
         world::map_entity_walk(ent, src_pos, target_pos);
         // mark viewshed as dirty to recalculate
@@ -112,24 +110,24 @@ void walk(entt::entity ent, const position_t& src_pos,
 
 bool move_attack(entt::registry& reg, entt::entity& ent,
                  const position_t& delta_pos) {
+    using namespace world;
     using engine::reg;
     // mark as dirty to trigger an screen update
-    auto& actual_pos = reg.get<position_t>(ent);
-    auto target_pos  = actual_pos + delta_pos;
+    auto& src_pos = reg.get<position_t>(ent);
+    auto dst_pos  = src_pos + delta_pos;
 
     // maybe check if occupies vicinity, or add vicinity component
-    auto& map                     = reg.ctx<world::Map>();
-    const auto& target_tile_chars = map[{target_pos}].characteristics;
+    auto& map                     = reg.ctx<Map>();
+    const auto& target_tile_chars = map[{dst_pos}].characteristics;
 
     // ## 1. attack if enemy is in the targeted pos
-    if(radl::world::is_occupied(reg, target_pos)) {
-        // if(is_occupied(reg, target_pos)) {
+    if(is_occupied(reg, dst_pos)) {
         // attack
         return false;
     }
     // ## 2. walk if tile is no occupied and walkable
     else if(target_tile_chars.walkable) {
-        walk(ent, actual_pos, target_pos);
+        walk(ent, src_pos, dst_pos);
     }
 
     // ## 3. do nothing if is wall

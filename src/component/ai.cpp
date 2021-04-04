@@ -24,8 +24,8 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
     // found
     auto e_pos = reg.get<position_t>(e_ent);
     if(e_pos != target_pos) {
-        auto path
-            = find_path<position_t, navigator<position_t>>(e_pos, target_pos);
+        auto path = find_path_2d<position_t, navigator<position_t>>(e_pos,
+                                                                    target_pos);
         if(path->success && path->steps.size() > 1) {
             auto next_step = path->steps.front();
             path->steps.pop_front();
@@ -58,7 +58,8 @@ void ai_enemy(entt::registry& reg) {
         }
     };
 
-    std::for_each(g_enemies.begin(), g_enemies.end(), func);
+    std::for_each(std::execution::par_unseq, g_enemies.begin(), g_enemies.end(),
+                  func);
 }
 
 }  // namespace radl

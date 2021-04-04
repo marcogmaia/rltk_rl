@@ -95,12 +95,7 @@ void update() {
                 fov_update_parallel(get_entities_near_player());
                 ai_enemy(reg);
             }
-
-            // run everything else (systems ?)
-            // XXX test!
-            // on visible destruct remove visible from enemies!!!!!
         }
-        // if(player_has_input) {
         // TODO move switch from process_input to here.
         gamestatus = game_status_t::NEW_TURN;
         // }

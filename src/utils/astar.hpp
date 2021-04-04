@@ -112,7 +112,7 @@ public:  // methods
     // constructor just initialises private data
     AStarSearch()
         : m_State(SEARCH_STATE_NOT_INITIALISED)
-        , m_CurrentSolutionNode(NULL)
+        , m_CurrentSolutionNode(nullptr)
         ,
 #if USE_FSA_MEMORY
         m_FixedSizeAllocator(1000)
@@ -124,7 +124,7 @@ public:  // methods
 
     AStarSearch(int MaxNodes)
         : m_State(SEARCH_STATE_NOT_INITIALISED)
-        , m_CurrentSolutionNode(NULL)
+        , m_CurrentSolutionNode(nullptr)
         ,
 #if USE_FSA_MEMORY
         m_FixedSizeAllocator(MaxNodes)
@@ -146,7 +146,7 @@ public:  // methods
         m_Start = AllocateNode();
         m_Goal  = AllocateNode();
 
-        assert((m_Start != NULL && m_Goal != NULL));
+        assert((m_Start != nullptr && m_Goal != nullptr));
 
         m_Start->m_UserState = Start;
         m_Goal->m_UserState  = Goal;
@@ -247,7 +247,7 @@ public:  // methods
             // User provides this functions and uses AddSuccessor to add each
             // successor of node 'n' to m_Successors
             bool ret = n->m_UserState.GetSuccessors(
-                this, n->parent ? &n->parent->m_UserState : NULL);
+                this, n->parent ? &n->parent->m_UserState : nullptr);
 
             if(!ret) {
                 typename vector<Node*>::iterator successor;
@@ -444,7 +444,7 @@ public:  // methods
                 n         = n->child;
                 FreeNode(del);
 
-                del = NULL;
+                del = nullptr;
 
             } while(n != m_Goal);
 
@@ -467,7 +467,7 @@ public:  // methods
             return &m_Start->m_UserState;
         }
         else {
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -483,7 +483,7 @@ public:  // methods
             }
         }
 
-        return NULL;
+        return nullptr;
     }
 
     // Get end node
@@ -493,7 +493,7 @@ public:  // methods
             return &m_Goal->m_UserState;
         }
         else {
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -509,7 +509,7 @@ public:  // methods
             }
         }
 
-        return NULL;
+        return nullptr;
     }
 
     // Get final cost of solution
@@ -541,7 +541,7 @@ public:  // methods
             return &(*iterDbgOpen)->m_UserState;
         }
 
-        return NULL;
+        return nullptr;
     }
 
     UserState* GetOpenListNext() {
@@ -558,7 +558,7 @@ public:  // methods
             return &(*iterDbgOpen)->m_UserState;
         }
 
-        return NULL;
+        return nullptr;
     }
 
     UserState* GetClosedListStart() {
@@ -576,7 +576,7 @@ public:  // methods
             return &(*iterDbgClosed)->m_UserState;
         }
 
-        return NULL;
+        return nullptr;
     }
 
     UserState* GetClosedListNext() {
@@ -594,7 +594,7 @@ public:  // methods
             return &(*iterDbgClosed)->m_UserState;
         }
 
-        return NULL;
+        return nullptr;
     }
 
     // Get the number of steps
@@ -655,7 +655,7 @@ private:  // methods
             if(!n->child) {
                 FreeNode(n);
 
-                n = NULL;
+                n = nullptr;
             }
 
             iterOpen++;
@@ -672,7 +672,7 @@ private:  // methods
 
             if(!n->child) {
                 FreeNode(n);
-                n = NULL;
+                n = nullptr;
             }
         }
 
@@ -689,7 +689,7 @@ private:  // methods
         Node* address = m_FixedSizeAllocator.alloc();
 
         if(!address) {
-            return NULL;
+            return nullptr;
         }
         m_AllocateNodeCount++;
         Node* p = new(address) Node;

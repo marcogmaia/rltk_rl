@@ -36,10 +36,13 @@ struct navigator {
     static location_t get_xy(int x, int y) {
         return location_t{x, y};
     }
+
     static bool is_walkable(const location_t& pos) {
         auto& map = engine::reg.ctx<world::Map>();
-        return map.rect.contains(pos) && map[pos].characteristics.walkable;
+        return map.rect.contains(pos) && map[pos].characteristics.walkable
+               && !world::is_occupied(engine::reg, pos);
     }
+    
     // This lets you define a distance heuristic. Manhattan distance works
     // really well, but for now we'll just use a simple euclidian distance
     // squared. The geometry system defines one for us.
@@ -71,9 +74,23 @@ struct navigator {
                 }
                 location_t offset{x, y};
                 auto w_pos = pos + offset;
-                auto map   = engine::reg.ctx<world::Map>();
-                if(map.rect.contains(w_pos)
-                   && map[w_pos].characteristics.walkable) {
+                using engine::reg;
+                auto& map = reg.ctx<world::Map>();
+
+                auto& player_pos = engine::reg.get<position_t>(engine::player);
+
+                //     map.rect.contains(pos) &&
+                //     map[pos].characteristics.walkable
+                //    && !world::is_occupied(engine::reg, pos)
+
+                // map.rect.contains(w_pos)
+                //    && map[w_pos].characteristics.walkable
+                //    && (!world::is_occupied(engine::reg, w_pos) || w_pos ==
+                //    engine::reg.get<position_t>(engine::player));
+                if(w_pos == player_pos
+                   || (map.rect.contains(w_pos)
+                       && map[w_pos].characteristics.walkable
+                       && !world::is_occupied(reg, w_pos))) {
                     successors.push_back(w_pos);
                 }
             }
