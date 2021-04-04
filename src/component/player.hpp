@@ -10,5 +10,10 @@
  */
 #pragma once
 
+namespace radl {
+
+
 // Tag for the player component
 struct player_t {};
+
+}  // namespace radl

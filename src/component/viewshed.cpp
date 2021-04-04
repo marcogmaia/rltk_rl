@@ -31,8 +31,12 @@ struct nav_helper {
 // make this update parallel
 void fov_update(entt::registry& reg, entt::entity ent) {
     using namespace world;
-    auto& map     = reg.ctx<Map>();
-    auto& vshed   = reg.get<viewshed_t>(ent);
+    auto& map   = reg.ctx<Map>();
+    auto& vshed = reg.get<viewshed_t>(ent);
+    if(!vshed.dirty) {
+        return;
+    }
+    vshed.dirty   = false;
     auto& ent_pos = reg.get<position_t>(ent);
 
     // lots of temporary allocs!
@@ -45,7 +49,7 @@ void fov_update(entt::registry& reg, entt::entity ent) {
             // vshed.visible_coordinates.insert(reveal_pos);
             if(ent == engine::player) {
                 reveal_tile.characteristics.explored = true;
-            } 
+            }
         }
     };
 

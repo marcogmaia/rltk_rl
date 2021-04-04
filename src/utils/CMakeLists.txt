@@ -1,11 +1,9 @@
-include_directories(
-    "."
-)
 
 set(
     UTILS_SRC
     "utils.cpp"
     "rng.cpp"
+   
 )
 
 add_library(

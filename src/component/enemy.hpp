@@ -1,5 +1,7 @@
 #pragma once
 
 namespace radl {
-    struct enemy_t {};
+    struct being_t {
+        std::string name;
+    };
 }

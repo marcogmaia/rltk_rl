@@ -1,13 +1,10 @@
-include_directories(
-    "."
-)
 
 set(
     GAMESYS_SRC
-    "move_attack.cpp"
-    # "visibility.cpp"
     "camera.cpp"
     "player_action.cpp"
+    # "move_attack.cpp"
+    # "visibility.cpp"
    
 )
     

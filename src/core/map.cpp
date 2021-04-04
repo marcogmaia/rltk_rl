@@ -145,7 +145,7 @@ void query_entities_near_player() {
     reg.view<viewshed_t, position_t, renderable_t>().each(
         [&active_rect](entt::entity ent, viewshed_t& vshed,
                        const position_t& e_pos, renderable_t& rend) {
-            if(active_rect.contains(e_pos)) {
+            if(ent != engine::player && active_rect.contains(e_pos)) {
                 active_entities_near_player->push_back(ent);
             }
         });
@@ -154,10 +154,11 @@ void query_entities_near_player() {
 
 bool is_occupied(entt::registry& reg, position_t target_pos) {
     return std::ranges::any_of(*active_entities_near_player.get(),
-                               [&](auto& ent) {
-                                   auto active_pos = reg.get<position_t>(ent);
-                                   return active_pos == target_pos;
+                               [&](entity ent) {
+                                   auto ent_pos = reg.get<position_t>(ent);
+                                   return ent_pos == target_pos;
                                });
+    return false;
 }
 
 

@@ -27,7 +27,7 @@ constexpr int width  = 96;
 constexpr int height = 48;
 static void rltk_init() {
     // using namespace entt::literals;
-    constexpr auto font_file =  "../assets" ;
+    constexpr auto font_file = "../assets";
     rltk::init(rltk::config_simple(font_file, width, height,
                                    "Maia Roguelike learning", "16x16", false));
 }
@@ -47,12 +47,12 @@ void add_enemies() {
             if(!is_occupied(reg, rand_pos)) {
                 auto chance = rng.range(1, 3);
                 if(chance == 1) {
-                    factory::enemy_factory(rand_pos,
-                                           vchar_t{'g', DARK_GREEN, BLACK});
+                    factory::enemy_factory(
+                        rand_pos, vchar_t{'g', DARK_GREEN, BLACK}, "Goblin");
                 }
                 else {
-                    factory::enemy_factory(rand_pos,
-                                           vchar_t{'O', GREEN, BLACK});
+                    factory::enemy_factory(rand_pos, vchar_t{'O', GREEN, BLACK},
+                                           "Orc");
                 }
             }
         }
@@ -95,12 +95,13 @@ void update() {
     case game_status_t::NEW_TURN: {
         query_entities_near_player();
         fov_update(reg, player);
-        fov_update_parallel(*get_entities_near_player());
+        fov_update_parallel(get_entities_near_player());
 
         // run everything else (systems ?)
         // XXX test!
         // on visible destruct remove visible from enemies!!!!!
-        ai_sys(reg);
+        ai_enemy(reg);
+   
 
         camera_update(reg, player);
         gamestatus = game_status_t::IDLE;

@@ -133,7 +133,7 @@ struct Map {
 };
 
 
-auto is_occupied(entt::registry& reg, position_t target_pos) -> bool;
+bool is_occupied(entt::registry& reg, position_t target_pos);
 
 Map make_test_map(const rect_t& dimension, const position_t& player_pos);
 

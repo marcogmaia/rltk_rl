@@ -1,8 +1,3 @@
-
-include_directories(
-    "."
-)
-
 set(COMPONENT_SCRS
     "attacker.cpp"
     "viewshed.cpp"
@@ -17,6 +12,6 @@ add_library(
     ${COMPONENT_SCRS}
 )
 
+target_link_libraries(game_component PRIVATE game_system)
 
-
-target_link_libraries(game_component tbb spdlog::spdlog)
+target_link_libraries(game_component PUBLIC tbb spdlog::spdlog)
