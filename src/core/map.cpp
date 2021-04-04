@@ -162,5 +162,13 @@ bool is_occupied(entt::registry& reg, position_t target_pos) {
     return false;
 }
 
+void map_entity_walk(entity ent, const position_t& src_pos,
+                     const position_t& dst_pos) {
+    using engine::reg;
+    reg.replace<position_t>(ent, dst_pos);
+    auto& map = reg.ctx<world::Map>();
+    map[src_pos].entities_here.remove(ent);
+    map[dst_pos].entities_here.push_front(ent);
+}
 
 }  // namespace radl::world

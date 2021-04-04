@@ -60,7 +60,7 @@ concept EntIter = std::random_access_iterator<T>&& std::indirectly_readable<T>;
 template <EntIter C>
 void fov_update_parallel(C e_iterable) {
     using engine::reg;
-    std::for_each(std::execution::par_unseq, e_iterable->begin(),
+    std::for_each( e_iterable->begin(),
                   e_iterable->end(), [](auto& ent) {
                       fov_update(engine::reg, ent);
                   });

@@ -66,7 +66,7 @@ void camera_update(entt::registry& reg, entt::entity ent) {
 
     // search entities in visible positions and print them
     std::for_each(
-        std::execution::par_unseq, std::begin(pvshed.visible_coordinates),
+        std::begin(pvshed.visible_coordinates),
         std::end(pvshed.visible_coordinates), [&](const position_t& vpos) {
             const auto& ents = map[vpos].entities_here;
             for(const auto& ent : ents) {

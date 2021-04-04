@@ -132,4 +132,9 @@ std::vector<entt::entity>* get_entities_near_player();
 
 void query_entities_near_player();
 // void update_enemies_visibility(entt::registry& reg, entt::entity ent);
+
+
+void map_entity_walk(entity ent, const position_t& src_pos,
+                     const position_t& dst_pos);
+
 }  // namespace radl::world

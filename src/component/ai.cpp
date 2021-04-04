@@ -18,20 +18,20 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
     viewshed_t& e_vshed = reg.get<viewshed_t>(e_ent);
     auto& vis_coords    = e_vshed.visible_coordinates;
 
-    auto found_at = std::ranges::find(vis_coords, target_pos);
+    if(!vis_coords.contains(target_pos)) {
+        return;
+    }
     // found
-    if(found_at != vis_coords.end()) {
-        auto e_pos = reg.get<position_t>(e_ent);
-        if(e_pos != target_pos) {
-            auto path = find_path_2d<position_t, navigator<position_t>>(
-                e_pos, target_pos);
-            if(path->success && path->steps.size() > 1) {
-                auto next_step = path->steps.front();
-                path->steps.pop_front();
-                auto& map = reg.ctx<Map>();
-                if(map.rect.contains(next_step)) {
-                    walk(e_ent, e_pos, next_step);
-                }
+    auto e_pos = reg.get<position_t>(e_ent);
+    if(e_pos != target_pos) {
+        auto path
+            = find_path<position_t, navigator<position_t>>(e_pos, target_pos);
+        if(path->success && path->steps.size() > 1) {
+            auto next_step = path->steps.front();
+            path->steps.pop_front();
+            auto& map = reg.ctx<Map>();
+            if(map.rect.contains(next_step)) {
+                walk(e_ent, e_pos, next_step);
             }
         }
     }
@@ -51,17 +51,14 @@ void ai_enemy(entt::registry& reg) {
         }
         auto& e_vshed    = reg.get<viewshed_t>(ent);
         auto& vis_coords = e_vshed.visible_coordinates;
-        auto pos = std::find(std::begin(vis_coords), std::end(vis_coords),
-                             player_pos);
-        if(pos != std::end(vis_coords)) {
+        if(vis_coords.contains(player_pos)) {
             if(ent != player) {
                 ai_enemy_find_path(ent, player_pos);
             }
         }
     };
 
-    std::for_each(std::execution::par_unseq, g_enemies.begin(), g_enemies.end(),
-                  func);
+    std::for_each(g_enemies.begin(), g_enemies.end(), func);
 }
 
 }  // namespace radl

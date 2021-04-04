@@ -1,4 +1,7 @@
 #include <memory>
+
+#include "component/position.hpp"
+
 #include "utils/astar.hpp"
 #include "utils/geometry.hpp"
 
@@ -125,10 +128,7 @@ public:
         }
         else {
             map_search_node<location_t, navigator_t> tmp(pos);
-            a_star_search->AddSuccessor(tmp);
-            // navigator_t::get_successors({-1, -1}, successors);
-            // throw std::runtime_error("Null parent error.");
-            // return false;
+            navigator_t::get_successors(pos, successors);
         }
         for(location_t loc : successors) {
             map_search_node<location_t, navigator_t> tmp(loc);

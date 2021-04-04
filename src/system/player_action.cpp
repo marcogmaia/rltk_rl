@@ -88,27 +88,25 @@ bool process_input(entt::registry& reg, entt::entity e) {
         }
         handle_screen_resize(ev, reg, e);
         auto delta_pos = get_next_position(ev, &player_input);
-        if(delta_pos != position_t{0, 0}) {
-            move_attack(reg, e, delta_pos);
-        }
+        // if(delta_pos != position_t{0, 0}) {
+        move_attack(reg, e, delta_pos);
+        // }
     }
     return player_input;
 }
 
-namespace {
-std::mutex walk_mutex;
-}
+// namespace {
+// std::mutex walk_mutex;
+// }
 
 void walk(entt::entity ent, const position_t& src_pos,
           const position_t& target_pos) {
     using engine::reg;
-    std::lock_guard guard(walk_mutex);
-    if(!world::is_occupied(reg, target_pos)) {
-        auto& map = reg.ctx<world::Map>();
-        map[src_pos].entities_here.remove(ent);
-        map[target_pos].entities_here.push_front(ent);
+    // std::lock_guard guard(walk_mutex);
+    if(!world::is_occupied(reg, target_pos) && (src_pos != target_pos)) {
+        world::map_entity_walk(ent, src_pos, target_pos);
+        // mark viewshed as dirty to recalculate
         reg.get<world::viewshed_t>(ent).dirty = true;
-        reg.replace<position_t>(ent, target_pos);
     }
 }
 
