@@ -22,6 +22,9 @@ bool process_input(entt::registry&, entt::entity e);
 bool move_attack(entt::registry& reg, entt::entity& ent,
                  const position_t& delta_pos);
 
-void walk(entt::entity ent, const position_t& src_pos,
+void walk(const entt::entity& ent, const position_t& src_pos,
           const position_t& target_pos);
+
+void random_walk(const entt::entity& ent, const position_t& src_pos);
+
 }  // namespace radl

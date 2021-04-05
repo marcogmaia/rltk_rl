@@ -49,12 +49,16 @@ void ai_enemy(entt::registry& reg) {
         if(player == ent) {
             return;
         }
-        auto& e_vshed    = reg.get<viewshed_t>(ent);
-        auto& vis_coords = e_vshed.visible_coordinates;
+        const auto& [e_vshed, e_pos] = reg.get<viewshed_t, position_t>(ent);
+        const auto& vis_coords        = e_vshed.visible_coordinates;
         if(vis_coords.contains(player_pos)) {
             if(ent != player) {
                 ai_enemy_find_path(ent, player_pos);
             }
+        }
+        // can't see the player
+        else {
+            random_walk(ent, e_pos);
         }
     };
 

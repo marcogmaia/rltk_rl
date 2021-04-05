@@ -1,9 +1,12 @@
 #include "SFML/System.hpp"
 #include "spdlog/spdlog.h"
+
 #include "player_action.hpp"
 #include "core/engine.hpp"
+
+#include "utils/rng.hpp"
+#include "component/component.hpp"
 #include "system/camera.hpp"
-#include <component/component.hpp>
 
 namespace radl {
 
@@ -118,7 +121,7 @@ bool process_input(entt::registry& reg, entt::entity e) {
         else if(ev.type != sf::Event::EventType::KeyPressed) {
             return false;
         }
-        
+
         auto target_pos = player_pos + get_delta_pos(ev, &player_input);
         move_attack(reg, e, target_pos);
     }
@@ -126,18 +129,31 @@ bool process_input(entt::registry& reg, entt::entity e) {
 }
 
 namespace {
+using namespace world;
+using engine::reg;
 std::mutex walk_mutex;
-}
+}  // namespace
 
-void walk(entt::entity ent, const position_t& src_pos,
+void walk(const entt::entity& ent, const position_t& src_pos,
           const position_t& target_pos) {
-    using engine::reg;
+    if(!reg.ctx<Map>().at(target_pos).characteristics.walkable) {
+        return;
+    }
+
     std::lock_guard guard(walk_mutex);
     if(!world::is_occupied(reg, target_pos) && (src_pos != target_pos)) {
         world::map_entity_walk(ent, src_pos, target_pos);
         // mark viewshed as dirty to recalculate
         reg.get<world::viewshed_t>(ent).dirty = true;
     }
+}
+
+void random_walk(const entt::entity& ent, const position_t& src_pos) {
+    auto dx = rng::rng.range(-1, 1);
+    auto dy = rng::rng.range(-1, 1);
+
+    position_t target_pos = src_pos + position_t{dx, dy};
+    walk(ent, src_pos, target_pos);
 }
 
 bool move_attack(entt::registry& reg, entt::entity& ent,
