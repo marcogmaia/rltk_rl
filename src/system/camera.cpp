@@ -70,7 +70,7 @@ void camera_update(entt::registry& reg, entt::entity ent) {
         std::end(pvshed.visible_coordinates), [&](const position_t& vpos) {
             const auto& ents = map[vpos].entities_here;
             for(const auto& ent : ents) {
-                if(!reg.all_of<being_t, renderable_t, position_t>(ent)) {
+                if(!reg.all_of<renderable_t, position_t>(ent)) {
                     continue;
                 }
                 const auto& e_rend   = reg.get<renderable_t>(ent);

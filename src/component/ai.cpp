@@ -26,12 +26,12 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
     if(e_pos != target_pos) {
         auto path = find_path_2d<position_t, navigator<position_t>>(e_pos,
                                                                     target_pos);
-        if(path->success && path->steps.size() > 1) {
+        if(path->success && path->steps.size() > 0) {
             auto next_step = path->steps.front();
             path->steps.pop_front();
             auto& map = reg.ctx<Map>();
             if(map.rect.contains(next_step)) {
-                walk(e_ent, e_pos, next_step);
+                move_attack(engine::reg, e_ent, next_step);
             }
         }
     }

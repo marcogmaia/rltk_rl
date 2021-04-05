@@ -3,6 +3,7 @@ set(
     GAMESYS_SRC
     "camera.cpp"
     "player_action.cpp"
+    "combat.cpp"
     # "move_attack.cpp"
     # "visibility.cpp"
    
@@ -15,6 +16,6 @@ add_library(
     ${GAMESYS_SRC}
 )
 
-target_link_libraries(game_system spdlog::spdlog pthread tbb fmt)
+target_link_libraries(game_system game_component spdlog::spdlog pthread tbb fmt)
 
 set(CMAKE_BUILD_TYPE DEBUG)

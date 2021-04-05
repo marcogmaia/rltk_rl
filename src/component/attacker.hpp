@@ -8,6 +8,9 @@ struct attacker_t {
     float power = 0.F;
 };
 
+// void attack(const entity& ent_atk, const entity& ent_def);
+void attack(const entity& ent_atk, const position_t& pos);
+
 // inline void attack(entt::entity atkent, entt::entity defent) {
 //     using engine::reg;
 //     auto& attacker    = reg.get<attacker_t>(atkent);

@@ -4,6 +4,9 @@
 #include "entt/entt.hpp"
 #include "core/map.hpp"
 
+using entt::registry;
+using entt::entity;
+
 namespace radl::engine {
 
 // extern entt::observer observer;

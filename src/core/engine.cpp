@@ -69,7 +69,7 @@ void update() {
     static auto& gamestatus = reg.ctx<game_status_t>();
     switch(gamestatus) {
     case game_status_t::STARTUP: {
-        auto map_obj          = new_map(reg, rect_t{0, 0, width, height});
+        auto map_obj = new_map(reg, rect_t{0, 0, width * 4, height * 4});
         auto player_start_pos = map_obj.rooms[0].center();
         reg.set<Map>(map_obj);
         player = reg.create();

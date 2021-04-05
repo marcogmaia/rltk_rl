@@ -18,9 +18,9 @@ namespace visibility_private {
 
 template <class location_t_, class navigator_t>
 void internal_2d_sweep(const location_t_& position, const int& range,
-                       std::function<void(location_t_)> set_visible,
-                       std::function<bool(location_t_)> is_transparent,
-                       const std::pair<int, int> offset) {
+                       const std::function<void(location_t_)>& set_visible,
+                       const std::function<bool(location_t_)>& is_transparent,
+                       const std::pair<int, int>& offset) {
     bool blocked      = false;
     const int start_x = navigator_t::get_x(position);
     const int start_y = navigator_t::get_y(position);

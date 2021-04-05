@@ -116,7 +116,7 @@ public:  // methods
     {
     }
 
-    AStarSearch(int MaxNodes)
+    explicit AStarSearch(int MaxNodes)
         : m_State(SEARCH_STATE_NOT_INITIALISED)
         , m_CurrentSolutionNode(nullptr)
         ,

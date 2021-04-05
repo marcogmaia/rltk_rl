@@ -48,7 +48,7 @@ void viewshed_update(position_t& player_pos, viewshed_t& viewshed, Map& map);
  * @param reg
  * @param ent
  */
-void fov_update(entt::registry& reg, entt::entity ent);
+void fov_update(entt::registry& reg, const entt::entity& ent);
 
 
 template <typename T>
@@ -62,7 +62,7 @@ concept EntIter = std::random_access_iterator<T>&& std::indirectly_readable<T>;
  */
 template <EntIter C>
 void fov_update_parallel(C e_iterable) {
-    std::for_each(e_iterable->begin(), e_iterable->end(), [](entity ent) {
+    std::for_each(e_iterable->begin(), e_iterable->end(), [](entity& ent) {
         fov_update(engine::reg, ent);
     });
 }

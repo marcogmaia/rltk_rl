@@ -59,7 +59,7 @@ void try_apply_room_to_map(entt::registry& reg, Map& map, const rect_t& rect) {
     map.rooms.push_back(rect);
 }
 
-constexpr int max_rooms = 30;
+constexpr int max_rooms = 30*10;
 constexpr int min_size  = 6;
 constexpr int max_size  = 12;
 
@@ -155,7 +155,10 @@ void query_entities_near_player() {
 // XXX change this in the future, now we are only using entities that blocks the
 // path
 bool is_occupied(entt::registry& reg, position_t target_pos) {
-    return !reg.ctx<Map>().at(target_pos).entities_here.empty();
+    auto& ents_here = reg.ctx<Map>().at(target_pos).entities_here;
+    return std::ranges::any_of(ents_here, [&reg](auto& ent) {
+        return reg.any_of<blocks_t>(ent);
+    });
 }
 
 void map_entity_walk(entity ent, const position_t& src_pos,

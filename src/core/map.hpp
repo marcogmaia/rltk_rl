@@ -27,12 +27,11 @@ struct tile_characteristics_t {
     bool is_visible  = false;
 };
 
+struct blocks_t {};
+
 // struct active_t {};
 
 // struct explored_t {};
-
-
-// struct blocks_t {};
 
 struct tile_t {
     tile_type_t type = wall;

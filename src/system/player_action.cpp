@@ -17,7 +17,7 @@ void handle_screen_resize(const sf::Event& ev, entt::registry& reg,
     }
 }
 
-static position_t get_next_position(const sf::Event& ev, bool* player_input) {
+static position_t get_delta_pos(const sf::Event& ev, bool* player_input) {
     int dx = 0;
     int dy = 0;
 
@@ -95,13 +95,16 @@ bool process_input(entt::registry& reg, entt::entity e) {
         auto ev = engine::event_queue.front();
         engine::event_queue.pop();
 
+        handle_screen_resize(ev, reg, e);
+
+        auto player_pos = reg.get<position_t>(engine::player);
         // TODO arrumar isso depois
         if(ev.type == sf::Event::EventType::MouseMoved) {
             auto [mx, my] = ev.mouseMove;
             int tx        = std::round(static_cast<double>(mx) / 16.0);
             int ty        = std::round(static_cast<double>(my) / 16.0);
 
-            auto [px, py] = reg.get<position_t>(engine::player);
+            auto [px, py] = player_pos;
             auto func     = [](int x, int y) {
                 using namespace rltk::colors;
                 rltk::console->set_char(x, y,
@@ -109,14 +112,15 @@ bool process_input(entt::registry& reg, entt::entity e) {
             };
             auto [rx, ry] = render_pos(px, py);
             radl::line_func(rx, ry, tx, ty, func);
+            return false;
         }
 
         else if(ev.type != sf::Event::EventType::KeyPressed) {
             return false;
         }
-        handle_screen_resize(ev, reg, e);
-        auto delta_pos = get_next_position(ev, &player_input);
-        move_attack(reg, e, delta_pos);
+        
+        auto target_pos = player_pos + get_delta_pos(ev, &player_input);
+        move_attack(reg, e, target_pos);
     }
     return player_input;
 }
@@ -137,11 +141,13 @@ void walk(entt::entity ent, const position_t& src_pos,
 }
 
 bool move_attack(entt::registry& reg, entt::entity& ent,
-                 const position_t& delta_pos) {
+                 const position_t& dst_pos) {
     using namespace world;
-    // mark as dirty to trigger an screen update
+    //  wait turn
     auto& src_pos = reg.get<position_t>(ent);
-    auto dst_pos  = src_pos + delta_pos;
+    if(dst_pos == src_pos) {
+        return false;
+    }
 
     // maybe check if occupies vicinity, or add vicinity component
     auto& map                     = reg.ctx<Map>();
@@ -150,6 +156,8 @@ bool move_attack(entt::registry& reg, entt::entity& ent,
     // ## 1. attack if enemy is in the targeted pos
     if(is_occupied(reg, dst_pos)) {
         // attack
+        // auto target = map[dst_pos].entities_here.front();
+        attack(ent, dst_pos);
         return false;
     }
     // ## 2. walk if tile is no occupied and walkable
