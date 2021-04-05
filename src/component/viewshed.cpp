@@ -39,21 +39,19 @@ void fov_update(entt::registry& reg, entt::entity ent) {
     vshed.dirty   = false;
     auto& ent_pos = reg.get<position_t>(ent);
 
-    // lots of temporary allocs!
-    vshed.visible_coordinates.clear();
+    decltype(vshed.visible_coordinates) new_vis;
 
-    auto set_visibility = [&](position_t reveal_pos) {
+    auto set_visibility = [&](const position_t& reveal_pos) {
         if(map.rect.contains(reveal_pos)) {
             auto& reveal_tile = map.at(reveal_pos);
-            // vshed.visible_coordinates.emplace_back(reveal_pos);
-            vshed.visible_coordinates.insert(reveal_pos);
+            new_vis.insert(reveal_pos);
             if(ent == engine::player) {
                 reveal_tile.characteristics.explored = true;
             }
         }
     };
 
-    auto is_transparent = [&](position_t check_pos) {
+    auto is_transparent = [&](const position_t& check_pos) {
         if(map.rect.contains(check_pos)) {
             auto& tile = map[check_pos];
             return tile.characteristics.transparent;
@@ -63,6 +61,7 @@ void fov_update(entt::registry& reg, entt::entity ent) {
 
     radl::visibility_sweep_2d<position_t, nav_helper>(
         ent_pos, vshed.range, set_visibility, is_transparent);
+    vshed.visible_coordinates.swap(new_vis);
 }
 
 }  // namespace radl::world

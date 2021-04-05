@@ -14,14 +14,10 @@ namespace radl::engine {
 
 using namespace world;
 using namespace rltk::colors;
-// using namespace factory;
 std::queue<sf::Event> event_queue;
 
 entt::registry reg;
 entt::entity player;
-// entt::entity map;
-
-// entt::observer observer{reg, entt::collector.group<position_t, player_t>()};
 
 constexpr int width  = 96;
 constexpr int height = 48;
@@ -34,10 +30,9 @@ static void rltk_init() {
 
 void add_enemies() {
     constexpr uint32_t max_enemies_pex_room = 4;
-
     using rng::rng;
 
-    auto& w_map = reg.ctx<Map>();
+    const auto& w_map = reg.ctx<Map>();
     for(const auto& room : w_map.rooms) {
         auto num_enemies = rng.range(0, max_enemies_pex_room);
         for(int i = 0; i < num_enemies; ++i) {

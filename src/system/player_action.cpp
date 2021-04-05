@@ -76,6 +76,17 @@ static position_t get_next_position(const sf::Event& ev, bool* player_input) {
     return position_t{dx, dy};
 }
 
+#include "utils/geometry.hpp"
+
+static position_t render_pos(int rx, int ry) {
+    using engine::reg;
+    using rltk::console;
+    auto [px, py] = reg.get<position_t>(engine::player);
+    auto xci      = px - console->term_width / 2;
+    auto yci      = py - console->term_height / 2;
+
+    return position_t{rx - xci, ry - yci};
+}
 
 bool process_input(entt::registry& reg, entt::entity e) {
     bool player_input = false;
@@ -83,7 +94,24 @@ bool process_input(entt::registry& reg, entt::entity e) {
     if(!engine::event_queue.empty()) {
         auto ev = engine::event_queue.front();
         engine::event_queue.pop();
-        if(ev.type != sf::Event::EventType::KeyPressed) {
+
+        // TODO arrumar isso depois
+        if(ev.type == sf::Event::EventType::MouseMoved) {
+            auto [mx, my] = ev.mouseMove;
+            int tx        = std::round(static_cast<double>(mx) / 16.0);
+            int ty        = std::round(static_cast<double>(my) / 16.0);
+
+            auto [px, py] = reg.get<position_t>(engine::player);
+            auto func     = [](int x, int y) {
+                using namespace rltk::colors;
+                rltk::console->set_char(x, y,
+                                        vchar_t{glyph::BLOCK1, ORANGE, BLACK});
+            };
+            auto [rx, ry] = render_pos(px, py);
+            radl::line_func(rx, ry, tx, ty, func);
+        }
+
+        else if(ev.type != sf::Event::EventType::KeyPressed) {
             return false;
         }
         handle_screen_resize(ev, reg, e);

@@ -8,14 +8,17 @@
 #include "core/map.hpp"
 #include "entt/entt.hpp"
 
-namespace std {
-template <>
-struct hash<radl::position_t> {
-    std::size_t operator()(const radl::position_t& pos) const {
-        return (hash<int>()(pos.first) ^ ((hash<int>()(pos.second) << 1)) >> 1);
-    }
-};
-}  // namespace std
+#include "boost/container/flat_set.hpp"
+
+
+// namespace std {
+// template <>
+// struct hash<radl::position_t> {
+//     std::size_t operator()(const radl::position_t& pos) const {
+//         return (hash<int>()(pos.first) ^ ((hash<int>()(pos.second) << 1)) >> 1);
+//     }
+// };
+// }  // namespace std
 
 namespace radl::world {
 
@@ -23,10 +26,11 @@ namespace {
 constexpr int default_range = 8;
 }
 
-
 struct viewshed_t {
     int range = default_range;  // range of visibility
-    std::unordered_set<position_t> visible_coordinates;
+
+    // the flat_set is the set API with vector as a base instead of a tree
+    boost::container::flat_set<position_t> visible_coordinates;
     bool dirty = true;
 };
 

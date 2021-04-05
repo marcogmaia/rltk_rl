@@ -39,7 +39,7 @@ void camera_update(entt::registry& reg, entt::entity ent) {
             if(!map.rect.contains({x, y})) {
                 continue;
             }
-            auto tile = map[{x, y}];
+            const auto& tile = map[{x, y}];
             if(!tile.characteristics.explored) {
                 continue;
             }

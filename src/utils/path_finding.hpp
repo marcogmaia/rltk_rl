@@ -38,11 +38,11 @@ struct navigator {
     }
 
     static bool is_walkable(const location_t& pos) {
-        auto& map = engine::reg.ctx<world::Map>();
+        const auto& map = engine::reg.ctx<world::Map>();
         return map.rect.contains(pos) && map[pos].characteristics.walkable
                && !world::is_occupied(engine::reg, pos);
     }
-    
+
     // This lets you define a distance heuristic. Manhattan distance works
     // really well, but for now we'll just use a simple euclidian distance
     // squared. The geometry system defines one for us.
@@ -75,7 +75,7 @@ struct navigator {
                 location_t offset{x, y};
                 auto w_pos = pos + offset;
                 using engine::reg;
-                auto& map = reg.ctx<world::Map>();
+                const auto& map = reg.ctx<world::Map>();
 
                 auto& player_pos = engine::reg.get<position_t>(engine::player);
 

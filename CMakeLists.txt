@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15.0)
 project(learning VERSION 0.1.0)
 
-set(BUILD_SHARED_LIBS ON)
+# set(BUILD_SHARED_LIBS ON)
 # set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
 find_package(spdlog REQUIRED)
 
@@ -9,7 +9,7 @@ set(MYW_DISABLES "-Wextra -Wno-attributes -Wno-unused-parameter  -Wno-ignored-qu
 # set(MYW_DISABLES "-Wno-attributes ")
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -Wall ${MYW_DISABLES} -DDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}-O2 -Wall ${MYW_DISABLES} -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}-O2 -Wall ${MYW_DISABLES} ")
 # set(CMAKE_BUILD_TYPE DEBUG)
 # set(CMAKE_BUILD_TYPE RELEASE)
 

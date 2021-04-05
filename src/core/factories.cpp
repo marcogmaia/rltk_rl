@@ -32,7 +32,7 @@ void player_factory(entt::entity ent, const position_t& pos,
 void enemy_factory(const position_t& pos, vchar_t vch, std::string_view name) {
     auto enemy = reg.create();
     reg.emplace<renderable_t>(enemy, vch);
-    reg.emplace<viewshed_t>(enemy, 8);
+    reg.emplace<viewshed_t>(enemy, 12);
     reg.emplace<position_t>(enemy, pos);
     reg.emplace<destructible_t>(enemy);
     // reg.emplace<blocks_t>(enemy);
