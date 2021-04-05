@@ -73,15 +73,13 @@ public:  // methods
         , m_MaxElements(MaxElements) {
         // Allocate enough memory for the maximum number of elements
 
-        char* pMem = new char[m_MaxElements * sizeof(FSA_ELEMENT)];
+        // initializes with memory cleared
+        char* pMem = new char[m_MaxElements * sizeof(FSA_ELEMENT)]();
 
         m_pMemory = (FSA_ELEMENT*)pMem;
 
         // Set the free list first pointer
         m_pFirstFree = m_pMemory;
-
-        // Clear the memory
-        memset(m_pMemory, 0, sizeof(FSA_ELEMENT) * m_MaxElements);
 
         // Point at first element
         FSA_ELEMENT* pElement = m_pFirstFree;
