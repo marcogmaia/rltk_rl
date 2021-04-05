@@ -96,10 +96,10 @@ inline double distance3d_manhattan(const int& x1, const int& y1, const int& z1,
 inline void line_func(const int& x1, const int& y1, const int& x2,
                       const int& y2,
                       std::function<void(int, int)>&& func) noexcept {
-    double x             = static_cast<double>(x1) + 0.5F;
-    double y             = static_cast<double>(y1) + 0.5F;
-    const double dest_x  = static_cast<double>(x2);
-    const double dest_y  = static_cast<double>(y2);
+    auto x               = static_cast<double>(x1) + 0.5F;
+    auto y               = static_cast<double>(y1) + 0.5F;
+    auto dest_x          = static_cast<const double>(x2);
+    auto dest_y          = static_cast<const double>(y2);
     const double n_steps = distance2d(x1, y1, x2, y2);
     const int steps      = static_cast<const int>(std::floor(n_steps) + 1);
     const double slope_x = (dest_x - x) / n_steps;
@@ -147,10 +147,10 @@ void line_func_3d(const int& x1, const int& y1, const int& z1, const int& x2,
 template <typename F>
 inline void line_func_cancellable(const int& x1, const int& y1, const int& x2,
                                   const int& y2, F&& func) noexcept {
-    double x            = static_cast<double>(x1) + 0.5;
-    double y            = static_cast<double>(y1) + 0.5;
-    const double dest_x = static_cast<double>(x2);
-    const double dest_y = static_cast<double>(y2);
+    auto x      = static_cast<double>(x1) + 0.5;
+    auto y      = static_cast<double>(y1) + 0.5;
+    auto dest_x = static_cast<const double>(x2);
+    auto dest_y = static_cast<const double>(y2);
     // XXX good enough for max distance 32
     const double n_steps = distance2d(x1, y1, x2, y2) * 2.41;
     const int steps      = static_cast<const int>(std::floor(n_steps) + 1);
@@ -186,7 +186,7 @@ inline void bresenham(double x1, double y1, double x2, double y2,
     int is_swapped = 0;
 
     // Swap if needed
-    if(abs(dy) > abs(dx)) {
+    if(std::abs(dy) > std::abs(dx)) {
         // swap dx and dy
         double tdx = dx;
         dx         = dy;
@@ -196,7 +196,7 @@ inline void bresenham(double x1, double y1, double x2, double y2,
     }
 
     // Decision parameter
-    double p = 2 * (abs(dy)) - abs(dx);
+    double p = 2 * (std::abs(dy)) - std::abs(dx);
 
     // Print Initial Point
     // putpixels(x, y);
@@ -205,7 +205,7 @@ inline void bresenham(double x1, double y1, double x2, double y2,
     }
 
     // Loop for dx times
-    for(int i = 0; i <= abs(dx); i++) {
+    for(int i = 0; i <= std::abs(dx); i++) {
         // Depending on decision parameter
         if(p <= 0) {
             if(is_swapped == 0) {
@@ -222,7 +222,7 @@ inline void bresenham(double x1, double y1, double x2, double y2,
                     // return;
                 }
             }
-            p = p + 2 * abs(dy);
+            p = p + 2 * std::abs(dy);
         }
         else {
             x = x + sx;
@@ -231,7 +231,7 @@ inline void bresenham(double x1, double y1, double x2, double y2,
             if(!func(x, y)) {
                 // return;
             }
-            p = p + 2 * abs(dy) - 2 * abs(dx);
+            p = p + 2 * std::abs(dy) - 2 * std::abs(dx);
         }
     }
 }

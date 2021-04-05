@@ -2,6 +2,6 @@
 
 namespace radl {
     struct being_t {
-        std::string name;
+        std::string name = "";
     };
 }

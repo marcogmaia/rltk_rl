@@ -10,7 +10,7 @@ struct destructible_t {
     float defense;            // hit points deflected
     std::string corpse_name;  // the entity's name once dead/destroyed
  
-    inline bool is_dead() {
+    inline bool is_dead() const {
         return hp <= 0;
     }
 

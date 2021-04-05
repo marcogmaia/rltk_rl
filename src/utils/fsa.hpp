@@ -45,8 +45,8 @@ binary trees can be used instead to get O(logn) access time.
 #ifndef FSA_H
 #define FSA_H
 
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 
 namespace radl {
 
@@ -68,7 +68,7 @@ public:
     };
 
 public:  // methods
-    FixedSizeAllocator(unsigned int MaxElements = FSA_DEFAULT_SIZE)
+    explicit FixedSizeAllocator(unsigned int MaxElements = FSA_DEFAULT_SIZE)
         : m_pFirstUsed(NULL)
         , m_MaxElements(MaxElements) {
         // Allocate enough memory for the maximum number of elements
@@ -111,32 +111,30 @@ public:  // methods
         if(!m_pFirstFree) {
             return NULL;
         }
-        else {
-            pNewNode     = m_pFirstFree;
-            m_pFirstFree = pNewNode->pNext;
+        pNewNode     = m_pFirstFree;
+        m_pFirstFree = pNewNode->pNext;
 
-            // if the new node points to another free node then
-            // change that nodes prev free pointer...
-            if(pNewNode->pNext) {
-                pNewNode->pNext->pPrev = NULL;
-            }
-
-            // node is now on the used list
-
-            pNewNode->pPrev
-                = NULL;  // the allocated node is always first in the list
-
-            if(m_pFirstUsed == NULL) {
-                pNewNode->pNext = NULL;  // no other nodes
-            }
-            else {
-                m_pFirstUsed->pPrev
-                    = pNewNode;  // insert this at the head of the used list
-                pNewNode->pNext = m_pFirstUsed;
-            }
-
-            m_pFirstUsed = pNewNode;
+        // if the new node points to another free node then
+        // change that nodes prev free pointer...
+        if(pNewNode->pNext) {
+            pNewNode->pNext->pPrev = NULL;
         }
+
+        // node is now on the used list
+
+        pNewNode->pPrev
+            = NULL;  // the allocated node is always first in the list
+
+        if(m_pFirstUsed == NULL) {
+            pNewNode->pNext = NULL;  // no other nodes
+        }
+        else {
+            m_pFirstUsed->pPrev
+                = pNewNode;  // insert this at the head of the used list
+            pNewNode->pNext = m_pFirstUsed;
+        }
+
+        m_pFirstUsed = pNewNode;
 
         return reinterpret_cast<USER_TYPE*>(pNewNode);
     }
@@ -147,7 +145,7 @@ public:  // methods
     // (To add the debug check you'd need to make sure the pointer is in
     // the m_pMemory area and is pointing at the start of a node)
     void free(USER_TYPE* user_data) {
-        FSA_ELEMENT* pNode = reinterpret_cast<FSA_ELEMENT*>(user_data);
+        auto* pNode = reinterpret_cast<FSA_ELEMENT*>(user_data);
 
         // manage used list, remove this node from it
         if(pNode->pPrev) {

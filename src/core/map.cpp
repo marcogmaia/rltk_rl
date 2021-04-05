@@ -155,7 +155,7 @@ void query_entities_near_player() {
 // XXX change this in the future, now we are only using entities that blocks the
 // path
 bool is_occupied(entt::registry& reg, position_t target_pos) {
-    return reg.ctx<Map>().at(target_pos).entities_here.size() > 0;
+    return !reg.ctx<Map>().at(target_pos).entities_here.empty();
 }
 
 void map_entity_walk(entity ent, const position_t& src_pos,

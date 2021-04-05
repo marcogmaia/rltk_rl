@@ -1,9 +1,11 @@
 #include <memory>
+#include <deque>
 
 #include "component/position.hpp"
 
 #include "utils/astar.hpp"
 #include "utils/geometry.hpp"
+#include "core/engine.hpp"
 
 namespace radl {
 
@@ -16,13 +18,6 @@ concept CNavigable = requires(T nav) {
     ->std::integral;
 };
 
-
-namespace {
-
-using location_t = position_t;
-
-
-}  // namespace
 
 // TODO try to make my own concept (C++20 concepts) for the navigator
 template <typename location_t>
@@ -119,8 +114,8 @@ class map_search_node {
 public:
     location_t pos;
 
-    map_search_node() {}
-    map_search_node(location_t loc)
+    map_search_node() = default;
+    explicit map_search_node(location_t loc)
         : pos(loc) {}
 
     float GoalDistanceEstimate(map_search_node<location_t, navigator_t>& goal) {
@@ -212,8 +207,8 @@ find_path_2d(const location_t& start, const location_t& end) {
     map_search_node<location_t, navigator_t> a_end(end);
 
     a_star_search.SetStartAndGoalStates(a_start, a_end);
-    unsigned int search_state;
-    unsigned int search_steps = 0;
+    unsigned int search_state = 0;
+    std::size_t search_steps  = 0;
 
     do {
         search_state = a_star_search.SearchStep();
@@ -231,8 +226,9 @@ find_path_2d(const location_t& start, const location_t& end) {
             = a_star_search.GetSolutionStart();
         for(;;) {
             node = a_star_search.GetSolutionNext();
-            if(!node)
+            if(!node) {
                 break;
+            }
             result->steps.push_back(node->pos);
         }
         a_star_search.FreeSolutionNodes();
@@ -261,8 +257,8 @@ std::shared_ptr<navigation_path<location_t>> find_path(const location_t start,
     map_search_node<location_t, navigator_t> a_end(end);
 
     a_star_search.SetStartAndGoalStates(a_start, a_end);
-    unsigned int search_state;
-    std::size_t search_steps = 0;
+    unsigned int search_state = 0;
+    std::size_t search_steps  = 0;
 
     do {
         search_state = a_star_search.SearchStep();
@@ -281,8 +277,9 @@ std::shared_ptr<navigation_path<location_t>> find_path(const location_t start,
             = a_star_search.GetSolutionStart();
         for(;;) {
             node = a_star_search.GetSolutionNext();
-            if(!node)
+            if(!node) {
                 break;
+            }
             result->steps.push_back(node->pos);
         }
         a_star_search.FreeSolutionNodes();

@@ -139,7 +139,6 @@ void walk(entt::entity ent, const position_t& src_pos,
 bool move_attack(entt::registry& reg, entt::entity& ent,
                  const position_t& delta_pos) {
     using namespace world;
-    using engine::reg;
     // mark as dirty to trigger an screen update
     auto& src_pos = reg.get<position_t>(ent);
     auto dst_pos  = src_pos + delta_pos;

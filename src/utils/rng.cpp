@@ -5,7 +5,6 @@ namespace radl::rng {
 
 random_number_generator rng;
 
-
 int random_number_generator::fastrand() {
     g_seed = (214013 * g_seed + 2531011);
     return (g_seed >> 16) & 0x7FFF;
@@ -21,7 +20,7 @@ random_number_generator::random_number_generator(const int seed) {
     g_seed       = initial_seed;
 }
 
-random_number_generator::random_number_generator(const std::string seed) {
+random_number_generator::random_number_generator(const std::string &seed) {
     std::hash<std::string> hash_func;
     initial_seed = hash_func(seed);
     g_seed       = initial_seed;

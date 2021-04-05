@@ -9,7 +9,7 @@ using namespace radl;
 void run() {
     using rltk::console;
     sf::Event event;
-    auto main_window = rltk::get_window();
+    auto *main_window = rltk::get_window();
     main_window->setFramerateLimit(240);
 
     while(main_window->isOpen()) {

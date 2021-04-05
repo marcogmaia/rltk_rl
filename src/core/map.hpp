@@ -11,13 +11,9 @@
 
 namespace radl::world {
 
-namespace {
-
 using namespace rltk::colors;
 using entt::entity;
 using entt::registry;
-
-}  // namespace
 
 enum tile_type_t {
     wall,
