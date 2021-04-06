@@ -10,18 +10,9 @@
 namespace radl {
 
 
-template <typename T, int X>
-concept CNavigable = requires(T nav) {
-    { nav.get_x(X) }
-    ->std::integral;
-    { nav.get_y(X) }
-    ->std::integral;
-};
-
-
 // TODO try to make my own concept (C++20 concepts) for the navigator
 template <typename location_t>
-struct navigator {
+struct navigator_t {
     static int get_x(const location_t& pos) {
         return pos.first;
     }
@@ -35,7 +26,7 @@ struct navigator {
     static bool is_walkable(const location_t& pos) {
         const auto& map = engine::get_map();
         return map.rect.contains(pos) && map[pos].characteristics.walkable
-               && !world::is_occupied(engine::reg, pos);
+               && !world::is_occupied(pos);
     }
 
     // This lets you define a distance heuristic. Manhattan distance works
@@ -77,7 +68,7 @@ struct navigator {
                 if(w_pos == player_pos
                    || (map.rect.contains(w_pos)
                        && map[w_pos].characteristics.walkable
-                       && !world::is_occupied(reg, w_pos))) {
+                       && !world::is_occupied(w_pos))) {
                     successors.push_back(w_pos);
                 }
             }
@@ -166,7 +157,8 @@ struct navigation_path {
 
 template <typename location_t, typename navigator_t>
 std::shared_ptr<navigation_path<location_t>>
-find_path_2d(const location_t& start, const location_t& end) {
+find_path_2d(const location_t& start, const location_t& end,
+             size_t limit_steps = 50) {
     {
         auto result = std::make_shared<navigation_path<location_t>>(true, end);
         auto x1     = navigator_t::get_x(start);
@@ -205,6 +197,9 @@ find_path_2d(const location_t& start, const location_t& end) {
     do {
         search_state = a_star_search.SearchStep();
         ++search_steps;
+        if(search_steps > limit_steps) {
+            a_star_search.CancelSearch();
+        }
     } while(
         search_state
         == AStarSearch<

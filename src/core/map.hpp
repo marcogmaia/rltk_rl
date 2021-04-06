@@ -112,7 +112,7 @@ struct Map {
 void create_random_rooms(Map& map);
 void make_corridors_between_rooms(Map& map);
 
-bool is_occupied(entt::registry& reg, position_t target_pos);
+bool is_occupied(position_t target_pos);
 
 Map make_test_map(const rect_t& dimension, const position_t& player_pos);
 
@@ -125,7 +125,7 @@ void query_entities_near_player();
 // void update_enemies_visibility(entt::registry& reg, entt::entity ent);
 
 
-void map_entity_walk(entity ent, const position_t& src_pos,
-                     const position_t& dst_pos);
+// void map_entity_walk(entity ent, const position_t& src_pos,
+//                      const position_t& dst_pos);
 
 }  // namespace radl::world

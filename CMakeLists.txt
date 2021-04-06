@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15.0)
 project(learning VERSION 0.1.0)
 
-# set(BUILD_SHARED_LIBS ON)
+set(BUILD_SHARED_LIBS ON)
 # set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
 find_package(spdlog REQUIRED)
 
@@ -40,7 +40,7 @@ add_executable(
     "src/core/main.cpp"
 )
 
-target_link_libraries(${PROJECT_NAME} game_core tbb pthread)
+target_link_libraries(${PROJECT_NAME} fmt game_utils game_core game_system game_component tbb pthread)
 
 # set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 # set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

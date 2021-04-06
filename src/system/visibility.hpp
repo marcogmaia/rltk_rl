@@ -16,7 +16,7 @@ namespace visibility_private {
  * - Using a naieve float based slope, it averages 0.2 uS per line.
  */
 
-template <class location_t_, class navigator_t>
+template <typename location_t_, typename navigator_t>
 void internal_2d_sweep(const location_t_& position, const int& range,
                        const std::function<void(location_t_)>& set_visible,
                        const std::function<bool(location_t_)>& is_transparent,
@@ -52,7 +52,7 @@ void internal_2d_sweep(const location_t_& position, const int& range,
 /**
  * @brief Simple all-direction visibility sweep in 2 dimensions. This requires
  * that your location_t utilize an x and y component. *
- * @tparam location_t_
+ * @tparam location_t
  * @tparam navigator_t just like for path finding. It must support
  * get_x, get_y, and get_xy.
  * @param position where you are sweeping from.
@@ -62,25 +62,25 @@ void internal_2d_sweep(const location_t_& position, const int& range,
  * @param is_transparent a callback to ask your map if you can see
  * through a tile.
  */
-template <class location_t_, class navigator_t>
-void visibility_sweep_2d(const location_t_& position, const int& range,
-                         std::function<void(location_t_)> set_visible,
-                         std::function<bool(location_t_)> is_transparent) {
+template <typename location_t, typename navigator_t>
+void visibility_sweep_2d(const location_t& position, const int& range,
+                         std::function<void(location_t)> set_visible,
+                         std::function<bool(location_t)> is_transparent) {
     // You can always see yourself
     set_visible(position);
 
     // Box-sweep
     for(int i = 0 - range; i < range; ++i) {
-        visibility_private::internal_2d_sweep<location_t_, navigator_t>(
+        visibility_private::internal_2d_sweep<location_t, navigator_t>(
             position, range, set_visible, is_transparent,
             std::make_pair(i, 0 - range));
-        visibility_private::internal_2d_sweep<location_t_, navigator_t>(
+        visibility_private::internal_2d_sweep<location_t, navigator_t>(
             position, range, set_visible, is_transparent,
             std::make_pair(i, range));
-        visibility_private::internal_2d_sweep<location_t_, navigator_t>(
+        visibility_private::internal_2d_sweep<location_t, navigator_t>(
             position, range, set_visible, is_transparent,
             std::make_pair(0 - range, i));
-        visibility_private::internal_2d_sweep<location_t_, navigator_t>(
+        visibility_private::internal_2d_sweep<location_t, navigator_t>(
             position, range, set_visible, is_transparent,
             std::make_pair(range, i));
     }

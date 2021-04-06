@@ -5,6 +5,7 @@
 #include "component/component.hpp"
 #include "system/player_action.hpp"
 #include "system/camera.hpp"
+#include "system/system.hpp"
 #include "utils/rng.hpp"
 
 #include "spdlog/spdlog.h"
@@ -31,7 +32,7 @@ static void rltk_init() {
 namespace {
 
 void add_enemy(const position_t& pos) {
-    if(!is_occupied(reg, pos)) {
+    if(!is_occupied(pos)) {
         auto chance = rng::rng.range(1, 3);
         if(chance == 1) {
             factory::enemy_factory(pos, vchar_t{'g', DARK_GREEN, BLACK},
@@ -54,7 +55,7 @@ void add_enemies() {
             int rand_x          = rng.range(room.x1, room.x2 - 1);
             int rand_y          = rng.range(room.y1, room.y2 - 1);
             position_t rand_pos = {rand_x, rand_y};
-            if(!is_occupied(reg, rand_pos)) {
+            if(!is_occupied(rand_pos)) {
                 add_enemy(rand_pos);
             }
         }
@@ -95,9 +96,6 @@ void update() {
     switch(gamestatus) {
     case game_state_t::STARTUP: {
         reg.set<Map>();
-        reg.clear();
-
-
         auto& map = get_map();
         map.init(rect_t{0, 0, width * 4, height * 4});
         create_random_rooms(map);
@@ -109,18 +107,15 @@ void update() {
                                 vchar_t{'@', YELLOW, BLACK});
         add_enemies();
         query_entities_near_player();
-        fov_update(reg, player);
+        fov_update();
         camera_update(reg, player);
+
+        spdlog::info("entities created: {}", reg.alive());
         gamestatus = game_state_t::IDLE;
     } break;
 
     case game_state_t::IDLE: {
-        if(reg.get<destructible_t>(player).is_dead()) {
-            gamestatus = game_state_t::DEFEAT;
-            return;
-        }
-        while(!engine::event_queue.empty()
-              && !reg.get<destructible_t>(player).is_dead()) {
+        if(!engine::event_queue.empty()) {
             auto valid_input = radl::process_input(player);
             // perform action
             if(valid_input) {
@@ -130,20 +125,19 @@ void update() {
     } break;
     case game_state_t::NEW_TURN: {
         // ## if player is dead then restart game
-        if(reg.get<destructible_t>(player).is_dead()) {
-            gamestatus = game_state_t::DEFEAT;
-            return;
-        }
-        enemy_spawner();
         query_entities_near_player();
-        fov_update(reg, player);
-        fov_update_parallel(get_entities_near_player());
-        ai_enemy(reg);
+        system::systems_run();
         camera_update(reg, player);
+
         // ## update gui
-        gamestatus = game_state_t::IDLE;
+
+        if(reg.all_of<dead_t>(player)) {
+            gamestatus = game_state_t::DEFEAT;
+        }
+        else {
+            gamestatus = game_state_t::IDLE;
+        }
     } break;
-    // FIXME: refactor this lots of bugs
     case game_state_t::DEFEAT: {
         terminate();
         gamestatus = game_state_t::STARTUP;
@@ -154,11 +148,8 @@ void update() {
 }
 
 void terminate() {
-    // reg.clear();
-    // engine::get_map() =
-    // reg.clear();
-    // reg = entt::registry();
-    // reg.set<game_state_t>(game_state_t::STARTUP);
+    reg.unset<world::Map>();
+    reg.clear();
 }
 
 }  // namespace radl::engine

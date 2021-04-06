@@ -2,6 +2,7 @@
 #include "system/camera.hpp"
 
 #include "engine.hpp"
+#include "component/component.hpp"
 
 #include <fmt/format.h>
 
@@ -27,19 +28,15 @@ void player_factory(entt::entity ent, const position_t& pos,
     reg.emplace<viewshed_t>(ent, 16);
     reg.emplace<renderable_t>(ent, renderable_t{vch});
     reg.emplace<position_t>(ent, pos);
-    reg.emplace<destructible_t>(ent, destructible_t{
-                                         .max_hp      = 100,
-                                         .hp          = 100,
-                                         .defense     = 5,
-                                         .corpse_name = "ded",
+    reg.emplace<combat_stats_t>(ent, combat_stats_t{
+                                         .max_hp  = 100,
+                                         .hp      = 100,
+                                         .defense = 5,
+                                         .power   = 50,
                                      });
-    reg.emplace<attacker_t>(ent, attacker_t{
-                                     .power = 10,
-                                 });
     reg.emplace<being_t>(ent, "Player");
     reg.emplace<blocks_t>(ent);
     reg.emplace<player_t>(ent);
-
     add_ent_to_map(ent, pos);
 }
 
@@ -49,17 +46,12 @@ void enemy_factory(const position_t& pos, vchar_t vch, const char* name) {
     reg.emplace<renderable_t>(ent, vch);
     reg.emplace<viewshed_t>(ent, 12);
     reg.emplace<position_t>(ent, pos);
-    reg.emplace<destructible_t>(ent,
-                                destructible_t{
-                                    .max_hp      = 30,
-                                    .hp          = 30,
-                                    .defense     = 1,
-                                    .corpse_name = fmt::format("ded {}", name),
-                                });
-    reg.emplace<attacker_t>(ent, attacker_t{
-                                     .power = 6,
-                                 });
-    // reg.emplace<being_t>(ent, name);
+    reg.emplace<combat_stats_t>(ent, combat_stats_t{
+                                         .max_hp  = 50,
+                                         .hp      = 50,
+                                         .defense = 5,
+                                         .power   = 6,
+                                     });
     reg.emplace<being_t>(ent, name);
     reg.emplace<blocks_t>(ent);
     add_ent_to_map(ent, pos);

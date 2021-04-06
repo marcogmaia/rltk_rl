@@ -112,9 +112,14 @@ void draw_line_from_player(sf::Event& ev, const position_t& player_pos) {
 
 }  // namespace
 
-bool process_input(entt::entity ent) {
-    using rltk::my_event_queue;
+void flush_events() {
+    auto &ev_queue = engine::event_queue;
+    while(!ev_queue.empty()) {
+        ev_queue.pop();
+    }
+}
 
+bool process_input(entt::entity ent) {
     if(!engine::event_queue.empty()) {
         auto ev = engine::event_queue.front();
         engine::event_queue.pop();
@@ -130,7 +135,8 @@ bool process_input(entt::entity ent) {
             return true;
         } break;
         case sf::Event::MouseMoved: {
-            draw_line_from_player(ev, player_pos);
+            // draw_line_from_player(ev, player_pos);
+            flush_events();
         } break;
         default:
             break;
@@ -139,25 +145,8 @@ bool process_input(entt::entity ent) {
     return false;
 }
 
-namespace {
 
-std::mutex walk_mutex;
 
-}  // namespace
-
-void walk(const entt::entity& ent, const position_t& src_pos,
-          const position_t& target_pos) {
-    if(!engine::get_map().at(target_pos).characteristics.walkable) {
-        return;
-    }
-
-    std::lock_guard guard(walk_mutex);
-    if(!world::is_occupied(reg, target_pos) && (src_pos != target_pos)) {
-        world::map_entity_walk(ent, src_pos, target_pos);
-        // mark viewshed as dirty to recalculate
-        reg.get<world::viewshed_t>(ent).dirty = true;
-    }
-}
 
 void random_walk(const entt::entity& ent, const position_t& src_pos) {
     auto dx = rng::rng.range(-1, 1);
@@ -178,7 +167,7 @@ bool move_wait_attack(entt::entity& ent, const position_t& dst_pos) {
     const auto& target_tile_chars = map[{dst_pos}].characteristics;
 
     // ## 1. attack if enemy is in the targeted pos
-    if(is_occupied(reg, dst_pos)) {
+    if(is_occupied(dst_pos)) {
         // attack
         attack(ent, dst_pos);
         return false;

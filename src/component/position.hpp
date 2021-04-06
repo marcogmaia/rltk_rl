@@ -17,55 +17,13 @@ std::pair<T, T> operator-(const std::pair<T, T>& left,
     return {left.first - right.first, left.second - right.second};
 }
 
-
 using position_t = std::pair<int, int>;
 
-// struct position_t {
-//     int x;
-//     int y;
-//     // mas nem precisa da referência, pois a posição já pode achar a tile!
-//     // world::tile_t *tile;
-// };
-
-// Position component
-// struct position_t {
-//     int x;
-//     int y;
-// };
-//
-// constexpr position_t
-// operator+(const position_t lhs, const position_t rhs) {
-//     return {lhs.first + rhs.first, lhs.second + rhs.second};
-// }
-
-// constexpr position_t& operator+=(position_t& lhs, const position_t rhs) {
-//     return lhs = lhs + rhs;
-// }
-
-// constexpr position_t operator-(const position_t lhs, const position_t rhs) {
-//     return {lhs.first - rhs.first, lhs.second - rhs.second};
-// }
-
-// constexpr position_t operator*(const position_t lhs, const int rhs) {
-//     return {lhs.first * rhs, lhs.second * rhs};
-// }
-
-// constexpr bool operator==(const position_t lhs, const position_t rhs) {
-//     return lhs.first == rhs.first && lhs.second == rhs.second;
-// }
-
-// constexpr bool operator!=(const position_t lhs, const position_t rhs) {
-//     return !(lhs == rhs);
-// }
-
-// inline int distance2(const position_t a, const position_t b) {
-//     const int dx = a.first - b.first;
-//     const int dy = a.second - b.second;
-//     return dx * dx + dy * dy;
-// }
-
-// inline float distance(const position_t a, const position_t b) {
-//     return sqrtf32(distance2(a, b));
-// }
+struct PosHasher {
+    inline size_t operator()(const position_t& pos) const {
+        return std::hash<int>()(pos.first)
+               ^ ((std::hash<int>()(pos.second) << 1) >> 1);
+    }
+};
 
 }  // namespace radl

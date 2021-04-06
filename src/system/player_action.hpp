@@ -27,8 +27,6 @@ bool process_input(entt::entity ent);
  */
 bool move_wait_attack(entt::entity& ent, const position_t& dst_pos);
 
-void walk(const entt::entity& ent, const position_t& src_pos,
-          const position_t& target_pos);
 
 void random_walk(const entt::entity& ent, const position_t& src_pos);
 

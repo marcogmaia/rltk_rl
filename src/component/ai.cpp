@@ -28,7 +28,7 @@ bool surrounded(const position_t& pos) {
             position_t offset = {dx, dy};
             auto look_pos     = pos + offset;
             auto walkable     = map[look_pos].characteristics.walkable;
-            auto can_walk     = !is_occupied(reg, look_pos) && walkable;
+            auto can_walk     = !is_occupied(look_pos) && walkable;
             if(can_walk) {
                 return false;
             }
@@ -58,64 +58,51 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
     // found
     auto e_pos = reg.get<position_t>(e_ent);
     if(e_pos != target_pos) {
-        auto path = find_path_2d<position_t, navigator<position_t>>(e_pos,
-                                                                    target_pos);
+        auto path = find_path_2d<position_t, navigator_t<position_t>>(
+            e_pos, target_pos);
         if(path->success && !path->steps.empty()) {
             auto next_step = path->steps.front();
             path->steps.pop_front();
-            auto& map = engine::get_map();
-            if(map.rect.contains(next_step)) {
+            auto& map                       = engine::get_map();
+            constexpr double range_distance = 2.1;
+            if(distance2d_squared(e_pos.first, e_pos.second, target_pos.first,
+                                  target_pos.second)
+               <= range_distance) {
+                attack(e_ent, engine::player);
+            }
+            else if(map.rect.contains(next_step)) {
                 move_wait_attack(e_ent, next_step);
             }
         }
     }
 }
 
-
-void ai_enemy(entt::registry& reg) {
+// uses being, position, and viewshed
+void ai_enemy() {
     using engine::player;
+    using engine::reg;
     using namespace world;
 
-    auto g_enemies  = reg.group<being_t, position_t>();
+    auto v_enemies  = reg.group<being_t, position_t, viewshed_t>();
     auto player_pos = reg.get<position_t>(player);
 
-    std::vector<entity> entities_parallel;
-    entities_parallel.reserve(16);
-
     auto player_is_surrounded = surrounded(player_pos);
-    for(auto [e_ent, e_b, e_pos] : g_enemies.each()) {
+
+    for(auto [e_ent, e_b, e_pos, e_vshed] : v_enemies.each()) {
         if(e_ent == engine::player) {
             continue;
         }
-        // auto&& e_pos   = std::get<position_t>(ent_tuple);
-        // auto&& e_ent   = std::get<entity>(ent_tuple);
-
-        auto& e_vshed = reg.get<viewshed_t>(e_ent);
-        auto pos      = std::find(std::begin(e_vshed.visible_coordinates),
-                             std::end(e_vshed.visible_coordinates), player_pos);
+        auto player_is_visible
+            = e_vshed.visible_coordinates.contains(player_pos);
         //  found player
-        if(pos != std::end(e_vshed.visible_coordinates)
-           && !player_is_surrounded) {
-            entities_parallel.push_back(e_ent);
-        }
-        else if(is_near(e_pos, player_pos)) {
-            entities_parallel.push_back(e_ent);
+        if(player_is_visible && e_ent != player) {
+            ai_enemy_find_path(e_ent, player_pos);
         }
         // can't see the player
-        else if(!is_near(e_pos, player_pos)) {
+        else {
             random_walk(e_ent, e_pos);
         }
     }
-
-    auto func = [&](entity ent) {
-        if(ent != player) {
-            ai_enemy_find_path(ent, player_pos);
-        }
-    };
-
-
-    std::for_each(std::execution::par, entities_parallel.begin(),
-                  entities_parallel.end(), func);
 }
 
 }  // namespace radl

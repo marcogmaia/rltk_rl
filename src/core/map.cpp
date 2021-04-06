@@ -152,27 +152,28 @@ void query_entities_near_player() {
 
 // XXX change this in the future, now we are only using entities that blocks the
 // path
-bool is_occupied(entt::registry& reg, position_t target_pos) {
+bool is_occupied(position_t target_pos) {
+    using engine::reg;
     auto& ents_here = engine::get_map().at(target_pos).entities_here;
-    return std::ranges::any_of(ents_here, [&reg](auto& ent) {
+    return std::ranges::any_of(ents_here, [&](auto& ent) {
         return reg.any_of<blocks_t>(ent);
     });
 }
 
-void map_entity_walk(entity ent, const position_t& src_pos,
-                     const position_t& dst_pos) {
-    using engine::reg;
-    auto& map = engine::get_map();
-    map[src_pos].entities_here.remove(ent);
-    map[dst_pos].entities_here.push_back(ent);
-    reg.patch<position_t>(ent, [=](position_t& pos) {
-        pos = dst_pos;
-    });
-}
+// void map_entity_walk(entity ent, const position_t& src_pos,
+//                      const position_t& dst_pos) {
+//     using engine::reg;
+//     auto& map = engine::get_map();
+//     map[src_pos].entities_here.remove(ent);
+//     map[dst_pos].entities_here.push_back(ent);
+//     reg.patch<position_t>(ent, [=](position_t& pos) {
+//         pos = dst_pos;
+//     });
+// }
 
 void Map::init(const rect_t& rect) {
-    this->rect      = rect;
-    auto area = rect.area();
+    this->rect = rect;
+    auto area  = rect.area();
     tiles.resize(area);
 }
 

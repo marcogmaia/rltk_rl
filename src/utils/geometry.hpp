@@ -37,8 +37,8 @@ inline double distance2d(const int& x1, const int& y1, const int& x2,
  */
 inline double distance2d_squared(const int& x1, const int& y1, const int& x2,
                                  const int& y2) noexcept {
-    const double dx = (double)x1 - (double)x2;
-    const double dy = (double)y1 - (double)y2;
+    auto dx = (double)x1 - (double)x2;
+    auto dy = (double)y1 - (double)y2;
     return (dx * dx) + (dy * dy);
 }
 
