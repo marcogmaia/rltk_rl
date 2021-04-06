@@ -3,13 +3,6 @@
         {
             "name": "roguelike",
             "includePath": [
-                // "/usr/include",
-                // "/usr/include/entt",
-                // "/usr/include/spdlog",
-                // "/usr/include/c++/10.2.0",
-                // "/usr/include/c++/10.2.0/tr1",
-                // "/usr/include/c++/10.2.0/x86_64-pc-linux-gnu/",
-                // "/usr/include/linux",
                 "${workspaceFolder}/src",
                 "${workspaceFolder}/lib/rltk"
             ],

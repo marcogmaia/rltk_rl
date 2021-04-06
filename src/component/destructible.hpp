@@ -11,7 +11,7 @@ struct destructible_t {
     std::string corpse_name;  // the entity's name once dead/destroyed
  
     [[nodiscard]] inline bool is_dead() const {
-        return hp <= 0;
+        return hp <= 0.F;
     }
 
 };

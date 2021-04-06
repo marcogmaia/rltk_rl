@@ -5,6 +5,7 @@
 #include "core/engine.hpp"
 
 #include "utils/rng.hpp"
+#include "utils/geometry.hpp"
 #include "component/component.hpp"
 #include "system/camera.hpp"
 
@@ -20,9 +21,9 @@ void handle_screen_resize(const sf::Event& ev, entt::registry& reg,
     }
 }
 
-static position_t get_delta_pos(const sf::Event& ev, bool* player_input) {
-    int dx = 0;
-    int dy = 0;
+static position_t get_delta_pos(const sf::Event& ev) {
+    position_t delta_pos{0, 0};
+    auto& [dx, dy] = delta_pos;
 
     if(ev.type != sf::Event::EventType::KeyPressed) {
         return {dx, dy};
@@ -67,19 +68,14 @@ static position_t get_delta_pos(const sf::Event& ev, bool* player_input) {
         ++dy;
     } break;
     case sf::Keyboard::Numpad5: {
-        *player_input = true;
     } break;
     default:
         break;
     }
 
-    if(!*player_input) {
-        *player_input = dx != 0 || dy != 0;
-    }
-    return position_t{dx, dy};
+    return delta_pos;
 }
 
-#include "utils/geometry.hpp"
 
 static position_t render_pos(int rx, int ry) {
     using engine::reg;
@@ -91,52 +87,67 @@ static position_t render_pos(int rx, int ry) {
     return position_t{rx - xci, ry - yci};
 }
 
-bool process_input(entt::registry& reg, entt::entity e) {
-    bool player_input = false;
+
+namespace {
+
+using engine::reg;
+using namespace world;
+using namespace rltk::colors;
+
+void draw_line_from_player(sf::Event& ev, const position_t& player_pos) {
+    if(ev.type == sf::Event::EventType::MouseMoved) {
+        auto [mx, my] = ev.mouseMove;
+        int tx        = std::round(static_cast<double>(mx) / 16.0);
+        int ty        = std::round(static_cast<double>(my) / 16.0);
+
+        auto [px, py] = player_pos;
+        auto func     = [](int x, int y) {
+            rltk::console->set_char(x, y,
+                                    vchar_t{glyph::BLOCK1, ORANGE, BLACK});
+        };
+        auto [rx, ry] = render_pos(px, py);
+        radl::line_func(rx, ry, tx, ty, func);
+    }
+}
+
+}  // namespace
+
+bool process_input(entt::entity ent) {
     using rltk::my_event_queue;
+
     if(!engine::event_queue.empty()) {
         auto ev = engine::event_queue.front();
         engine::event_queue.pop();
 
-        handle_screen_resize(ev, reg, e);
+        handle_screen_resize(ev, reg, ent);
 
         auto player_pos = reg.get<position_t>(engine::player);
-        // TODO arrumar isso depois
-        if(ev.type == sf::Event::EventType::MouseMoved) {
-            auto [mx, my] = ev.mouseMove;
-            int tx        = std::round(static_cast<double>(mx) / 16.0);
-            int ty        = std::round(static_cast<double>(my) / 16.0);
 
-            auto [px, py] = player_pos;
-            auto func     = [](int x, int y) {
-                using namespace rltk::colors;
-                rltk::console->set_char(x, y,
-                                        vchar_t{glyph::BLOCK1, ORANGE, BLACK});
-            };
-            auto [rx, ry] = render_pos(px, py);
-            radl::line_func(rx, ry, tx, ty, func);
-            return false;
+        switch(ev.type) {
+        case sf::Event::KeyPressed: {
+            auto target_pos = player_pos + get_delta_pos(ev);
+            move_wait_attack(ent, target_pos);
+            return true;
+        } break;
+        case sf::Event::MouseMoved: {
+            draw_line_from_player(ev, player_pos);
+        } break;
+        default:
+            break;
         }
-
-        else if(ev.type != sf::Event::EventType::KeyPressed) {
-            return false;
-        }
-
-        auto target_pos = player_pos + get_delta_pos(ev, &player_input);
-        move_attack(reg, e, target_pos);
     }
-    return player_input;
+    return false;
 }
 
 namespace {
-using namespace world;
-using engine::reg;
+
 std::mutex walk_mutex;
+
 }  // namespace
 
 void walk(const entt::entity& ent, const position_t& src_pos,
           const position_t& target_pos) {
-    if(!reg.ctx<Map>().at(target_pos).characteristics.walkable) {
+    if(!engine::get_map().at(target_pos).characteristics.walkable) {
         return;
     }
 
@@ -156,33 +167,29 @@ void random_walk(const entt::entity& ent, const position_t& src_pos) {
     walk(ent, src_pos, target_pos);
 }
 
-bool move_attack(entt::registry& reg, entt::entity& ent,
-                 const position_t& dst_pos) {
+bool move_wait_attack(entt::entity& ent, const position_t& dst_pos) {
     using namespace world;
-    //  wait turn
     auto& src_pos = reg.get<position_t>(ent);
+    // ## 0. wait turn
     if(dst_pos == src_pos) {
         return false;
     }
-
-    // maybe check if occupies vicinity, or add vicinity component
-    auto& map                     = reg.ctx<Map>();
+    auto& map                     = engine::get_map();
     const auto& target_tile_chars = map[{dst_pos}].characteristics;
 
     // ## 1. attack if enemy is in the targeted pos
     if(is_occupied(reg, dst_pos)) {
         // attack
-        // auto target = map[dst_pos].entities_here.front();
         attack(ent, dst_pos);
         return false;
     }
     // ## 2. walk if tile is no occupied and walkable
     else if(target_tile_chars.walkable) {
         walk(ent, src_pos, dst_pos);
+        return true;
     }
-
     // ## 3. do nothing if is wall
-    return true;
+    return false;
 }
 
 }  // namespace radl

@@ -20,8 +20,13 @@ void die(entity& ent) {
 
 }  // namespace
 
+namespace {
+std::mutex attack_mutex;
+}
+
 void attack(const entity& ent_atk, const position_t& pos) {
-    auto& ents = reg.ctx<Map>().at(pos).entities_here;
+    std::lock_guard lock(attack_mutex);
+    auto& ents = engine::get_map().at(pos).entities_here;
     auto found = std::ranges::find_if(ents, [&](auto& ent) {
         return reg.all_of<being_t, destructible_t>(ent);
     });
@@ -37,7 +42,9 @@ void attack(const entity& ent_atk, const position_t& pos) {
     if(final_damage < 0) {
         final_damage = 0;
     }
+
     if(!defender.is_dead()) {
+        // FIXME: beign_t is gone, I'm calling this with a dead entity
         spdlog::debug("The {} attacks the {} for {} damage.",
                       reg.get<being_t>(ent_atk).name,
                       reg.get<being_t>(ent_def).name, final_damage);

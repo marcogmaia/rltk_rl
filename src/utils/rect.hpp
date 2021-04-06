@@ -1,7 +1,8 @@
 #pragma once
 #include <cmath>
 #include <fmt/format.h>
-#include "../component/position.hpp"
+#include "utils/rng.hpp"
+#include "component/position.hpp"
 
 
 namespace radl {
@@ -23,6 +24,12 @@ struct rect_t {
 
     [[nodiscard]] inline position_t center() const {
         return position_t{(x1 + x2) / 2, (y1 + y2) / 2};
+    }
+
+    [[nodiscard]] inline position_t random_pos() const {
+        int rand_x = rng::rng.range(x1, x2 - 1);
+        int rand_y = rng::rng.range(y1, y2 - 1);
+        return position_t{rand_x, rand_y};
     }
 
     [[nodiscard]] inline size_t area() const {

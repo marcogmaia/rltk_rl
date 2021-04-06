@@ -9,7 +9,6 @@
 
 #include "spdlog/spdlog.h"
 
-
 namespace radl::engine {
 
 using namespace world;
@@ -28,11 +27,27 @@ static void rltk_init() {
                                    "Maia Roguelike learning", "16x16", false));
 }
 
+
+namespace {
+
+void add_enemy(const position_t& pos) {
+    if(!is_occupied(reg, pos)) {
+        auto chance = rng::rng.range(1, 3);
+        if(chance == 1) {
+            factory::enemy_factory(pos, vchar_t{'g', DARK_GREEN, BLACK},
+                                   "Goblin");
+        }
+        else {
+            factory::enemy_factory(pos, vchar_t{'O', GREEN, BLACK}, "Orc");
+        }
+    }
+}
+
 void add_enemies() {
-    constexpr uint32_t max_enemies_pex_room = 4;
+    constexpr uint32_t max_enemies_pex_room = 4 * 10;
     using rng::rng;
 
-    const auto& w_map = reg.ctx<Map>();
+    const auto& w_map = engine::get_map();
     for(const auto& room : w_map.rooms) {
         auto num_enemies = rng.range(0, max_enemies_pex_room);
         for(int i = 0; i < num_enemies; ++i) {
@@ -40,19 +55,13 @@ void add_enemies() {
             int rand_y          = rng.range(room.y1, room.y2 - 1);
             position_t rand_pos = {rand_x, rand_y};
             if(!is_occupied(reg, rand_pos)) {
-                auto chance = rng.range(1, 3);
-                if(chance == 1) {
-                    factory::enemy_factory(
-                        rand_pos, vchar_t{'g', DARK_GREEN, BLACK}, "Goblin");
-                }
-                else {
-                    factory::enemy_factory(rand_pos, vchar_t{'O', GREEN, BLACK},
-                                           "Orc");
-                }
+                add_enemy(rand_pos);
             }
         }
     }
 }
+}  // namespace
+
 
 void init() {
 #ifdef DEBUG
@@ -60,44 +69,84 @@ void init() {
 #endif
     spdlog::info("Initializing engine.");
     rltk_init();
-    reg.set<game_status_t>(game_status_t::STARTUP);
-
-    update();
+    reg.set<game_state_t>(game_state_t::STARTUP);
 }
 
+world::Map& get_map() {
+    return reg.ctx<world::Map>();
+}
+
+namespace {
+
+
+void enemy_spawner() {
+    auto& map        = engine::get_map();
+    int random_index = rng::rng.range(0, map.rooms.size() - 1);
+    auto random_pos  = map.rooms.at(random_index).random_pos();
+    add_enemy(random_pos);
+}
+
+
+}  // namespace
+
+
 void update() {
-    static auto& gamestatus = reg.ctx<game_status_t>();
+    auto& gamestatus = reg.ctx<game_state_t>();
     switch(gamestatus) {
-    case game_status_t::STARTUP: {
-        auto map_obj = new_map(reg, rect_t{0, 0, width * 4, height * 4});
-        auto player_start_pos = map_obj.rooms[0].center();
-        reg.set<Map>(map_obj);
-        player = reg.create();
+    case game_state_t::STARTUP: {
+        reg.set<Map>();
+        reg.clear();
+
+
+        auto& map = get_map();
+        map.init(rect_t{0, 0, width * 4, height * 4});
+        create_random_rooms(map);
+        make_corridors_between_rooms(map);
+
+        auto player_start_pos = map.rooms[0].center();
+        player                = reg.create();
         factory::player_factory(player, player_start_pos,
                                 vchar_t{'@', YELLOW, BLACK});
         add_enemies();
         query_entities_near_player();
         fov_update(reg, player);
         camera_update(reg, player);
-        gamestatus = game_status_t::IDLE;
+        gamestatus = game_state_t::IDLE;
     } break;
-    case game_status_t::IDLE: {
-        while(!engine::event_queue.empty()) {
-            auto player_has_input = radl::process_input(reg, player);
-            if(player_has_input) {
-                query_entities_near_player();
-                fov_update(reg, player);
-                fov_update_parallel(get_entities_near_player());
-                ai_enemy(reg);
+
+    case game_state_t::IDLE: {
+        if(reg.get<destructible_t>(player).is_dead()) {
+            gamestatus = game_state_t::DEFEAT;
+            return;
+        }
+        while(!engine::event_queue.empty()
+              && !reg.get<destructible_t>(player).is_dead()) {
+            auto valid_input = radl::process_input(player);
+            // perform action
+            if(valid_input) {
+                gamestatus = game_state_t::NEW_TURN;
             }
         }
-        // TODO move switch from process_input to here.
-        gamestatus = game_status_t::NEW_TURN;
-        // }
     } break;
-    case game_status_t::NEW_TURN: {
+    case game_state_t::NEW_TURN: {
+        // ## if player is dead then restart game
+        if(reg.get<destructible_t>(player).is_dead()) {
+            gamestatus = game_state_t::DEFEAT;
+            return;
+        }
+        enemy_spawner();
+        query_entities_near_player();
+        fov_update(reg, player);
+        fov_update_parallel(get_entities_near_player());
+        ai_enemy(reg);
         camera_update(reg, player);
-        gamestatus = game_status_t::IDLE;
+        // ## update gui
+        gamestatus = game_state_t::IDLE;
+    } break;
+    // FIXME: refactor this lots of bugs
+    case game_state_t::DEFEAT: {
+        terminate();
+        gamestatus = game_state_t::STARTUP;
     } break;
     default:
         break;
@@ -105,7 +154,11 @@ void update() {
 }
 
 void terminate() {
-    reg.clear();
+    // reg.clear();
+    // engine::get_map() =
+    // reg.clear();
+    // reg = entt::registry();
+    // reg.set<game_state_t>(game_state_t::STARTUP);
 }
 
 }  // namespace radl::engine

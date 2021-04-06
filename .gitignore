@@ -1,4 +1,5 @@
 roguebasin/
+perf.*
 
 lib/libtcod/
 lib/rltk/

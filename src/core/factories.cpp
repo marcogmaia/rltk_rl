@@ -18,7 +18,7 @@ using namespace world;
  * @param dst_post
  */
 static void add_ent_to_map(entity ent, const position_t& dst_post) {
-    auto& map = reg.ctx<world::Map>();
+    auto& map = engine::get_map();
     map[dst_post].entities_here.push_back(ent);
 }
 
@@ -44,7 +44,7 @@ void player_factory(entt::entity ent, const position_t& pos,
 }
 
 
-void enemy_factory(const position_t& pos, vchar_t vch, std::string_view name) {
+void enemy_factory(const position_t& pos, vchar_t vch, const char* name) {
     auto ent = reg.create();
     reg.emplace<renderable_t>(ent, vch);
     reg.emplace<viewshed_t>(ent, 12);
@@ -57,9 +57,10 @@ void enemy_factory(const position_t& pos, vchar_t vch, std::string_view name) {
                                     .corpse_name = fmt::format("ded {}", name),
                                 });
     reg.emplace<attacker_t>(ent, attacker_t{
-                                     .power = 1,
+                                     .power = 6,
                                  });
-    reg.emplace<being_t>(ent, std::string(name));
+    // reg.emplace<being_t>(ent, name);
+    reg.emplace<being_t>(ent, name);
     reg.emplace<blocks_t>(ent);
     add_ent_to_map(ent, pos);
 }

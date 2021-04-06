@@ -16,7 +16,7 @@ namespace radl {
 void camera_update(entt::registry& reg, entt::entity ent) {
     using namespace world;
     using rltk::console;
-    auto& map = reg.ctx<Map>();
+    auto& map = engine::get_map();
 
     console->clear();
     const auto& [player_pos, rend, pvshed]

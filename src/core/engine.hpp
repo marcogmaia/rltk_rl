@@ -4,8 +4,8 @@
 #include "entt/entt.hpp"
 #include "core/map.hpp"
 
-using entt::registry;
 using entt::entity;
+using entt::registry;
 
 namespace radl::engine {
 
@@ -14,7 +14,9 @@ extern entt::registry reg;
 extern entt::entity player;
 extern std::queue<sf::Event> event_queue;
 
-enum game_status_t {
+world::Map& get_map();
+
+enum game_state_t {
     STARTUP,
     IDLE,
     NEW_TURN,
@@ -27,4 +29,4 @@ void update();
 // void render();
 void terminate();
 
-}  // namespace engine
+}  // namespace radl::engine

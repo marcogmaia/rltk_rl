@@ -24,7 +24,7 @@ struct tile_characteristics_t {
     bool walkable    = false;
     bool transparent = false;
     bool explored    = false;
-    bool is_visible  = false;
+    // bool is_visible  = false;
 };
 
 struct blocks_t {};
@@ -35,9 +35,11 @@ struct blocks_t {};
 
 struct tile_t {
     tile_type_t type = wall;
-    tile_characteristics_t characteristics;
-    std::list<entity> entities_here;
+    tile_characteristics_t characteristics{};
+    std::list<entity> entities_here{};
     // entity characteristics;
+
+    // ~tile_t();
 
     inline vchar_t get_vchar() const {
         vchar_t vch = {
@@ -79,6 +81,8 @@ struct Map {
     // entities
     std::vector<tile_t> tiles;
 
+    // ~Map();
+
     [[nodiscard]] inline const tile_t& operator[](position_t pos) const {
         auto& [x, y] = pos;
         return tiles[x + y * rect.width()];
@@ -102,26 +106,18 @@ struct Map {
         return tiles[x + y * rect.width()];
     }
 
-    inline void init(entt::registry& reg, const rect_t& r) {
-        rect      = r;
-        auto area = r.area();
-        tiles.resize(area);
-
-
-        // for(int x = 0; x < r.width(); ++x) {
-        //     for(int y = 0; y < r.height(); ++y) {
-        //         // tiles[x + y * r.width()];
-        //     }
-        // }
-    }
+    void init(const rect_t& rect);
 };
 
+void create_random_rooms(Map& map);
+void make_corridors_between_rooms(Map& map);
 
 bool is_occupied(entt::registry& reg, position_t target_pos);
 
 Map make_test_map(const rect_t& dimension, const position_t& player_pos);
 
-Map new_map(entt::registry& reg, const rect_t& rect);
+// Map new_map(entt::registry& reg, const rect_t& rect);
+std::unique_ptr<Map> new_map(registry& reg, const rect_t& rect);
 
 std::vector<entt::entity>* get_entities_near_player();
 

@@ -8,28 +8,38 @@
 #include "core/map.hpp"
 #include "entt/entt.hpp"
 
-#include "boost/container/flat_set.hpp"
+// #include "boost/container/flat_set.hpp"
+#include <unordered_set>
 
 
-// namespace std {
-// template <>
-// struct hash<radl::position_t> {
-//     std::size_t operator()(const radl::position_t& pos) const {
-//         return (hash<int>()(pos.first) ^ ((hash<int>()(pos.second) << 1)) >>
-//         1);
-//     }
-// };
-// }  // namespace std
+namespace std {
+template <>
+struct hash<radl::position_t> {
+    std::size_t operator()(const radl::position_t& pos) const {
+        return hash<int>()(pos.first) ^ ((hash<int>()(pos.second) << 1) >> 1);
+    }
+};
+}  // namespace std
+
+
 extern entt::registry radl::engine::reg;
 
 namespace radl::world {
+
+struct PosHasher {
+    inline size_t operator()(const position_t& pos) const {
+        return std::hash<int>()(pos.first)
+               ^ ((std::hash<int>()(pos.second) << 1) >> 1);
+    }
+};
 
 struct viewshed_t {
     static constexpr int default_range = 8;
 
     int range = default_range;  // range of visibility
     // the flat_set is the set API with vector as a base instead of a tree
-    boost::container::flat_set<position_t> visible_coordinates;
+    std::unordered_set<position_t, PosHasher> visible_coordinates;
+    // boost::container::flat_set<position_t> visible_coordinates;
     bool dirty = true;
 };
 

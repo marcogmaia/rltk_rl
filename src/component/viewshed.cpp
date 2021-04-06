@@ -31,7 +31,7 @@ struct nav_helper {
 // make this update parallel
 void fov_update(entt::registry& reg, const entt::entity& ent) {
     using namespace world;
-    auto& map   = reg.ctx<Map>();
+    auto& map   = engine::get_map();
     auto& vshed = reg.get<viewshed_t>(ent);
     if(!vshed.dirty) {
         return;
@@ -40,7 +40,7 @@ void fov_update(entt::registry& reg, const entt::entity& ent) {
     auto& ent_pos = reg.get<position_t>(ent);
 
     decltype(vshed.visible_coordinates) new_vis;
-    new_vis.reserve(vshed.range * vshed.range);
+    // new_vis.reserve(vshed.range * vshed.range);
 
     auto set_visibility = [&](const position_t& reveal_pos) {
         if(map.rect.contains(reveal_pos)) {
