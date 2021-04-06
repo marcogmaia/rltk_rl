@@ -37,7 +37,8 @@ bool surrounded(const position_t& pos) {
     return true;
 }
 
-bool is_near(const position_t& src_pos, const position_t& dst_pos) {
+[[maybe_unused]] bool is_near(const position_t& src_pos,
+                              const position_t& dst_pos) {
     auto delta_pos = dst_pos - src_pos;
     auto& [dx, dy] = delta_pos;
     return !(dx > 1 && dy > 1);
@@ -59,7 +60,7 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
     auto e_pos = reg.get<position_t>(e_ent);
     if(e_pos != target_pos) {
         auto path = find_path_2d<position_t, navigator_t<position_t>>(
-            e_pos, target_pos);
+            e_pos, target_pos, 20);
         if(path->success && !path->steps.empty()) {
             auto next_step = path->steps.front();
             path->steps.pop_front();
@@ -86,14 +87,15 @@ void ai_enemy() {
     auto v_enemies  = reg.group<being_t, position_t, viewshed_t>();
     auto player_pos = reg.get<position_t>(player);
 
-    auto player_is_surrounded = surrounded(player_pos);
+    // auto player_is_surrounded = surrounded(player_pos);
 
-    for(auto [e_ent, e_b, e_pos, e_vshed] : v_enemies.each()) {
+    auto aifunc = [&](auto e_ent) {
+        auto [e_pos, vshed] = v_enemies.get<position_t, viewshed_t>(e_ent);
+
         if(e_ent == engine::player) {
-            continue;
+            return;
         }
-        auto player_is_visible
-            = e_vshed.visible_coordinates.contains(player_pos);
+        auto player_is_visible = vshed.visible_coordinates.contains(player_pos);
         //  found player
         if(player_is_visible && e_ent != player) {
             ai_enemy_find_path(e_ent, player_pos);
@@ -102,7 +104,25 @@ void ai_enemy() {
         else {
             random_walk(e_ent, e_pos);
         }
-    }
+    };
+    std::for_each(std::execution::par_unseq, v_enemies.begin(), v_enemies.end(),
+                  aifunc);
+
+    // for(auto [e_ent, e_b, e_pos, e_vshed] : v_enemies.each()) {
+    //     if(e_ent == engine::player) {
+    //         continue;
+    //     }
+    //     auto player_is_visible
+    //         = e_vshed.visible_coordinates.contains(player_pos);
+    //     //  found player
+    //     if(player_is_visible && e_ent != player) {
+    //         ai_enemy_find_path(e_ent, player_pos);
+    //     }
+    //     // can't see the player
+    //     else {
+    //         random_walk(e_ent, e_pos);
+    //     }
+    // }
 }
 
 }  // namespace radl

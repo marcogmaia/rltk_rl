@@ -135,7 +135,8 @@
         "cassert": "cpp",
         "cfloat": "cpp",
         "*.tcc": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "*.def": "cpp"
     },
     "cSpell.enableFiletypes": [
         "!c",

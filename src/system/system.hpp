@@ -4,8 +4,8 @@
 
 namespace radl::system {
 
-// struct State {
-    void systems_run();
-// };
+void systems_run();
+
+void systems_player();
 
 }  // namespace radl::system

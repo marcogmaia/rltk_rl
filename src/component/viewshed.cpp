@@ -11,6 +11,15 @@
 
 namespace radl::world {
 
+namespace {
+void timeit(std::function<void(void)> func) {
+    sf::Clock clk;
+    clk.restart();
+    func();
+    spdlog::info("\tran in: {}us", clk.getElapsedTime().asMicroseconds());
+}
+}  // namespace
+
 /**
  * @brief Update entitis viewshet parallel
  *
@@ -19,9 +28,22 @@ void fov_update() {
     using namespace world;
     using engine::reg;
 
+    sf::Clock clk;
+    clk.restart();
+
     const auto& view_vshed = reg.view<viewshed_t>();
 
-    auto run_fov_sweep = [&view_vshed](auto ent) {
+    auto& ents_near = *get_entities_near_player();
+    std::vector<entity> ents_to_calculate_fov;
+    ents_to_calculate_fov.reserve(64);
+    std::ranges::copy_if(ents_near, std::back_inserter(ents_to_calculate_fov),
+                         [&view_vshed](auto ent) {
+                             return view_vshed.contains(ent);
+                         });
+
+    int count_fovs_updated = 0;
+    static std::mutex cntmutex;
+    auto run_fov_sweep = [&](auto ent) {
         auto& vshed = view_vshed.get<viewshed_t>(ent);
         if(!vshed.dirty) {
             return;
@@ -53,10 +75,18 @@ void fov_update() {
         radl::visibility_sweep_2d<position_t, navigator_t<position_t>>(
             ent_pos, vshed.range, set_visibility, is_transparent);
         vshed.visible_coordinates.swap(new_vis);
+        std::lock_guard lock(cntmutex);
+        ++count_fovs_updated;
     };
 
-    spdlog::info("updating_fov {} entities", view_vshed.size());
-    std::for_each(view_vshed.begin(), view_vshed.end(), run_fov_sweep);
+    spdlog::info("updating_fov {} entities", ents_to_calculate_fov.size());
+
+    std::for_each(ents_to_calculate_fov.begin(), ents_to_calculate_fov.end(),
+                  run_fov_sweep);
+    run_fov_sweep(engine::player);
+
+    spdlog::info("\tupdated: {} fovs, dT: {}", count_fovs_updated,
+                 clk.getElapsedTime().asMicroseconds());
 }
 
 }  // namespace radl::world

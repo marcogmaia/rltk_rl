@@ -14,8 +14,6 @@ using engine::game_state_t;
 using engine::reg;
 using namespace world;
 
-std::mutex walk_mutex;
-
 }  // namespace
 
 void system_visibility() {
@@ -55,11 +53,11 @@ void system_destroy_deads() {
 }
 
 void system_walk() {
-    auto wanting_to_walk = reg.view<want_to_walk_t, viewshed_t>();
-    auto& map            = engine::get_map();
+    auto wanting_to_walk
+        = reg.view<want_to_walk_t, viewshed_t>(entt::exclude<dead_t>);
+    auto& map = engine::get_map();
 
-    auto fwalk
-        = [&](auto ent) -> void {
+    auto fwalk = [&](auto ent) -> void {
         // want_to_walk_t& want_walk = wanting_to_walk.get<want_to_walk_t>(ent);
         auto [want_walk, vshed] = wanting_to_walk.get(ent);
         reg.remove<want_to_walk_t>(ent);
@@ -71,7 +69,6 @@ void system_walk() {
         if(!can_walk_to) {
             return;
         }
-        std::lock_guard lock(walk_mutex);
         // if can walk
         if(auto remove_pos = std::ranges::find(ents_tile_from, ent);
            remove_pos != ents_tile_from.end()) {
@@ -79,12 +76,10 @@ void system_walk() {
         }
         ents_tile_to.push_back(ent);
         reg.replace<position_t>(ent, want_walk.to);
-        // wanting_to_walk.get<viewshed_t>(ent).dirty = true;
         vshed.dirty = true;
     };
 
-    std::for_each(std::execution::par, wanting_to_walk.begin(),
-                  wanting_to_walk.end(), fwalk);
+    std::for_each(wanting_to_walk.begin(), wanting_to_walk.end(), fwalk);
 }
 
 void system_damage() {
@@ -109,6 +104,13 @@ void system_damage() {
 void systems_run() {
     system_visibility();
     system_ai();
+    system_melee_combat();
+    system_damage();
+    system_walk();
+}
+
+void systems_player() {
+    system_visibility();
     system_melee_combat();
     system_damage();
     system_walk();

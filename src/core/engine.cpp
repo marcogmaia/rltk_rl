@@ -115,12 +115,11 @@ void update() {
     } break;
 
     case game_state_t::IDLE: {
-        if(!engine::event_queue.empty()) {
-            auto valid_input = radl::process_input(player);
-            // perform action
-            if(valid_input) {
-                gamestatus = game_state_t::NEW_TURN;
-            }
+        auto valid_input = radl::process_input(player);
+        // perform action
+        if(valid_input) {
+            system::systems_player();
+            gamestatus = game_state_t::NEW_TURN;
         }
     } break;
     case game_state_t::NEW_TURN: {

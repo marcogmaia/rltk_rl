@@ -18,6 +18,7 @@ struct viewshed_t {
 
     int range = default_range;  // range of visibility
     std::unordered_set<position_t, PosHasher> visible_coordinates;
+    // boost::container::flat_set<position_t> visible_coordinates;
     bool dirty
         = true;  // dirty flag signals that the viewshed needs to be updated
 };
