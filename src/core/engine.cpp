@@ -73,6 +73,13 @@ void init() {
     reg.set<game_state_t>(game_state_t::STARTUP);
 }
 
+/**
+ * @brief Get the map object
+ *
+ * @warning call this function only after setting the map on the register
+ *
+ * @return the map from the register context
+ */
 world::Map& get_map() {
     return reg.ctx<world::Map>();
 }
