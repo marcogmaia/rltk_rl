@@ -12,6 +12,8 @@ std::mutex attack_mutex;
 }  // namespace
 
 void attack(const entity& ent_atk, const entity& ent_def) {
+    static std::mutex melee_mutex;
+    std::lock_guard lock(melee_mutex);
     if(!reg.any_of<dead_t>(ent_def)) {
         reg.emplace_or_replace<wants_to_melee_t>(ent_atk, ent_def);
     }

@@ -14,12 +14,15 @@ extern entt::registry reg;
 extern entt::entity player;
 extern std::queue<sf::Event> event_queue;
 
+extern rltk::virtual_terminal* console;
+// extern sf::RenderWindow *main_window;
+
 world::Map& get_map();
 
 enum game_state_t {
     STARTUP,
-    IDLE,
-    NEW_TURN,
+    PLAYER_TURN,
+    ENEMY_TURN,
     VICTORY,
     DEFEAT,
 };

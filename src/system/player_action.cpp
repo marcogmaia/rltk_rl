@@ -14,7 +14,7 @@ namespace radl {
 void handle_screen_resize(const sf::Event& ev, entt::registry& reg,
                           entt::entity e) {
     if(ev.type == sf::Event::Resized) {
-        using rltk::console;
+        using engine::console;
         camera_update(reg, e);
         spdlog::debug("screen resize: x: {}, y: {}", console->term_width,
                       console->term_height);
@@ -94,7 +94,8 @@ using engine::reg;
 using namespace world;
 using namespace rltk::colors;
 
-void draw_line_from_player(sf::Event& ev, const position_t& player_pos) {
+[[maybe_unused]] void draw_line_from_player(sf::Event& ev,
+                                            const position_t& player_pos) {
     if(ev.type == sf::Event::EventType::MouseMoved) {
         auto [mx, my] = ev.mouseMove;
         int tx        = std::round(static_cast<double>(mx) / 16.0);
@@ -113,7 +114,7 @@ void draw_line_from_player(sf::Event& ev, const position_t& player_pos) {
 }  // namespace
 
 void flush_events() {
-    auto &ev_queue = engine::event_queue;
+    auto& ev_queue = engine::event_queue;
     while(!ev_queue.empty()) {
         ev_queue.pop();
     }
@@ -144,8 +145,6 @@ bool process_input(entt::entity ent) {
     }
     return false;
 }
-
-
 
 
 void random_walk(const entt::entity& ent, const position_t& src_pos) {

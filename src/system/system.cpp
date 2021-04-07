@@ -18,6 +18,7 @@ using namespace world;
 
 void system_visibility() {
     // TODO only update near player
+    // can be multithread
     fov_update();
 }
 

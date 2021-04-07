@@ -12,7 +12,7 @@
 namespace radl::world {
 
 namespace {
-void timeit(std::function<void(void)> func) {
+[[maybe_unused]] void timeit(std::function<void(void)> func) {
     sf::Clock clk;
     clk.restart();
     func();
@@ -43,6 +43,7 @@ void fov_update() {
 
     int count_fovs_updated = 0;
     static std::mutex cntmutex;
+
     auto run_fov_sweep = [&](auto ent) {
         auto& vshed = view_vshed.get<viewshed_t>(ent);
         if(!vshed.dirty) {
@@ -81,8 +82,8 @@ void fov_update() {
 
     spdlog::info("updating_fov {} entities", ents_to_calculate_fov.size());
 
-    std::for_each(ents_to_calculate_fov.begin(), ents_to_calculate_fov.end(),
-                  run_fov_sweep);
+    std::for_each(std::execution::par_unseq, ents_to_calculate_fov.begin(),
+                  ents_to_calculate_fov.end(), run_fov_sweep);
     run_fov_sweep(engine::player);
 
     spdlog::info("\tupdated: {} fovs, dT: {}", count_fovs_updated,

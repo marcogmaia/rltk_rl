@@ -18,7 +18,7 @@ namespace {
 using engine::reg;
 using namespace world;
 
-bool surrounded(const position_t& pos) {
+[[maybe_unused]] bool surrounded(const position_t& pos) {
     auto& map = engine::get_map();
     for(int dx = -1; dx <= 1; ++dx) {
         for(int dy = -1; dy <= 1; ++dy) {
@@ -64,11 +64,11 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
         if(path->success && !path->steps.empty()) {
             auto next_step = path->steps.front();
             path->steps.pop_front();
-            auto& map                       = engine::get_map();
-            constexpr double range_distance = 2.1;
-            if(distance2d_squared(e_pos.first, e_pos.second, target_pos.first,
-                                  target_pos.second)
-               <= range_distance) {
+            auto& map                  = engine::get_map();
+            constexpr double atk_range = 2.1;
+            auto distance_to_target    = distance2d_squared(
+                e_pos.first, e_pos.second, target_pos.first, target_pos.second);
+            if(distance_to_target <= atk_range) {
                 attack(e_ent, engine::player);
             }
             else if(map.rect.contains(next_step)) {
@@ -107,22 +107,6 @@ void ai_enemy() {
     };
     std::for_each(std::execution::par_unseq, v_enemies.begin(), v_enemies.end(),
                   aifunc);
-
-    // for(auto [e_ent, e_b, e_pos, e_vshed] : v_enemies.each()) {
-    //     if(e_ent == engine::player) {
-    //         continue;
-    //     }
-    //     auto player_is_visible
-    //         = e_vshed.visible_coordinates.contains(player_pos);
-    //     //  found player
-    //     if(player_is_visible && e_ent != player) {
-    //         ai_enemy_find_path(e_ent, player_pos);
-    //     }
-    //     // can't see the player
-    //     else {
-    //         random_walk(e_ent, e_pos);
-    //     }
-    // }
 }
 
 }  // namespace radl
