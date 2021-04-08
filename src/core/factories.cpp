@@ -54,6 +54,7 @@ void enemy_factory(const position_t& pos, vchar_t vch, const char* name) {
                                      });
     reg.emplace<being_t>(ent, name);
     reg.emplace<blocks_t>(ent);
+    reg.emplace<enemy_t>(ent);
     add_ent_to_map(ent, pos);
 }
 

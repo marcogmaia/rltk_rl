@@ -9,8 +9,6 @@
 
 namespace radl {
 
-
-// TODO try to make my own concept (C++20 concepts) for the navigator
 template <typename location_t>
 struct navigator_t {
     static int get_x(const location_t& pos) {

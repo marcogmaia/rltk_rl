@@ -32,10 +32,15 @@ struct blocks_t {};
 // struct active_t {};
 
 // struct explored_t {};
+enum tile_status_t {
+    NONE,
+    BLOODIED,
+};
 
 struct tile_t {
     tile_type_t type = wall;
     tile_characteristics_t characteristics{};
+    tile_status_t status = tile_status_t::NONE;
     std::list<entity> entities_here{};
     // entity characteristics;
 
@@ -121,7 +126,7 @@ std::unique_ptr<Map> new_map(registry& reg, const rect_t& rect);
 
 std::vector<entt::entity>* get_entities_near_player();
 
-void query_entities_near_player();
+void query_alive_entities_near_player();
 // void update_enemies_visibility(entt::registry& reg, entt::entity ent);
 
 

@@ -6,6 +6,7 @@
 #include "rltk/rltk.hpp"
 
 #include "core/map.hpp"
+#include "core/gui.hpp"
 #include "system/camera.hpp"
 #include "component/component.hpp"
 
@@ -20,7 +21,10 @@ void camera_update(entt::entity ent) {
     using engine::console;
     auto& map = engine::get_map();
 
-    console->clear();
+    // console->clear();
+    term(gui::GUI_MAP)->clear();
+    term(gui::GUI_ENTITIES)->clear();
+
     const auto& [player_pos, rend, pvshed]
         = reg.get<position_t, renderable_t, viewshed_t>(ent);
     const auto& [px, py] = player_pos;
@@ -46,7 +50,8 @@ void camera_update(entt::entity ent) {
                 continue;
             }
             auto vch       = tile.get_vchar();
-            vch.foreground = DARKEST_GREY;
+            vch.foreground = color_t(15,15,15);
+            // vch.foreground = DARKEST_GREY;
             auto renderpos = render_pos(x, y);
             console->set_char(renderpos.first, renderpos.second, vch);
         }
@@ -57,13 +62,18 @@ void camera_update(entt::entity ent) {
         const auto& tile = map.at(v_pos);
         vchar_t tile_vch = tile.get_vchar();
         if(tile.type == tile_type_t::wall) {
-            tile_vch.foreground = LimeGreen;
+            tile_vch.foreground = color_t(0, 31, 36);
         }
         else if(tile.type == tile_type_t::floor) {
-            tile_vch.foreground = SkyBlue;
+            if(tile.status == tile_status_t::BLOODIED) {
+                tile_vch.foreground = DARKER_RED;
+            }
+            else {
+                tile_vch.foreground = color_t(36, 18, 4);
+            }
         }
         auto [rx, ry] = render_pos(v_pos.first, v_pos.second);
-        console->set_char(rx, ry, tile_vch);
+        term(gui::GUI_MAP)->set_char(rx, ry, tile_vch);
     }
 
     // search entities in visible positions and print them
@@ -78,13 +88,13 @@ void camera_update(entt::entity ent) {
                 const auto& e_rend   = reg.get<renderable_t>(ent);
                 const auto& e_pos    = reg.get<position_t>(ent);
                 const auto& [rx, ry] = render_pos(e_pos.first, e_pos.second);
-                console->set_char(rx, ry, e_rend.vchar);
+                term(gui::GUI_ENTITIES)->set_char(rx, ry, e_rend.vchar);
             }
         });
 
     // render player
     auto player_vch = rend.vchar;
-    console->set_char(px - xci, py - yci, player_vch);
+    term(gui::GUI_ENTITIES)->set_char(px - xci, py - yci, player_vch);
 }
 
 }  // namespace radl

@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "core/gui.hpp"
 #include "core/engine.hpp"
 #include "component/combat.hpp"
@@ -6,19 +8,14 @@
 namespace radl::gui {
 
 
+
 namespace {
 
 using namespace rltk::colors;
 using engine::player;
 using engine::reg;
 using rltk::gui;
-using rltk::term;
 
-
-constexpr int GUI_MAP      = 0;
-constexpr int GUI_ENTITIES = 1;
-constexpr int GUI_STATUS   = 2;
-constexpr int GUI_LOG      = 3;
 
 void resize_main(rltk::layer_t* l, int w, int h) {
     // Simply set the width to the whole window width
@@ -37,9 +34,10 @@ void resize_box(rltk::layer_t* l, int w, int h) {
 void print_hp_bar(int x, int y, vchar_t fg_vch, vchar_t bg_vch) {
     const auto& pstats = reg.get<combat_stats_t>(player);
 
+    // print HP bar
     auto hp_fmt = fmt::format("HP:{:3d}/{:3d} ", pstats.hp, pstats.max_hp);
     int xhp     = 2;
-    int yhp     = 2;
+    int yhp     = 0;
     term(GUI_STATUS)->print(xhp, yhp, hp_fmt, YELLOW);
 
     double divs   = 100.0;
@@ -53,9 +51,19 @@ void print_hp_bar(int x, int y, vchar_t fg_vch, vchar_t bg_vch) {
     for(int i = 0; i < hp_index; ++i) {
         term(GUI_STATUS)->set_char(xhp + i + hp_fmt.size(), yhp, fg_vch);
     }
+
+    // print game log
+    auto& log = engine::get_game_log().entries;
+    int i     = 1;
+    std::for_each_n(log.crbegin(), std::min(static_cast<int>(log.size()), 8),
+                    [&i](const std::string& entry) {
+                        term(GUI_STATUS)->print(1, i++, entry);
+                    });
 }
 
 }  // namespace
+
+// TODO add mouse hover tooltip
 
 
 void init() {
@@ -79,12 +87,13 @@ void init() {
     gui->add_layer(GUI_STATUS, srect.x1, srect.y1, srect.x2, srect.y2, "8x16",
                    resize_box, false);
 
-    engine::console = term(GUI_ENTITIES);
+    engine::console = term(GUI_MAP);
 }
 
 void render_gui() {
     [[maybe_unused]] auto [fw, fh] = term(GUI_STATUS)->get_font_size();
     term(GUI_STATUS)->clear();
+
     term(GUI_STATUS)->box(GREY, BLACK, true);
 
     print_hp_bar(1, 3,
@@ -98,9 +107,6 @@ void render_gui() {
                      DARKEST_RED,
                      BLACK,
                  });
-
-
-    term(GUI_STATUS)->print(3, 0, "stats");
 }
 
 }  // namespace radl::gui

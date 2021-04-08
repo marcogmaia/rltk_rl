@@ -3,6 +3,7 @@
 #include <list>
 #include "entt/entt.hpp"
 #include "core/map.hpp"
+#include "component/log.hpp"
 
 using entt::entity;
 using entt::registry;
@@ -15,9 +16,11 @@ extern entt::entity player;
 extern std::queue<sf::Event> event_queue;
 
 extern rltk::virtual_terminal* console;
+
 // extern sf::RenderWindow *main_window;
 
 world::Map& get_map();
+component::game_log_t& get_game_log();
 
 enum game_state_t {
     STARTUP,

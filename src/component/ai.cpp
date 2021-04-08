@@ -84,29 +84,38 @@ void ai_enemy() {
     using engine::reg;
     using namespace world;
 
-    auto v_enemies  = reg.group<being_t, position_t, viewshed_t>();
+    // auto v_enemies  = reg.group<being_t, position_t, viewshed_t>();
+    // auto v_enemies = reg.view<being_t, position_t, viewshed_t, enemy_t>(
+    //     entt::exclude<dead_t>);
     auto player_pos = reg.get<position_t>(player);
 
     // auto player_is_surrounded = surrounded(player_pos);
 
-    auto aifunc = [&](auto e_ent) {
-        auto [e_pos, vshed] = v_enemies.get<position_t, viewshed_t>(e_ent);
+    auto& enemies_near = *get_entities_near_player();
 
-        if(e_ent == engine::player) {
+    auto aifunc = [&](auto e_ent) {
+        if(!reg.any_of<enemy_t>(e_ent)) {
             return;
         }
+        auto [e_pos, vshed, enemy]
+            = reg.get<position_t, viewshed_t, enemy_t>(e_ent);
+
         auto player_is_visible = vshed.visible_coordinates.contains(player_pos);
+
         //  found player
-        if(player_is_visible && e_ent != player) {
+        if(player_is_visible) {
             ai_enemy_find_path(e_ent, player_pos);
+            enemy.remembers_target_position = true;
+            enemy.memory                    = player_pos;
+            enemy.remember_turns            = 5;
         }
         // can't see the player
         else {
             random_walk(e_ent, e_pos);
         }
     };
-    std::for_each(std::execution::par_unseq, v_enemies.begin(), v_enemies.end(),
-                  aifunc);
+    std::for_each(std::execution::par_unseq, enemies_near.begin(),
+                  enemies_near.end(), aifunc);
 }
 
 }  // namespace radl

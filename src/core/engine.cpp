@@ -25,7 +25,6 @@ entt::registry reg;
 entt::entity player;
 
 rltk::virtual_terminal* console;
-// sf::RenderWindow* main_window;
 
 constexpr int width  = 1024 / 16;
 constexpr int height = 768 / 16;
@@ -105,7 +104,6 @@ world::Map& get_map() {
 
 namespace {
 
-
 [[maybe_unused]] void enemy_spawner() {
     auto& map        = engine::get_map();
     int random_index = rng::rng.range(0, map.rooms.size() - 1);
@@ -113,15 +111,19 @@ namespace {
     add_enemy(random_pos);
 }
 
-
 }  // namespace
 
+
+component::game_log_t& get_game_log() {
+    return reg.ctx<component::game_log_t>();
+}
 
 void update() {
     auto& gamestatus = reg.ctx<game_state_t>();
     switch(gamestatus) {
     case game_state_t::STARTUP: {
         reg.set<Map>();
+        reg.set<component::game_log_t>();
         auto& map = get_map();
         map.init(rect_t{0, 0, width * 4, height * 4});
         create_random_rooms(map);
@@ -132,9 +134,8 @@ void update() {
         factory::player_factory(player, player_start_pos,
                                 vchar_t{'@', YELLOW, BLACK});
         add_enemies();
-        query_entities_near_player();
+        query_alive_entities_near_player();
         fov_update();
-
 
         spdlog::info("entities created: {}", reg.alive());
         gamestatus = game_state_t::PLAYER_TURN;
@@ -152,7 +153,7 @@ void update() {
     } break;
     case game_state_t::ENEMY_TURN: {
         // ## if player is dead then restart game
-        query_entities_near_player();
+        query_alive_entities_near_player();
         system::systems_run();
 
 
@@ -179,6 +180,7 @@ void render() {
 
 void terminate() {
     reg.unset<world::Map>();
+    reg.unset<component::game_log_t>();
     reg.clear();
 }
 

@@ -17,7 +17,6 @@ using namespace world;
 }  // namespace
 
 void system_visibility() {
-    // TODO only update near player
     // can be multithread
     fov_update();
 }
@@ -25,6 +24,7 @@ void system_visibility() {
 void map_indexer() {}
 
 void system_ai() {
+    // TODO get only entities near the player
     ai_enemy();
 }
 
@@ -38,6 +38,18 @@ void system_melee_combat() {
         auto final_damage = atker_stats.power - target_stats.defense;
         final_damage      = std::max(final_damage, 0);
         new_damage(want_to_melee.target, final_damage);
+
+        std::string log_entry;
+        if(final_damage > 0) {
+            log_entry = fmt::format("{} hits {}, for {} hp", being.name,
+                                    target_being.name, final_damage);
+        }
+        else {
+            log_entry = fmt::format("{} is unable to hit {}", being.name,
+                                    target_being.name);
+        }
+        engine::get_game_log().entries.push_back(log_entry);
+
         reg.remove<wants_to_melee_t>(ent);
     }
 }
@@ -84,15 +96,20 @@ void system_walk() {
 }
 
 void system_damage() {
-    auto sufferers = reg.view<being_t, suffer_damage_t, combat_stats_t>(
-        entt::exclude<dead_t>);
-    for(auto [ent, being, damage, stats] : sufferers.each()) {
+    auto sufferers
+        = reg.view<being_t, suffer_damage_t, combat_stats_t, position_t>(
+            entt::exclude<dead_t>);
+    for(auto [ent, being, damage, stats, e_pos] : sufferers.each()) {
         auto total_damage
             = std::accumulate(damage.amount.cbegin(), damage.amount.cend(), 0);
         stats.hp -= total_damage;
         damage.amount.clear();
 
         spdlog::debug("{} suffers {} damage", being.name, total_damage);
+        if(total_damage > 0) {
+            auto& map  = engine::get_map().at(e_pos);
+            map.status = tile_status_t::BLOODIED;
+        }
 
         if(stats.hp <= 0) {
             reg.emplace<dead_t>(ent);

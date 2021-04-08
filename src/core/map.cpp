@@ -129,7 +129,7 @@ std::vector<entt::entity>* get_entities_near_player() {
     return active_entities_near_player.get();
 }
 
-void query_entities_near_player() {
+void query_alive_entities_near_player() {
     active_entities_near_player->clear();
     constexpr int max_size = 32;
     using engine::reg;
@@ -141,9 +141,10 @@ void query_entities_near_player() {
 
     rect_t active_rect = rect_create(p1, p2);
 
-    reg.view<viewshed_t, position_t, renderable_t>().each(
-        [&active_rect](entt::entity ent, viewshed_t& vshed,
-                       const position_t& e_pos, renderable_t& rend) {
+    reg.view<viewshed_t, position_t, renderable_t>(
+           entt::exclude<dead_t, player_t>)
+        .each([&active_rect](entt::entity ent, viewshed_t& vshed,
+                             const position_t& e_pos, renderable_t& rend) {
             if(ent != engine::player && active_rect.contains(e_pos)) {
                 active_entities_near_player->push_back(ent);
             }
