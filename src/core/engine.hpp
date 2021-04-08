@@ -29,7 +29,7 @@ enum game_state_t {
 
 void init();
 void update();
-// void render();
+void render();
 void terminate();
 
 }  // namespace radl::engine

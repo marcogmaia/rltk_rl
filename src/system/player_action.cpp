@@ -15,7 +15,7 @@ void handle_screen_resize(const sf::Event& ev, entt::registry& reg,
                           entt::entity e) {
     if(ev.type == sf::Event::Resized) {
         using engine::console;
-        camera_update(reg, e);
+        camera_update(e);
         spdlog::debug("screen resize: x: {}, y: {}", console->term_width,
                       console->term_height);
     }
@@ -125,7 +125,7 @@ bool process_input(entt::entity ent) {
         auto ev = engine::event_queue.front();
         engine::event_queue.pop();
 
-        handle_screen_resize(ev, reg, ent);
+        // handle_screen_resize(ev, reg, ent);
 
         auto player_pos = reg.get<position_t>(engine::player);
 
@@ -172,7 +172,7 @@ bool move_wait_attack(entt::entity& ent, const position_t& dst_pos) {
         return false;
     }
     // ## 2. walk if tile is no occupied and walkable
-    else if(target_tile_chars.walkable) {
+    if(target_tile_chars.walkable) {
         walk(ent, src_pos, dst_pos);
         return true;
     }

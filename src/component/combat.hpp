@@ -27,7 +27,7 @@ struct dead_t {};
 inline void new_damage(entt::entity ent_target, int damage) {
     using engine::reg;
     
-    if(auto suffering = reg.try_get<suffer_damage_t>(ent_target)) {
+    if(auto *suffering = reg.try_get<suffer_damage_t>(ent_target)) {
         suffering->amount.push_back(damage);
     }
     else {

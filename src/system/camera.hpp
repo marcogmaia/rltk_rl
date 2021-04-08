@@ -4,6 +4,6 @@
 
 namespace radl {
 
-void camera_update(entt::registry& reg, entt::entity ent);
+void camera_update(entt::entity ent);
 
 }

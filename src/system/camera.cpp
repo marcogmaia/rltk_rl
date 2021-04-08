@@ -13,8 +13,9 @@
 namespace radl {
 
 
-void camera_update(entt::registry& reg, entt::entity ent) {
+void camera_update(entt::entity ent) {
     using namespace world;
+    using engine::reg;
     // using rltk::console;
     using engine::console;
     auto& map = engine::get_map();
@@ -52,7 +53,7 @@ void camera_update(entt::registry& reg, entt::entity ent) {
     }
 
     // render visible tiles
-    for(auto& v_pos : pvshed.visible_coordinates) {
+    for(const auto& v_pos : pvshed.visible_coordinates) {
         const auto& tile = map.at(v_pos);
         vchar_t tile_vch = tile.get_vchar();
         if(tile.type == tile_type_t::wall) {

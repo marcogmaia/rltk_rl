@@ -1,24 +1,24 @@
 
 add_library(
     game_core
-    "game.cpp"
     "engine.cpp"
-    "map.cpp"
     "factories.cpp"
+    "gui.cpp"
+    "map.cpp"
 )
 
 target_link_libraries(
     game_core PRIVATE
-    "game_utils"
-    "game_system"
     "game_component"
+    "game_system"
+    "game_utils"
 )
     
 target_link_libraries(
     game_core PUBLIC
-    "spdlog::spdlog"
-    "pthread"
-    "tbb"
     "fmt"
+    "pthread"
     "rltk"
+    "spdlog::spdlog"
+    "tbb"
 )
