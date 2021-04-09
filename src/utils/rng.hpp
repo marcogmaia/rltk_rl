@@ -1,4 +1,5 @@
 #pragma once
+#include <random>
 
 #include "rltk/rltk.hpp"
 
@@ -13,11 +14,11 @@ public:
 
     int roll_dice(const int& n, const int& d);
     int range(const int& min, const int& max);
-    int initial_seed;
+    uint_fast64_t initial_seed;
 
 private:
-    int fastrand();
     int g_seed;
+    std::mt19937_64 rng;
 };
 
 extern random_number_generator rng;
