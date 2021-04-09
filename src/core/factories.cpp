@@ -26,7 +26,11 @@ static void add_ent_to_map(entity ent, const position_t& dst_post) {
 void player_factory(entt::entity ent, const position_t& pos,
                     const vchar_t& vch) {
     reg.emplace<viewshed_t>(ent, 16);
-    reg.emplace<renderable_t>(ent, renderable_t{vch});
+    reg.emplace<inventory_t>(ent);
+    reg.emplace<renderable_t>(ent, renderable_t{
+                                       vch,
+                                       z_level_t::BEING,
+                                   });
     reg.emplace<position_t>(ent, pos);
     reg.emplace<combat_stats_t>(ent, combat_stats_t{
                                          .max_hp  = 100,
@@ -41,9 +45,12 @@ void player_factory(entt::entity ent, const position_t& pos,
 }
 
 
-void enemy_factory(const position_t& pos, vchar_t vch, const char* name) {
+entity enemy_factory(const position_t& pos, vchar_t vch, const char* name) {
     auto ent = reg.create();
-    reg.emplace<renderable_t>(ent, vch);
+    reg.emplace<renderable_t>(ent, renderable_t{
+                                       vch,
+                                       z_level_t::BEING,
+                                   });
     reg.emplace<viewshed_t>(ent, 12);
     reg.emplace<position_t>(ent, pos);
     reg.emplace<combat_stats_t>(ent, combat_stats_t{
@@ -54,8 +61,20 @@ void enemy_factory(const position_t& pos, vchar_t vch, const char* name) {
                                      });
     reg.emplace<being_t>(ent, name);
     reg.emplace<blocks_t>(ent);
+    reg.emplace<inventory_t>(ent);
     reg.emplace<enemy_t>(ent);
     add_ent_to_map(ent, pos);
+    return ent;
+}
+
+entity item_factory(item_t item, vchar_t vch) {
+    auto ent = reg.create();
+    reg.emplace<item_t>(ent, item);
+    reg.emplace<renderable_t>(ent, renderable_t{
+                                       vch,
+                                       z_level_t::ITEM,
+                                   });
+    return ent;
 }
 
 

@@ -58,7 +58,8 @@ void system_destroy_deads() {
     auto deads = reg.view<renderable_t, dead_t>();
 
     deads.each([&](entity ent, renderable_t& rend) {
-        rend.vchar = {'%', DARK_RED, DARKEST_RED};
+        rend.vchar   = {'%', DARK_RED, DARKEST_RED};
+        rend.z_level = z_level_t::DEAD;
         reg.remove_if_exists<blocks_t>(ent);
     });
 
@@ -95,10 +96,14 @@ void system_walk() {
     std::for_each(wanting_to_walk.begin(), wanting_to_walk.end(), fwalk);
 }
 
+
 void system_damage() {
+    auto& map = engine::get_map();
+
     auto sufferers
         = reg.view<being_t, suffer_damage_t, combat_stats_t, position_t>(
             entt::exclude<dead_t>);
+
     for(auto [ent, being, damage, stats, e_pos] : sufferers.each()) {
         auto total_damage
             = std::accumulate(damage.amount.cbegin(), damage.amount.cend(), 0);
@@ -107,12 +112,26 @@ void system_damage() {
 
         spdlog::debug("{} suffers {} damage", being.name, total_damage);
         if(total_damage > 0) {
-            auto& map  = engine::get_map().at(e_pos);
-            map.status = tile_status_t::BLOODIED;
+            auto& tile  = map.at(e_pos);
+            tile.status = tile_status_t::BLOODIED;
         }
 
         if(stats.hp <= 0) {
             reg.emplace<dead_t>(ent);
+
+            auto& e_inventory = reg.get<inventory_t>(ent);
+            spdlog::debug("{} drops {} items.", being.name,
+                          e_inventory.items.size());
+            // TODO make enemies drop items;
+            auto& tile = map.at(e_pos);
+
+            for(auto& e_item : e_inventory.items) {
+                reg.emplace<position_t>(e_item, e_pos);
+            }
+            
+            std::copy(e_inventory.items.begin(), e_inventory.items.end(),
+                      std::back_inserter(tile.entities_here));
+            reg.remove<inventory_t>(ent);
         }
     }
     system_destroy_deads();

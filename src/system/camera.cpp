@@ -50,7 +50,7 @@ void camera_update(entt::entity ent) {
                 continue;
             }
             auto vch       = tile.get_vchar();
-            vch.foreground = color_t(15,15,15);
+            vch.foreground = color_t(15, 15, 15);
             // vch.foreground = DARKEST_GREY;
             auto renderpos = render_pos(x, y);
             console->set_char(renderpos.first, renderpos.second, vch);
@@ -77,6 +77,9 @@ void camera_update(entt::entity ent) {
     }
 
     // search entities in visible positions and print them
+
+    std::vector<std::pair<renderable_t, position_t>> renderable_entities;
+
     std::for_each(
         std::begin(pvshed.visible_coordinates),
         std::end(pvshed.visible_coordinates), [&](const position_t& vpos) {
@@ -85,12 +88,23 @@ void camera_update(entt::entity ent) {
                 if(!reg.all_of<renderable_t, position_t>(ent)) {
                     continue;
                 }
-                const auto& e_rend   = reg.get<renderable_t>(ent);
-                const auto& e_pos    = reg.get<position_t>(ent);
-                const auto& [rx, ry] = render_pos(e_pos.first, e_pos.second);
-                term(gui::GUI_ENTITIES)->set_char(rx, ry, e_rend.vchar);
+                const auto& e_rend = reg.get<renderable_t>(ent);
+                const auto& e_pos  = reg.get<position_t>(ent);
+                const auto r_pos   = render_pos(e_pos.first, e_pos.second);
+                renderable_entities.push_back(std::make_pair(e_rend, r_pos));
             }
         });
+
+    std::ranges::sort(renderable_entities,
+                      [](std::pair<renderable_t, position_t>& lhs,
+                         std::pair<renderable_t, position_t>& rhs) {
+                          return lhs.first.z_level < rhs.first.z_level;
+                      });
+
+    for(auto& rend_pair : renderable_entities) {
+        auto& [rend, rpos] = rend_pair;
+        term(gui::GUI_ENTITIES)->set_char(rpos.first, rpos.second, rend.vchar);
+    }
 
     // render player
     auto player_vch = rend.vchar;

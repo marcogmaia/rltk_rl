@@ -7,8 +7,6 @@
 
 namespace radl::gui {
 
-
-
 namespace {
 
 using namespace rltk::colors;
@@ -51,14 +49,6 @@ void print_hp_bar(int x, int y, vchar_t fg_vch, vchar_t bg_vch) {
     for(int i = 0; i < hp_index; ++i) {
         term(GUI_STATUS)->set_char(xhp + i + hp_fmt.size(), yhp, fg_vch);
     }
-
-    // print game log
-    auto& log = engine::get_game_log().entries;
-    int i     = 1;
-    std::for_each_n(log.crbegin(), std::min(static_cast<int>(log.size()), 8),
-                    [&i](const std::string& entry) {
-                        term(GUI_STATUS)->print(1, i++, entry);
-                    });
 }
 
 }  // namespace
@@ -84,8 +74,15 @@ void init() {
                    resize_main, true);
     gui->add_layer(GUI_ENTITIES, mrect.x1, mrect.y1, mrect.x2, mrect.y2,
                    "16x16", resize_main, false);
+
     gui->add_layer(GUI_STATUS, srect.x1, srect.y1, srect.x2, srect.y2, "8x16",
-                   resize_box, false);
+                   resize_box, true);
+
+    // rltk::term(GUI_STATUS)->set_alpha(255);
+
+    // gui->get_layer(GUI_STATUS)
+    //     ->add_hbar(UI_PLAYER_HEALTH, 1, 1, 100, 0, 100, 100, RED, RED,
+    //                DARKEST_RED, DARKEST_RED, YELLOW, "Health: ");
 
     engine::console = term(GUI_MAP);
 }
@@ -107,6 +104,14 @@ void render_gui() {
                      DARKEST_RED,
                      BLACK,
                  });
+
+    // print game log
+    auto& log = engine::get_game_log().entries;
+    int i     = 1;
+    std::for_each_n(log.crbegin(), std::min(static_cast<int>(log.size()), 8),
+                    [&i](const std::string& entry) {
+                        term(GUI_STATUS)->print(1, i++, entry);
+                    });
 }
 
 }  // namespace radl::gui

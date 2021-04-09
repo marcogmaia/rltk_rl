@@ -36,3 +36,5 @@ void render();
 void terminate();
 
 }  // namespace radl::engine
+
+using radl::engine::reg;

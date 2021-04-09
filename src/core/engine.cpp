@@ -49,21 +49,42 @@ static void rltk_init() {
 
 namespace {
 
+
 void add_enemy(const position_t& pos) {
     if(!is_occupied(pos)) {
+        entity e_ent;
         auto chance = rng::rng.range(1, 3);
         if(chance == 1) {
-            factory::enemy_factory(pos, vchar_t{'g', DARK_GREEN, BLACK},
-                                   "Goblin");
+            e_ent = factory::enemy_factory(pos, vchar_t{'g', DARK_GREEN, BLACK},
+                                           "Goblin");
         }
         else {
-            factory::enemy_factory(pos, vchar_t{'O', GREEN, BLACK}, "Orc");
+            e_ent = factory::enemy_factory(pos, vchar_t{'O', GREEN, BLACK},
+                                           "Orc");
+        }
+
+        auto chance_to_have_item
+            = rng::rng.range(1, 10) == 1;  // 1 chance in 10
+        if(chance_to_have_item) {
+            auto& e_inventory = reg.get<inventory_t>(e_ent);
+
+            auto item = item_t {
+                .type            = item_type_t::POTION,
+                .characteristics = item_characteristics_t{
+                    .drinkable = true,
+                    .castable  = false,
+                },
+                .in_pack = true,
+            };
+            vchar_t item_vch('!', YELLOW, BLACK);
+            auto ent_item = factory::item_factory(item, item_vch);
+            e_inventory.items.push_back(ent_item);
         }
     }
 }
 
 void add_enemies() {
-    constexpr uint32_t max_enemies_pex_room = 4 * 10;
+    constexpr uint32_t max_enemies_pex_room = 5;
     using rng::rng;
 
     const auto& w_map = engine::get_map();

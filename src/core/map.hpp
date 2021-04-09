@@ -130,6 +130,17 @@ void query_alive_entities_near_player();
 // void update_enemies_visibility(entt::registry& reg, entt::entity ent);
 
 
+template <typename C1, typename C2>
+void move_append(C1& src, C2& dst) {
+    if(dst.empty()) {
+        dst = std::move(src);
+    }
+    else {
+        dst.reserve(dst.size() + src.size());
+        std::move(std::begin(src), std::end(src), std::back_inserter(dst));
+        src.clear();
+    }
+}
 // void map_entity_walk(entity ent, const position_t& src_pos,
 //                      const position_t& dst_pos);
 
