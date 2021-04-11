@@ -19,16 +19,19 @@ namespace radl::engine {
 
 using namespace world;
 using namespace rltk::colors;
-std::queue<sf::Event> event_queue;
+std::deque<sf::Event> event_queue;
 
 entt::registry reg;
 entt::entity player;
 
 rltk::virtual_terminal* console;
 
+entt::dispatcher event_dispatcher{};
+entt::sigh<sf::Event()> ev_signal{};
+entt::sink ev_sink{ev_signal};
+
 constexpr int width  = 1024 / 16;
 constexpr int height = 768 / 16;
-
 
 namespace {
 
@@ -100,20 +103,24 @@ void add_enemies() {
         }
     }
 }
+
+
 }  // namespace
 
 void init() {
 #ifdef DEBUG
     spdlog::set_level(spdlog::level::debug);
+    event_dispatcher.sink<sf::Event>().connect<&system::player_system>();
 #endif
     spdlog::info("Initializing engine.");
     rltk_init();
     gui::init();
-    reg.set<game_state_t>(game_state_t::STARTUP);
+    reg.set<game_state_t>(game_state_t::PRE_RUN);
+    // event_sink.connect<&process_input>();
 }
 
 /**
- * @brief Get the map object
+ * @brief Get the map from the register context
  *
  * @warning call this function only after setting the map on the register
  *
@@ -139,64 +146,69 @@ component::game_log_t& get_game_log() {
     return reg.ctx<component::game_log_t>();
 }
 
-void update() {
-    auto& gamestatus = reg.ctx<game_state_t>();
-    switch(gamestatus) {
-    case game_state_t::STARTUP: {
+void game_state_system() {
+    auto& game_state = reg.ctx<game_state_t>();
+
+    switch(game_state) {
+    case game_state_t::PRE_RUN: {
+        // initialize everything
         reg.set<Map>();
         reg.set<component::game_log_t>();
         auto& map = get_map();
         map.init(rect_t{0, 0, width * 4, height * 4});
         create_random_rooms(map);
         make_corridors_between_rooms(map);
-
         auto player_start_pos = map.rooms[0].center();
         player                = reg.create();
         factory::player_factory(player, player_start_pos,
                                 vchar_t{'@', YELLOW, BLACK});
         add_enemies();
-        query_alive_entities_near_player();
-        fov_update();
-
         spdlog::info("entities created: {}", reg.alive());
-        gamestatus = game_state_t::PLAYER_TURN;
+        system::systems_run();
+        game_state = game_state_t::AWAITING_INPUT;
+    } break;
+
+    case game_state_t::AWAITING_INPUT: {
+        game_state = player_input();
     } break;
 
     case game_state_t::PLAYER_TURN: {
-        render();
-
-        auto valid_input = radl::process_input(player);
-        // perform action
-        if(valid_input) {
-            system::systems_player();
-            gamestatus = game_state_t::ENEMY_TURN;
-        }
+        system::systems_run();
+        game_state = game_state_t::ENEMY_TURN;
     } break;
+
     case game_state_t::ENEMY_TURN: {
         // ## if player is dead then restart game
-        query_alive_entities_near_player();
-        system::systems_run();
-
-
         if(reg.all_of<dead_t>(player)) {
-            gamestatus = game_state_t::DEFEAT;
+            game_state = game_state_t::DEFEAT;
         }
         else {
-            gamestatus = game_state_t::PLAYER_TURN;
+            game_state = game_state_t::AWAITING_INPUT;
         }
     } break;
+
     case game_state_t::DEFEAT: {
         terminate();
-        gamestatus = game_state_t::STARTUP;
+        game_state = game_state_t::PRE_RUN;
     } break;
+
     default:
         break;
     }
+
+    render();
+}
+
+void update() {
+    engine::event_dispatcher.update();
+    game_state_system();
 }
 
 void render() {
-    camera_update(player);
-    gui::render_gui();
+    if(reg.valid(player)) {
+        camera_update(player);
+        gui::render_gui();
+    }
 }
 
 void terminate() {

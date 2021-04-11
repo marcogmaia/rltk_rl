@@ -4,18 +4,17 @@
 // #include "libtcod.hpp"
 #include "rltk/rltk.hpp"
 #include "component/position.hpp"
+#include "core/engine.hpp"
+
 
 
 namespace radl {
 
 /**
- * @brief eu não sei qual a definição dessa porra dessa função, 
- * 
- * @param ent
- * @return true 
- * @return false 
+ * @return true
+ * @return false
  */
-bool process_input(entt::entity ent);
+engine::game_state_t player_input();
 
 /**
  * @brief move (to tile) or attack something on @a dst_pos
@@ -29,5 +28,13 @@ bool move_wait_attack(entt::entity& ent, const position_t& dst_pos);
 
 
 void random_walk(const entt::entity& ent, const position_t& src_pos);
+
+/**
+ * @brief given an event, return the delta pos that would be occurred
+ * 
+ * @param ev 
+ * @return position_t 
+ */
+position_t get_delta_pos(const sf::Event& ev);
 
 }  // namespace radl

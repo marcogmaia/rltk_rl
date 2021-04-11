@@ -21,10 +21,14 @@ void system_visibility() {
     fov_update();
 }
 
+void system_active_universe() {
+    query_alive_entities_near_player();
+    system_visibility();
+}
+
 void map_indexer() {}
 
 void system_ai() {
-    // TODO get only entities near the player
     ai_enemy();
 }
 
@@ -122,13 +126,12 @@ void system_damage() {
             auto& e_inventory = reg.get<inventory_t>(ent);
             spdlog::debug("{} drops {} items.", being.name,
                           e_inventory.items.size());
-            // TODO make enemies drop items;
             auto& tile = map.at(e_pos);
 
             for(auto& e_item : e_inventory.items) {
                 reg.emplace<position_t>(e_item, e_pos);
             }
-            
+
             std::copy(e_inventory.items.begin(), e_inventory.items.end(),
                       std::back_inserter(tile.entities_here));
             reg.remove<inventory_t>(ent);
@@ -139,15 +142,30 @@ void system_damage() {
 
 // later we can group the components and run the groups in parallel
 void systems_run() {
-    system_visibility();
+    // system_visibility();
+    system_active_universe();
+
     system_ai();
     system_melee_combat();
     system_damage();
     system_walk();
 }
 
+
+void player_system(const sf::Event& ev) {
+    // using engine::event_dispatcher;
+    auto dpos = get_delta_pos(ev);
+    spdlog::debug("player dpos: ({}, {})", dpos.first, dpos.second);
+}
+
+void init_player() {
+    engine::event_dispatcher.sink<sf::Event>().connect<&player_system>();
+}
+
 void systems_player() {
-    system_visibility();
+    // system_visibility();
+    system_active_universe();
+
     system_melee_combat();
     system_damage();
     system_walk();

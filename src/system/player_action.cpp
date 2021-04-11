@@ -21,7 +21,7 @@ void handle_screen_resize(const sf::Event& ev, entt::registry& reg,
     }
 }
 
-static position_t get_delta_pos(const sf::Event& ev) {
+position_t get_delta_pos(const sf::Event& ev) {
     position_t delta_pos{0, 0};
     auto& [dx, dy] = delta_pos;
 
@@ -76,23 +76,21 @@ static position_t get_delta_pos(const sf::Event& ev) {
     return delta_pos;
 }
 
+namespace {
 
-static position_t render_pos(int rx, int ry) {
+using engine::reg;
+using namespace engine;
+using namespace world;
+using namespace rltk::colors;
+
+[[maybe_unused]] static position_t render_pos(int rx, int ry) {
     using engine::reg;
     using rltk::console;
     auto [px, py] = reg.get<position_t>(engine::player);
     auto xci      = px - console->term_width / 2;
     auto yci      = py - console->term_height / 2;
-
     return position_t{rx - xci, ry - yci};
 }
-
-
-namespace {
-
-using engine::reg;
-using namespace world;
-using namespace rltk::colors;
 
 [[maybe_unused]] void draw_line_from_player(sf::Event& ev,
                                             const position_t& player_pos) {
@@ -113,44 +111,42 @@ using namespace rltk::colors;
 
 }  // namespace
 
-void flush_events() {
-    auto& ev_queue = engine::event_queue;
-    while(!ev_queue.empty()) {
-        ev_queue.pop();
-    }
+[[maybe_unused]] void flush_events() {
+    // auto& ev_queue = engine::event_queue;
+    // while(!ev_queue.empty()) {
+    //     ev_queue.pop_front();
+    // }
+    event_queue.clear();
 }
 
-bool process_input(entt::entity ent) {
-    if(!engine::event_queue.empty()) {
-        auto ev = engine::event_queue.front();
-        engine::event_queue.pop();
+engine::game_state_t player_input() {
+    auto player_pos = reg.get<position_t>(engine::player);
 
-        // handle_screen_resize(ev, reg, ent);
-
-        auto player_pos = reg.get<position_t>(engine::player);
-
-        switch(ev.type) {
-        case sf::Event::KeyPressed: {
-            auto target_pos = player_pos + get_delta_pos(ev);
-            move_wait_attack(ent, target_pos);
-            return true;
-        } break;
-        case sf::Event::MouseMoved: {
-            // draw_line_from_player(ev, player_pos);
-            flush_events();
-        } break;
-        default:
-            break;
-        }
+    if(event_queue.empty()) {
+        return game_state_t::AWAITING_INPUT;
     }
-    return false;
-}
 
+    auto ev = event_queue.back();
+    event_queue.pop_back();
+    flush_events();
+
+    switch(ev.type) {
+    case sf::Event::KeyPressed: {
+        auto target_pos = player_pos + get_delta_pos(ev);
+        move_wait_attack(player, target_pos);
+    } break;
+    case sf::Event::MouseMoved: {
+    } break;
+    default: {
+        return game_state_t::AWAITING_INPUT;
+    } break;
+    }
+    return game_state_t::PLAYER_TURN;
+}
 
 void random_walk(const entt::entity& ent, const position_t& src_pos) {
-    auto dx = rng::rng.range(-1, 1);
-    auto dy = rng::rng.range(-1, 1);
-
+    auto dx               = rng::rng.range(-1, 1);
+    auto dy               = rng::rng.range(-1, 1);
     position_t target_pos = src_pos + position_t{dx, dy};
     walk(ent, src_pos, target_pos);
 }
@@ -164,7 +160,6 @@ bool move_wait_attack(entt::entity& ent, const position_t& dst_pos) {
     }
     auto& map                     = engine::get_map();
     const auto& target_tile_chars = map[{dst_pos}].characteristics;
-
     // ## 1. attack if enemy is in the targeted pos
     if(is_occupied(dst_pos)) {
         // attack

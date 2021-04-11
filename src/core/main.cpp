@@ -28,11 +28,8 @@ void run_game(entt::delegate<void(void)> on_game_tick) {
                 main_window->setView(sf::View(sf::FloatRect(
                     0.f, 0.f, static_cast<float>(event.size.width),
                     static_cast<float>(event.size.height))));
-                // console->resize_pixels(event.size.width, event.size.height);
                 rltk::gui->on_resize(event.size.width, event.size.height);
-
-
-                engine::event_queue.push(event);
+                engine::event_queue.push_back(event);
             } break;
             case sf::Event::LostFocus: {
                 //
@@ -50,8 +47,8 @@ void run_game(entt::delegate<void(void)> on_game_tick) {
                 //
             } break;
             case sf::Event::KeyPressed: {
-                engine::event_queue.push(event);
-                //
+                engine::event_queue.push_back(event);
+                engine::event_dispatcher.enqueue<sf::Event>(event);
             } break;
             case sf::Event::KeyReleased: {
                 //
@@ -61,23 +58,24 @@ void run_game(entt::delegate<void(void)> on_game_tick) {
             }
         }
 
-        on_game_tick();
-
+        if(on_game_tick) {
+            on_game_tick();
+        }
 
         main_window->clear();
 
         rltk::gui->render(*main_window);
 
         main_window->display();
-        // render
     }
 }
 
 int main() {
     engine::init();
-    
+
     entt::delegate<void(void)> delegate_run_game;
     delegate_run_game.connect<&engine::update>();
+
     run_game(delegate_run_game);
 
     engine::terminate();
