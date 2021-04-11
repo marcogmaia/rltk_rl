@@ -159,7 +159,7 @@ bool move_wait_attack(entt::entity& ent, const position_t& dst_pos) {
         return false;
     }
     auto& map                     = engine::get_map();
-    const auto& target_tile_chars = map[{dst_pos}].characteristics;
+    const auto& target_tile_chars = map[{dst_pos}].props;
     // ## 1. attack if enemy is in the targeted pos
     if(is_occupied(dst_pos)) {
         // attack

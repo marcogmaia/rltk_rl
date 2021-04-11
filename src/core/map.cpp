@@ -17,7 +17,7 @@ namespace radl::world {
 
 using namespace rltk::colors;
 
-void fill(Map& map, const rect_t& rect, tile_characteristics_t characteristics,
+void fill(Map& map, const rect_t& rect, tile_property_t characteristics,
           const tile_type_t& tiletype) {
     auto xi = std::min(rect.x1, rect.x2);
     auto xf = xi + rect.width();
@@ -27,7 +27,7 @@ void fill(Map& map, const rect_t& rect, tile_characteristics_t characteristics,
         for(int y = yi; y < yf; ++y) {
             auto& tile           = map.at(x, y);
             tile.type            = tiletype;
-            tile.characteristics = characteristics;
+            tile.props = characteristics;
         }
     }
 }
@@ -50,7 +50,7 @@ void try_apply_room_to_map(Map& map, const rect_t& rect) {
     }
     // ## if everything is ok, create room
     fill(map, rect,
-         tile_characteristics_t{
+         tile_property_t{
              true,
              true,
          },
@@ -78,7 +78,7 @@ void create_random_rooms(Map& map) {
 void corridor_horizontal(Map& map, int x1, int x2, int y) {
     auto xi                           = std::min(x1, x2);
     auto xf                           = std::max(x1, x2);
-    tile_characteristics_t tile_chars = {true, true};
+    tile_property_t tile_chars = {true, true};
     auto ttype                        = tile_type_t::floor;
     fill(map, rect_t{xi, y, xf + 1, y + 1}, tile_chars, ttype);
 }
@@ -86,7 +86,7 @@ void corridor_horizontal(Map& map, int x1, int x2, int y) {
 void corridor_vertical(Map& map, int y1, int y2, int x) {
     auto yi                           = std::min(y1, y2);
     auto yf                           = std::max(y1, y2);
-    tile_characteristics_t tile_chars = {true, true};
+    tile_property_t tile_chars = {true, true};
     auto ttype                        = tile_type_t::floor;
     fill(map, rect_t{x, yi, x + 1, yf + 1}, tile_chars, ttype);
 }

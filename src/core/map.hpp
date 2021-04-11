@@ -20,7 +20,7 @@ enum tile_type_t {
     floor,
 };
 
-struct tile_characteristics_t {
+struct tile_property_t {
     bool walkable    = false;
     bool transparent = false;
     bool explored    = false;
@@ -39,7 +39,7 @@ enum tile_status_t {
 
 struct tile_t {
     tile_type_t type = wall;
-    tile_characteristics_t characteristics{};
+    tile_property_t props{};
     tile_status_t status = tile_status_t::NONE;
     std::list<entity> entities_here{};
     // entity characteristics;

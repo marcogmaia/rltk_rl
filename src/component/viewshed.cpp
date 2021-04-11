@@ -60,7 +60,7 @@ void fov_update() {
                 auto& reveal_tile = map.at(reveal_pos);
                 new_vis.insert(reveal_pos);
                 if(ent == engine::player) {
-                    reveal_tile.characteristics.explored = true;
+                    reveal_tile.props.explored = true;
                 }
             }
         };
@@ -68,7 +68,7 @@ void fov_update() {
         auto is_transparent = [&](const position_t& check_pos) {
             if(map.rect.contains(check_pos)) {
                 auto& tile = map[check_pos];
-                return tile.characteristics.transparent;
+                return tile.props.transparent;
             }
             return false;
         };

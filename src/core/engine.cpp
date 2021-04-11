@@ -146,8 +146,9 @@ component::game_log_t& get_game_log() {
     return reg.ctx<component::game_log_t>();
 }
 
-void game_state_system() {
+void game_state_system([[maybe_unused]] double elapsed_time) {
     auto& game_state = reg.ctx<game_state_t>();
+
 
     switch(game_state) {
     case game_state_t::PRE_RUN: {
@@ -169,6 +170,7 @@ void game_state_system() {
     } break;
 
     case game_state_t::AWAITING_INPUT: {
+        render();
         game_state = player_input();
     } break;
 
@@ -179,6 +181,8 @@ void game_state_system() {
 
     case game_state_t::ENEMY_TURN: {
         // ## if player is dead then restart game
+        system::systems_run();
+
         if(reg.all_of<dead_t>(player)) {
             game_state = game_state_t::DEFEAT;
         }
@@ -195,13 +199,11 @@ void game_state_system() {
     default:
         break;
     }
-
-    render();
 }
 
-void update() {
+void update(double elapsed_time) {
     engine::event_dispatcher.update();
-    game_state_system();
+    game_state_system(elapsed_time);
 }
 
 void render() {

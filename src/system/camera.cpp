@@ -46,7 +46,7 @@ void camera_update(entt::entity ent) {
                 continue;
             }
             const auto& tile = map[{x, y}];
-            if(!tile.characteristics.explored) {
+            if(!tile.props.explored) {
                 continue;
             }
             auto vch       = tile.get_vchar();

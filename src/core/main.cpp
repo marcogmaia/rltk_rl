@@ -15,9 +15,14 @@ using engine::console;
 }  // namespace
 
 
-void run_game(entt::delegate<void(void)> on_game_tick) {
-    auto* main_window = rltk::get_window();
+void run_game(entt::delegate<void(double)> on_game_tick) {
+    auto* main_window  = rltk::get_window();
+    double duration_ms = 0.0;
+
     while(main_window->isOpen()) {
+        // auto elapsed_time = sf::Clock();
+        clock_t start_time = clock();
+
         sf::Event event;
         while(main_window->pollEvent(event)) {
             switch(event.type) {
@@ -59,7 +64,7 @@ void run_game(entt::delegate<void(void)> on_game_tick) {
         }
 
         if(on_game_tick) {
-            on_game_tick();
+            on_game_tick(duration_ms);
         }
 
         main_window->clear();
@@ -67,13 +72,15 @@ void run_game(entt::delegate<void(void)> on_game_tick) {
         rltk::gui->render(*main_window);
 
         main_window->display();
+        
+        duration_ms = ((clock() - start_time) * 1000.0) / CLOCKS_PER_SEC;
     }
 }
 
 int main() {
     engine::init();
 
-    entt::delegate<void(void)> delegate_run_game;
+    entt::delegate<void(double)> delegate_run_game;
     delegate_run_game.connect<&engine::update>();
 
     run_game(delegate_run_game);

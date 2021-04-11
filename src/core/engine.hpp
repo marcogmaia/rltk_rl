@@ -36,7 +36,7 @@ enum game_state_t {
 };
 
 void init();
-void update();
+void update(double elapsed_time);
 void render();
 void terminate();
 

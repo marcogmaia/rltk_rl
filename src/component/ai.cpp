@@ -27,7 +27,7 @@ using namespace world;
             }
             position_t offset = {dx, dy};
             auto look_pos     = pos + offset;
-            auto walkable     = map[look_pos].characteristics.walkable;
+            auto walkable     = map[look_pos].props.walkable;
             auto can_walk     = !is_occupied(look_pos) && walkable;
             if(can_walk) {
                 return false;

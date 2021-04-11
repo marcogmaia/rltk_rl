@@ -29,7 +29,12 @@ void system_active_universe() {
 void map_indexer() {}
 
 void system_ai() {
-    ai_enemy();
+    const auto& gstate = engine::reg.ctx<game_state_t>();
+    if(gstate == game_state_t::ENEMY_TURN) {
+        ai_enemy();
+    }
+    else if(gstate == game_state_t::PLAYER_TURN) {
+    }
 }
 
 void system_melee_combat() {
@@ -59,12 +64,24 @@ void system_melee_combat() {
 }
 
 void system_destroy_deads() {
-    auto deads = reg.view<renderable_t, dead_t>();
-
-    deads.each([&](entity ent, renderable_t& rend) {
+    const auto& gstate = reg.ctx<game_state_t>();
+    if(gstate != game_state_t::ENEMY_TURN) {
+        return;
+    }
+    auto deads = reg.view<renderable_t, dead_t, position_t>();
+    deads.each([&](entity ent, renderable_t& rend, dead_t& dead,
+                   position_t& dead_pos) {
         rend.vchar   = {'%', DARK_RED, DARKEST_RED};
         rend.z_level = z_level_t::DEAD;
         reg.remove_if_exists<blocks_t>(ent);
+        --dead.decompose_turns;
+        if(dead.decompose_turns <= 0) {
+            // remove from map
+            auto& map = engine::get_map();
+            map[dead_pos].entities_here.remove(ent);
+            query_alive_entities_near_player();
+            reg.destroy(ent);
+        }
     });
 
     // reg.destroy(deads.begin(), deads.end());
@@ -83,7 +100,7 @@ void system_walk() {
         auto& ents_tile_from = map[want_walk.from].entities_here;
         auto& ents_tile_to   = map[want_walk.to].entities_here;
         auto can_walk_to     = !is_occupied(want_walk.to)
-                           && map[want_walk.to].characteristics.walkable;
+                           && map[want_walk.to].props.walkable;
         if(!can_walk_to) {
             return;
         }
@@ -117,7 +134,7 @@ void system_damage() {
         spdlog::debug("{} suffers {} damage", being.name, total_damage);
         if(total_damage > 0) {
             auto& tile  = map.at(e_pos);
-            tile.status = tile_status_t::BLOODIED;
+            // tile.status = tile_status_t::BLOODIED;
         }
 
         if(stats.hp <= 0) {
@@ -137,7 +154,6 @@ void system_damage() {
             reg.remove<inventory_t>(ent);
         }
     }
-    system_destroy_deads();
 }
 
 // later we can group the components and run the groups in parallel
@@ -148,6 +164,7 @@ void systems_run() {
     system_ai();
     system_melee_combat();
     system_damage();
+    system_destroy_deads();
     system_walk();
 }
 
@@ -160,15 +177,6 @@ void player_system(const sf::Event& ev) {
 
 void init_player() {
     engine::event_dispatcher.sink<sf::Event>().connect<&player_system>();
-}
-
-void systems_player() {
-    // system_visibility();
-    system_active_universe();
-
-    system_melee_combat();
-    system_damage();
-    system_walk();
 }
 
 }  // namespace radl::system
