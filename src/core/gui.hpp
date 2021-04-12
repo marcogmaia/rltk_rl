@@ -11,12 +11,16 @@ using rltk::term;
 
 namespace radl::gui {
 
-constexpr int UI_MAP           = 0;
-constexpr int UI_ENTITIES      = 1;
-constexpr int UI_STATUS        = 2;
-constexpr int UI_LOG           = 3;
-constexpr int UI_PLAYER_HEALTH = 4;
-constexpr int UI_MOUSE         = 5;
+
+enum ui_order_t {
+UI_MAP,
+UI_ENTITIES,
+UI_STATUS,
+UI_LOG,
+UI_PLAYER_HEALTH,
+UI_MOUSE,
+UI_INVENTORY,
+};
 
 void init();
 void render_gui();

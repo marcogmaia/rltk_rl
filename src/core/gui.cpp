@@ -82,11 +82,7 @@ void init() {
                    resize_main, false);
     term(UI_MOUSE)->set_alpha(127);
 
-    // rltk::term(GUI_STATUS)->set_alpha(255);
-
-    // gui->get_layer(GUI_STATUS)
-    //     ->add_hbar(UI_PLAYER_HEALTH, 1, 1, 100, 0, 100, 100, RED, RED,
-    //                DARKEST_RED, DARKEST_RED, YELLOW, "Health: ");
+    // gui->add_layer(UI_INVENTORY);
 
     engine::console = term(UI_MAP);
 }

@@ -30,6 +30,7 @@ enum game_state_t {
     PRE_RUN,
     AWAITING_INPUT,
     PLAYER_TURN,
+    SHOW_INVENTORY,
     ENEMY_TURN,
     VICTORY,
     DEFEAT,

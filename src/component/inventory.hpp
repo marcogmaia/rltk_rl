@@ -1,7 +1,8 @@
 #pragma once
-#include <vector>
+#include <list>
 #include "entt/entity/registry.hpp"
 #include "component/position.hpp"
+#include "core/engine.hpp"
 
 namespace radl::component {
 using entt::entity;
@@ -25,6 +26,10 @@ struct item_characteristics_t {
     bool castable  = false;  // can cast
 };
 
+struct wants_to_use_t {
+    entity who;
+    entity what;
+};
 struct item_t {
     item_type_t type;
     item_characteristics_t characteristics;
@@ -32,7 +37,23 @@ struct item_t {
 };
 
 struct inventory_t {
-    std::vector<entt::entity> items;
+    std::list<entt::entity> items;
+
+    inline bool contains(entity ent) {
+        auto f_iter = std::find(items.cbegin(), items.cend(), ent);
+        return f_iter != items.cend();
+    }
+
+    inline item_t& get_item(entity ent) {
+        return reg.get<item_t>(ent);
+    }
+
+    inline void remove_first(entity ent) {
+        auto iter = std::ranges::find(items, ent);
+        if(iter != items.end()) {
+            items.erase(iter);
+        }
+    }
 };
 
 entity healing_potion(bool in_pack = false);

@@ -166,6 +166,41 @@ void system_damage() {
     }
 }
 
+void item_use_system() {
+    auto v_use = reg.view<wants_to_use_t>();
+
+    for(auto [e_use, use] : v_use.each()) {
+        auto [e_who, e_what] = use;
+        auto* inventory      = reg.try_get<inventory_t>(e_who);
+        if(!inventory) {
+            continue;
+        }
+        if(!inventory->contains(e_what)) {
+            continue;
+        }
+
+        auto item = inventory->get_item(e_what);
+        if(item.in_pack) {
+            // use item
+            switch(item.type) {
+            case item_type_t::POTION: {
+                auto& e_stats = reg.get<combat_stats_t>(e_who);
+                auto& potion  = reg.get<item_potion_t>(e_what);
+                e_stats.hp += potion.healing;
+                e_stats.hp = std::min(e_stats.max_hp, e_stats.hp);
+            } break;
+            default:
+                break;
+            }
+            // remove item
+            inventory->remove_first(e_what);
+            reg.remove<wants_to_use_t>(e_who);
+            // destroy entity
+            reg.destroy(e_what);
+        }
+    }
+}
+
 // later we can group the components and run the groups in parallel
 void systems_run() {
     system_active_universe();
@@ -175,6 +210,7 @@ void systems_run() {
     system_damage();
     system_walk();
     system_item_collection();
+    item_use_system();
     system_destroy_deads();
 }
 

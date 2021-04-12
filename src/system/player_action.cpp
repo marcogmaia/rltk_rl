@@ -167,6 +167,26 @@ engine::game_state_t player_input() {
 
     switch(ev.type) {
     case sf::Event::KeyPressed: {
+        switch(ev.key.code) {
+        case sf::Keyboard::I: {
+            return game_state_t::SHOW_INVENTORY;
+        } break;
+        case sf::Keyboard::Q: {
+            // get first item in inventory if not empty
+            auto& inv_items = reg.get<inventory_t>(engine::player).items;
+            if(inv_items.empty()) {
+                break;
+            }
+            // use item
+            reg.emplace<wants_to_use_t>(engine::player,
+                                        wants_to_use_t{
+                                            .who  = engine::player,
+                                            .what = inv_items.front(),
+                                        });
+        } break;
+        default:
+            break;
+        }
         auto target_pos = player_pos + get_delta_pos(ev);
         move_wait_attack(player, target_pos);
         perform_action(ev);
