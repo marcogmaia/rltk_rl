@@ -3,6 +3,7 @@
 #include "core/gui.hpp"
 #include "core/engine.hpp"
 #include "component/combat.hpp"
+#include "component/log.hpp"
 
 
 namespace radl::gui {
@@ -117,8 +118,9 @@ void render_gui() {
     auto& log = engine::get_game_log().entries;
     int i     = 1;
     std::for_each_n(log.crbegin(), std::min(static_cast<int>(log.size()), 8),
-                    [&i](const std::string& entry) {
-                        term(UI_STATUS)->print(1, i++, entry);
+                    [&i](const component::log_entry_t& entry) {
+                        term(UI_STATUS)->print(1, i++, entry.log, entry.fg,
+                                               entry.bg);
                     });
 
     render_mouse_overlay();

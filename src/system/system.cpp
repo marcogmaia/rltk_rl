@@ -47,14 +47,14 @@ void system_melee_combat() {
         final_damage      = std::max(final_damage, 0);
         new_damage(want_to_melee.target, final_damage);
 
-        std::string log_entry;
+        log_entry_t log_entry;
         if(final_damage > 0) {
-            log_entry = fmt::format("{} hits {}, for {} hp", being.name,
-                                    target_being.name, final_damage);
+            log_entry.log = fmt::format("{} hits {}, for {} hp", being.name,
+                                        target_being.name, final_damage);
         }
         else {
-            log_entry = fmt::format("{} is unable to hit {}", being.name,
-                                    target_being.name);
+            log_entry.log = fmt::format("{} is unable to hit {}", being.name,
+                                        target_being.name);
         }
         engine::get_game_log().entries.push_back(log_entry);
 
@@ -184,10 +184,17 @@ void item_use_system() {
             // use item
             switch(item.type) {
             case item_type_t::POTION: {
-                auto& e_stats = reg.get<combat_stats_t>(e_who);
-                auto& potion  = reg.get<item_potion_t>(e_what);
+                auto& e_stats  = reg.get<combat_stats_t>(e_who);
+                auto& potion   = reg.get<item_potion_t>(e_what);
+                auto prev_heal = e_stats.hp;
                 e_stats.hp += potion.healing;
                 e_stats.hp = std::min(e_stats.max_hp, e_stats.hp);
+                // log entry
+                auto final_healing = e_stats.hp - prev_heal;
+                log_entry_t log_entry;
+                log_entry.log = fmt::format("healed for {} hp.", final_healing);
+                log_entry.fg  = LIGHT_GREEN;
+                engine::get_game_log().entries.push_back(log_entry);
             } break;
             default:
                 break;
