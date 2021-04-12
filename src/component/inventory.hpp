@@ -18,7 +18,6 @@ struct item_potion_t {
 struct wants_to_pickup_item_t {
     entity picked_by;
     entity item;
-    position_t at_position;
 };
 
 struct item_characteristics_t {

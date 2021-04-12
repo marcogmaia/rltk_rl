@@ -23,7 +23,6 @@ void system_visibility() {
 
 void system_active_universe() {
     query_alive_entities_near_player();
-    system_visibility();
 }
 
 void map_indexer() {}
@@ -115,20 +114,20 @@ void system_walk() {
 }
 
 void system_item_collection() {
-    auto v_pick_item = reg.view<wants_to_pickup_item_t>();
-    v_pick_item.each([](auto ent, wants_to_pickup_item_t& want_pick) {
-        const auto& ent_item = want_pick.item;
-        auto pos_item        = want_pick.at_position;
-        // const auto& ent      = want_pick.picked_by;
-        add_to_inventory(ent, ent_item);
-        engine::get_map().at(pos_item).remove_entity(ent_item);
+    auto v_pick_item = reg.view<wants_to_pickup_item_t, position_t>();
+    v_pick_item.each(
+        [](auto ent, wants_to_pickup_item_t& want_pick, position_t& pos_item) {
+            const auto& ent_item = want_pick.item;
+            // const auto& ent      = want_pick.picked_by;
+            add_to_inventory(ent, ent_item);
+            engine::get_map().at(pos_item).remove_entity(ent_item);
 #ifdef DEBUG
-        const auto& being = reg.get<being_t>(ent);
-        spdlog::debug("item picked up by {}", being.name);
+            const auto& being = reg.get<being_t>(ent);
+            spdlog::debug("item picked up by {}", being.name);
 #endif
-        reg.remove<position_t>(ent_item);
-        reg.remove<wants_to_pickup_item_t>(ent);
-    });
+            reg.remove<position_t>(ent_item);
+            reg.remove<wants_to_pickup_item_t>(ent);
+        });
 }
 
 void system_damage() {
@@ -171,8 +170,8 @@ void system_damage() {
 
 // later we can group the components and run the groups in parallel
 void systems_run() {
-    // system_visibility();
     system_active_universe();
+    system_visibility();
     system_ai();
     system_melee_combat();
     system_damage();

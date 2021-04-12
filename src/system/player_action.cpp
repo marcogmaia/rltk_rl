@@ -136,7 +136,6 @@ void pick_item_at(entity ent, position_t pos) {
                                                        wants_to_pickup_item_t{
                                                            .picked_by = ent,
                                                            .item = ent_item,
-                                                           .at_position = pos,
                                                        });
     }
 }
