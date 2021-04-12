@@ -69,6 +69,7 @@ position_t get_delta_pos(const sf::Event& ev) {
     } break;
     case sf::Keyboard::Numpad5: {
     } break;
+
     default:
         break;
     }
@@ -119,6 +120,41 @@ using namespace rltk::colors;
     event_queue.clear();
 }
 
+// TODO pickable items
+
+
+void pick_item_at(entity ent, position_t pos) {
+    auto& ents_here = engine::get_map().at(pos).entities_here;
+    auto found      = std::ranges::find_if(ents_here, [](auto ent) {
+        return reg.all_of<item_t>(ent);
+    });
+    if(found != ents_here.end()) {
+        auto ent_item = *found;
+        // ents_here.remove(ent_item);
+        // backpack_insert(ent, ent_item);
+        reg.emplace_or_replace<wants_to_pickup_item_t>(ent,
+                                                       wants_to_pickup_item_t{
+                                                           .picked_by = ent,
+                                                           .item = ent_item,
+                                                           .at_position = pos,
+                                                       });
+    }
+}
+
+
+void perform_action(const sf::Event& ev) {
+    switch(ev.key.code) {
+    case sf::Keyboard::G: {
+        // want to pickup
+        auto player_pos = reg.get<position_t>(engine::player);
+        pick_item_at(player, player_pos);
+    }
+
+    default:
+        break;
+    }
+}
+
 engine::game_state_t player_input() {
     auto player_pos = reg.get<position_t>(engine::player);
 
@@ -134,6 +170,7 @@ engine::game_state_t player_input() {
     case sf::Event::KeyPressed: {
         auto target_pos = player_pos + get_delta_pos(ev);
         move_wait_attack(player, target_pos);
+        perform_action(ev);
     } break;
     case sf::Event::MouseMoved: {
     } break;

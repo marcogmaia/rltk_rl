@@ -38,7 +38,6 @@ namespace {
 using rltk::gui;
 using rltk::term;
 
-
 }  // namespace
 
 static void rltk_init() {
@@ -65,23 +64,11 @@ void add_enemy(const position_t& pos) {
             e_ent = factory::enemy_factory(pos, vchar_t{'O', GREEN, BLACK},
                                            "Orc");
         }
-
         auto chance_to_have_item
             = rng::rng.range(1, 10) == 1;  // 1 chance in 10
         if(chance_to_have_item) {
             auto& e_inventory = reg.get<inventory_t>(e_ent);
-
-            auto item = item_t {
-                .type            = item_type_t::POTION,
-                .characteristics = item_characteristics_t{
-                    .drinkable = true,
-                    .castable  = false,
-                },
-                .in_pack = true,
-            };
-            vchar_t item_vch('!', YELLOW, BLACK);
-            auto ent_item = factory::item_factory(item, item_vch);
-            e_inventory.items.push_back(ent_item);
+            e_inventory.items.push_back(healing_potion(true));
         }
     }
 }
@@ -217,6 +204,11 @@ void terminate() {
     reg.unset<world::Map>();
     reg.unset<component::game_log_t>();
     reg.clear();
+}
+
+position_t get_position_from_entity(entity ent) {
+    auto pos = reg.get<position_t>(ent);
+    return pos;
 }
 
 }  // namespace radl::engine

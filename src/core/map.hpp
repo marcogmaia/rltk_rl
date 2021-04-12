@@ -42,7 +42,6 @@ struct tile_t {
     tile_property_t props{};
     tile_status_t status = tile_status_t::NONE;
     std::list<entity> entities_here{};
-    // entity characteristics;
 
     // ~tile_t();
 
@@ -65,10 +64,9 @@ struct tile_t {
         }
         return vch;
     }
-    // position_t position;
-    // tile_characteristics_t characteristics;
-    // list because I don't want realocations
-    // std::list<entt::entity> entities;
+
+    void remove_entity(entity ent);
+    void insert_entity(entity ent) ;
 };
 
 // struct visible_t {};
@@ -78,15 +76,7 @@ struct Map {
     rect_t rect;
 
     std::vector<rect_t> rooms;
-
-    // cada posição no vetor é uma posição fixa no mapa
-    // preciso arrumar um jeito depois das posições se auto ajustarem
-    // cada entidade aqui vai apontar de volta pra posição em que ela ocupa
-    // não tô vendo muita vantagem em continuar deixando as entidades aqui
-    // entities
     std::vector<tile_t> tiles;
-
-    // ~Map();
 
     [[nodiscard]] inline const tile_t& operator[](position_t pos) const {
         auto& [x, y] = pos;
@@ -143,5 +133,6 @@ void move_append(C1& src, C2& dst) {
 }
 // void map_entity_walk(entity ent, const position_t& src_pos,
 //                      const position_t& dst_pos);
+
 
 }  // namespace radl::world

@@ -25,8 +25,8 @@ void fill(Map& map, const rect_t& rect, tile_property_t characteristics,
     auto yf = yi + rect.height();
     for(int x = xi; x < xf; ++x) {
         for(int y = yi; y < yf; ++y) {
-            auto& tile           = map.at(x, y);
-            tile.type            = tiletype;
+            auto& tile = map.at(x, y);
+            tile.type  = tiletype;
             tile.props = characteristics;
         }
     }
@@ -76,18 +76,18 @@ void create_random_rooms(Map& map) {
 }
 
 void corridor_horizontal(Map& map, int x1, int x2, int y) {
-    auto xi                           = std::min(x1, x2);
-    auto xf                           = std::max(x1, x2);
+    auto xi                    = std::min(x1, x2);
+    auto xf                    = std::max(x1, x2);
     tile_property_t tile_chars = {true, true};
-    auto ttype                        = tile_type_t::floor;
+    auto ttype                 = tile_type_t::floor;
     fill(map, rect_t{xi, y, xf + 1, y + 1}, tile_chars, ttype);
 }
 
 void corridor_vertical(Map& map, int y1, int y2, int x) {
-    auto yi                           = std::min(y1, y2);
-    auto yf                           = std::max(y1, y2);
+    auto yi                    = std::min(y1, y2);
+    auto yf                    = std::max(y1, y2);
     tile_property_t tile_chars = {true, true};
-    auto ttype                        = tile_type_t::floor;
+    auto ttype                 = tile_type_t::floor;
     fill(map, rect_t{x, yi, x + 1, yf + 1}, tile_chars, ttype);
 }
 
@@ -178,13 +178,13 @@ void Map::init(const rect_t& rect) {
     tiles.resize(area);
 }
 
-// Map::~Map() {
-//     tiles.clear();
-//     rooms.clear();
-// }
+void tile_t::remove_entity(entity ent) {
+    auto [beg, end] = std::ranges::remove(entities_here, ent);
+    entities_here.erase(beg, end);
+}
 
-// tile_t::~tile_t() {
-//     entities_here.clear();
-// }
+void tile_t::insert_entity(entity ent) {
+    entities_here.push_back(ent);
+}
 
 }  // namespace radl::world

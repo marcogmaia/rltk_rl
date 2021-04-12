@@ -13,7 +13,6 @@ using entt::registry;
 
 namespace radl::engine {
 
-// extern entt::observer observer;
 extern entt::registry reg;
 extern entt::entity player;
 extern std::deque<sf::Event> event_queue;
@@ -25,6 +24,7 @@ extern entt::dispatcher event_dispatcher;
 
 world::Map& get_map();
 component::game_log_t& get_game_log();
+position_t get_position_from_entity(entity ent);
 
 enum game_state_t {
     PRE_RUN,

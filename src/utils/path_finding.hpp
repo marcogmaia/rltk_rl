@@ -23,7 +23,7 @@ struct navigator_t {
 
     static bool is_walkable(const location_t& pos) {
         const auto& map = engine::get_map();
-        return map.rect.contains(pos) && map[pos].characteristics.walkable
+        return map.rect.contains(pos) && map[pos].props.walkable
                && !world::is_occupied(pos);
     }
 
@@ -65,7 +65,7 @@ struct navigator_t {
 
                 if(w_pos == player_pos
                    || (map.rect.contains(w_pos)
-                       && map[w_pos].characteristics.walkable
+                       && map[w_pos].props.walkable
                        && !world::is_occupied(w_pos))) {
                     successors.push_back(w_pos);
                 }

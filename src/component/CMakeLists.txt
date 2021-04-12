@@ -3,6 +3,7 @@ set(COMPONENT_SCRS
     "combat.cpp"
     "movable.cpp"
     "viewshed.cpp"
+    "inventory.cpp"
 )
 
 add_library(

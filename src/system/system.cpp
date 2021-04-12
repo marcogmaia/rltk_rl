@@ -97,26 +97,39 @@ void system_walk() {
         auto [want_walk, vshed] = wanting_to_walk.get(ent);
         reg.remove<want_to_walk_t>(ent);
 
-        auto& ents_tile_from = map[want_walk.from].entities_here;
-        auto& ents_tile_to   = map[want_walk.to].entities_here;
-        auto can_walk_to     = !is_occupied(want_walk.to)
-                           && map[want_walk.to].props.walkable;
+        auto can_walk_to
+            = !is_occupied(want_walk.to) && map[want_walk.to].props.walkable;
         if(!can_walk_to) {
             return;
         }
         // if can walk
-        if(auto remove_pos = std::ranges::find(ents_tile_from, ent);
-           remove_pos != ents_tile_from.end()) {
-            ents_tile_from.erase(remove_pos);
-        }
-        ents_tile_to.push_back(ent);
+        auto& map = engine::get_map();
+        map.at(want_walk.from).remove_entity(ent);
+        map.at(want_walk.to).insert_entity(ent);
+
         reg.replace<position_t>(ent, want_walk.to);
         vshed.dirty = true;
     };
 
-    std::for_each(wanting_to_walk.begin(), wanting_to_walk.end(), fwalk);
+    std::ranges::for_each(wanting_to_walk, fwalk);
 }
 
+void system_item_collection() {
+    auto v_pick_item = reg.view<wants_to_pickup_item_t>();
+    v_pick_item.each([](auto ent, wants_to_pickup_item_t& want_pick) {
+        const auto& ent_item = want_pick.item;
+        auto pos_item        = want_pick.at_position;
+        // const auto& ent      = want_pick.picked_by;
+        add_to_inventory(ent, ent_item);
+        engine::get_map().at(pos_item).remove_entity(ent_item);
+#ifdef DEBUG
+        const auto& being = reg.get<being_t>(ent);
+        spdlog::debug("item picked up by {}", being.name);
+#endif
+        reg.remove<position_t>(ent_item);
+        reg.remove<wants_to_pickup_item_t>(ent);
+    });
+}
 
 void system_damage() {
     auto& map = engine::get_map();
@@ -134,12 +147,11 @@ void system_damage() {
         spdlog::debug("{} suffers {} damage", being.name, total_damage);
         if(total_damage > 0) {
             auto& tile  = map.at(e_pos);
-            // tile.status = tile_status_t::BLOODIED;
+            tile.status = tile_status_t::BLOODIED;
         }
 
         if(stats.hp <= 0) {
             reg.emplace<dead_t>(ent);
-
             auto& e_inventory = reg.get<inventory_t>(ent);
             spdlog::debug("{} drops {} items.", being.name,
                           e_inventory.items.size());
@@ -148,10 +160,11 @@ void system_damage() {
             for(auto& e_item : e_inventory.items) {
                 reg.emplace<position_t>(e_item, e_pos);
             }
-
             std::copy(e_inventory.items.begin(), e_inventory.items.end(),
                       std::back_inserter(tile.entities_here));
-            reg.remove<inventory_t>(ent);
+            reg.remove<suffer_damage_t>(ent);
+            reg.remove<being_t>(ent);
+            reg.remove<combat_stats_t>(ent);
         }
     }
 }
@@ -160,12 +173,12 @@ void system_damage() {
 void systems_run() {
     // system_visibility();
     system_active_universe();
-
     system_ai();
     system_melee_combat();
     system_damage();
-    system_destroy_deads();
     system_walk();
+    system_item_collection();
+    system_destroy_deads();
 }
 
 
