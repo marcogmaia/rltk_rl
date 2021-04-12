@@ -22,21 +22,21 @@ void resize_main(rltk::layer_t* l, int w, int h) {
 }
 
 void resize_box(rltk::layer_t* l, int w, int h) {
-    auto [fw, fh] = term(GUI_STATUS)->get_font_size();
+    auto [fw, fh] = term(UI_STATUS)->get_font_size();
 
     l->w = w - 2 * fw;
     l->h = (2 + 8) * fh;
     l->y = h - l->h;
 }
 
-void print_hp_bar(int x, int y, vchar_t fg_vch, vchar_t bg_vch) {
+void render_hp_bar(int x, int y, vchar_t fg_vch, vchar_t bg_vch) {
     const auto& pstats = reg.get<combat_stats_t>(player);
 
     // print HP bar
     auto hp_fmt = fmt::format("HP:{:3d}/{:3d} ", pstats.hp, pstats.max_hp);
     int xhp     = 2;
     int yhp     = 0;
-    term(GUI_STATUS)->print(xhp, yhp, hp_fmt, YELLOW);
+    term(UI_STATUS)->print(xhp, yhp, hp_fmt, YELLOW);
 
     double divs   = 100.0;
     auto hp_index = static_cast<int>(std::ceil(pstats.hp / (100.0 / divs)));
@@ -44,10 +44,10 @@ void print_hp_bar(int x, int y, vchar_t fg_vch, vchar_t bg_vch) {
         = static_cast<int>(std::ceil(pstats.max_hp / (100.0 / divs)));
 
     for(int i = 0; i < hp_index_max; ++i) {
-        term(GUI_STATUS)->set_char(xhp + i + hp_fmt.size(), yhp, bg_vch);
+        term(UI_STATUS)->set_char(xhp + i + hp_fmt.size(), yhp, bg_vch);
     }
     for(int i = 0; i < hp_index; ++i) {
-        term(GUI_STATUS)->set_char(xhp + i + hp_fmt.size(), yhp, fg_vch);
+        term(UI_STATUS)->set_char(xhp + i + hp_fmt.size(), yhp, fg_vch);
     }
 }
 
@@ -70,13 +70,17 @@ void init() {
         768,
     };
 
-    gui->add_layer(GUI_MAP, mrect.x1, mrect.y1, mrect.x2, mrect.y2, "16x16",
+    gui->add_layer(UI_MAP, mrect.x1, mrect.y1, mrect.x2, mrect.y2, "16x16",
                    resize_main, true);
-    gui->add_layer(GUI_ENTITIES, mrect.x1, mrect.y1, mrect.x2, mrect.y2,
-                   "16x16", resize_main, false);
+    gui->add_layer(UI_ENTITIES, mrect.x1, mrect.y1, mrect.x2, mrect.y2, "16x16",
+                   resize_main, false);
 
-    gui->add_layer(GUI_STATUS, srect.x1, srect.y1, srect.x2, srect.y2, "8x16",
+    gui->add_layer(UI_STATUS, srect.x1, srect.y1, srect.x2, srect.y2, "8x16",
                    resize_box, true);
+
+    gui->add_layer(UI_MOUSE, mrect.x1, mrect.y1, mrect.x2, mrect.y2, "16x16",
+                   resize_main, false);
+    term(UI_MOUSE)->set_alpha(127);
 
     // rltk::term(GUI_STATUS)->set_alpha(255);
 
@@ -84,34 +88,44 @@ void init() {
     //     ->add_hbar(UI_PLAYER_HEALTH, 1, 1, 100, 0, 100, 100, RED, RED,
     //                DARKEST_RED, DARKEST_RED, YELLOW, "Health: ");
 
-    engine::console = term(GUI_MAP);
+    engine::console = term(UI_MAP);
+}
+
+void render_mouse_overlay() {
+    auto [mx, my] = state::get_mouse_position();
+    auto [fw, fh] = term(UI_MOUSE)->get_font_size();
+    mx /= fw;
+    my /= fh;
+    term(UI_MOUSE)->clear();
+    term(UI_MOUSE)->set_char(mx, my, vchar_t{glyph::SOLID1, ORANGE, BLACK});
 }
 
 void render_gui() {
-    [[maybe_unused]] auto [fw, fh] = term(GUI_STATUS)->get_font_size();
-    term(GUI_STATUS)->clear();
+    term(UI_STATUS)->clear();
 
-    term(GUI_STATUS)->box(GREY, BLACK, true);
+    term(UI_STATUS)->box(GREY, BLACK, true);
 
-    print_hp_bar(1, 3,
-                 vchar_t{
-                     glyph::BLOCK2,
-                     RED,
-                     BLACK,
-                 },
-                 vchar_t{
-                     glyph::BLOCK2,
-                     DARKEST_RED,
-                     BLACK,
-                 });
+    render_hp_bar(1, 3,
+                  vchar_t{
+                      glyph::BLOCK2,
+                      RED,
+                      BLACK,
+                  },
+                  vchar_t{
+                      glyph::BLOCK2,
+                      DARKEST_RED,
+                      BLACK,
+                  });
 
     // print game log
     auto& log = engine::get_game_log().entries;
     int i     = 1;
     std::for_each_n(log.crbegin(), std::min(static_cast<int>(log.size()), 8),
                     [&i](const std::string& entry) {
-                        term(GUI_STATUS)->print(1, i++, entry);
+                        term(UI_STATUS)->print(1, i++, entry);
                     });
+
+    render_mouse_overlay();
 }
 
 }  // namespace radl::gui

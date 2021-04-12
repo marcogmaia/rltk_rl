@@ -22,8 +22,8 @@ void camera_update(entt::entity ent) {
     auto& map = engine::get_map();
 
     // console->clear();
-    term(gui::GUI_MAP)->clear();
-    term(gui::GUI_ENTITIES)->clear();
+    term(gui::UI_MAP)->clear();
+    term(gui::UI_ENTITIES)->clear();
 
     const auto& [player_pos, rend, pvshed]
         = reg.get<position_t, renderable_t, viewshed_t>(ent);
@@ -73,7 +73,7 @@ void camera_update(entt::entity ent) {
             }
         }
         auto [rx, ry] = render_pos(v_pos.first, v_pos.second);
-        term(gui::GUI_MAP)->set_char(rx, ry, tile_vch);
+        term(gui::UI_MAP)->set_char(rx, ry, tile_vch);
     }
 
     // search entities in visible positions and print them
@@ -103,12 +103,12 @@ void camera_update(entt::entity ent) {
 
     for(auto& rend_pair : renderable_entities) {
         auto& [rend, rpos] = rend_pair;
-        term(gui::GUI_ENTITIES)->set_char(rpos.first, rpos.second, rend.vchar);
+        term(gui::UI_ENTITIES)->set_char(rpos.first, rpos.second, rend.vchar);
     }
 
     // render player
     auto player_vch = rend.vchar;
-    term(gui::GUI_ENTITIES)->set_char(px - xci, py - yci, player_vch);
+    term(gui::UI_ENTITIES)->set_char(px - xci, py - yci, player_vch);
 }
 
 }  // namespace radl

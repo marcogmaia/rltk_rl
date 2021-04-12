@@ -64,15 +64,15 @@ void system_melee_combat() {
 
 void system_destroy_deads() {
     const auto& gstate = reg.ctx<game_state_t>();
-    if(gstate != game_state_t::ENEMY_TURN) {
-        return;
-    }
-    auto deads = reg.view<renderable_t, dead_t, position_t>();
+    auto deads         = reg.view<renderable_t, dead_t, position_t>();
     deads.each([&](entity ent, renderable_t& rend, dead_t& dead,
                    position_t& dead_pos) {
         rend.vchar   = {'%', DARK_RED, DARKEST_RED};
         rend.z_level = z_level_t::DEAD;
         reg.remove_if_exists<blocks_t>(ent);
+        if(gstate != game_state_t::ENEMY_TURN) {
+            return;
+        }
         --dead.decompose_turns;
         if(dead.decompose_turns <= 0) {
             // remove from map
@@ -82,8 +82,6 @@ void system_destroy_deads() {
             reg.destroy(ent);
         }
     });
-
-    // reg.destroy(deads.begin(), deads.end());
 }
 
 void system_walk() {

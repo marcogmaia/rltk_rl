@@ -17,6 +17,7 @@ using engine::console;
 
 void run_game(entt::delegate<void(double)> on_game_tick) {
     auto* main_window  = rltk::get_window();
+    state::reset_mouse_state();
     double duration_ms = 0.0;
 
     while(main_window->isOpen()) {
@@ -44,6 +45,7 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
             } break;
             case sf::Event::MouseMoved: {
                 //
+                state::set_mouse_position(event.mouseMove.x, event.mouseMove.y);
             } break;
             case sf::Event::MouseButtonPressed: {
                 //
@@ -72,7 +74,7 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
         rltk::gui->render(*main_window);
 
         main_window->display();
-        
+
         duration_ms = ((clock() - start_time) * 1000.0) / CLOCKS_PER_SEC;
     }
 }

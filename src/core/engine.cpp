@@ -212,3 +212,37 @@ position_t get_position_from_entity(entity ent) {
 }
 
 }  // namespace radl::engine
+
+namespace radl::state {
+
+bool window_focused = true;
+std::array<bool, 7> mouse_button_pressed;
+int mouse_x = 0;
+int mouse_y = 0;
+
+
+void set_mouse_button_state(const int button, const bool state) {
+    mouse_button_pressed[button] = state;
+}
+
+bool get_mouse_button_state(const int button) {
+    return mouse_button_pressed[button];
+}
+
+double scale_factor = 1.0;
+void set_mouse_position(const int x, const int y) {
+    mouse_x = static_cast<int>(x / scale_factor);
+    mouse_y = static_cast<int>(y / scale_factor);
+}
+
+position_t get_mouse_position() {
+    return {mouse_x, mouse_y};
+}
+
+void reset_mouse_state() {
+    std::fill(mouse_button_pressed.begin(), mouse_button_pressed.end(), false);
+    mouse_x = 0;
+    mouse_y = 0;
+}
+
+}  // namespace radl::state

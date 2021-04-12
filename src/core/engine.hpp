@@ -42,4 +42,30 @@ void terminate();
 
 }  // namespace radl::engine
 
+namespace radl::state {
+
+bool is_window_focused();
+
+/* Setter function for window focus */
+void set_window_focus_state(const bool& s);
+
+/* Mouse state reset: clears all mouse state */
+void reset_mouse_state();
+
+/* Update the stored mouse position. Does not actually move the mouse. */
+void set_mouse_position(const int x, const int y);
+
+position_t get_mouse_position();
+
+/* Mouse button state */
+void set_mouse_button_state(const int button, const bool state);
+bool get_mouse_button_state(const int button);
+
+/* Keyboard queue */
+// void enqueue_key_pressed(sf::Event& event);
+
+
+}  // namespace radl::state
+
+
 using radl::engine::reg;
