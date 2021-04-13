@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include <fmt/format.h>
 
 #include "entt/entt.hpp"
@@ -20,9 +21,9 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
     state::reset_mouse_state();
     double duration_ms = 0.0;
 
+    auto clock = std::chrono::steady_clock();
     while(main_window->isOpen()) {
-        // auto elapsed_time = sf::Clock();
-        clock_t start_time = clock();
+        auto start_time = clock.now();
 
         sf::Event event;
         while(main_window->pollEvent(event)) {
@@ -72,6 +73,7 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
             }
         }
 
+
         if(on_game_tick) {
             on_game_tick(duration_ms);
         }
@@ -82,7 +84,9 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
 
         main_window->display();
 
-        duration_ms = ((clock() - start_time) * 1000.0) / CLOCKS_PER_SEC;
+        duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                          clock.now() - start_time)
+                          .count();
     }
 }
 

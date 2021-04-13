@@ -42,16 +42,12 @@ using rltk::term;
 
 static void rltk_init() {
     constexpr auto font_file = "../assets";
-    rltk::init(rltk::config_advanced(font_file, width * 16, height * 16,
-                                     "MaiaRL"));
-
-    // XXX fix this to sync with one variable
+    rltk::init(
+        rltk::config_advanced(font_file, width * 16, height * 16, "MaiaRL"));
 }
 
 
-namespace {
-
-}  // namespace
+namespace {}  // namespace
 
 void init() {
 #ifdef DEBUG
@@ -62,7 +58,6 @@ void init() {
     rltk_init();
     gui::init();
     reg.set<game_state_t>(game_state_t::PRE_RUN);
-    // event_sink.connect<&process_input>();
 }
 
 /**
@@ -97,7 +92,6 @@ void game_state_system([[maybe_unused]] double elapsed_time) {
         player                = reg.create();
         factory::player_factory(player, player_start_pos,
                                 vchar_t{'@', YELLOW, BLACK});
-
         add_enemies();
         spdlog::info("entities created: {}", reg.alive());
         system::systems_run();
@@ -138,9 +132,37 @@ void game_state_system([[maybe_unused]] double elapsed_time) {
     }
 }
 
+void phase_mouse_cursor(double elapsed_time) {
+    static double alpha_cursor = 0.0;
+    static double time_frame   = 0.0;
+    static bool increasing     = true;
+    time_frame += elapsed_time * 0.42;
+
+    if(time_frame >= 1.0) {
+        auto inc = static_cast<int>(time_frame);
+        time_frame -= inc;
+        if(increasing) {
+            alpha_cursor += inc;
+        } else {
+            alpha_cursor -= inc;
+        }
+        if(alpha_cursor >= 255) {
+            increasing   = false;
+            alpha_cursor = 255;
+        }
+        if(alpha_cursor <= 0) {
+            increasing   = true;
+            alpha_cursor = 0;
+        }
+    }
+
+    term(gui::UI_MOUSE)->set_alpha(static_cast<int>(alpha_cursor));
+}
+
 void update(double elapsed_time) {
     engine::event_dispatcher.update();
     game_state_system(elapsed_time);
+    phase_mouse_cursor(elapsed_time);
 }
 
 void render() {
