@@ -20,7 +20,7 @@
         {
             "label": "run",
             "type": "shell",
-            "command": "./learning",
+            "command": "./maiaRL",
             "options": {
                 "cwd": "${workspaceFolder}/build/"
             },

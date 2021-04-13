@@ -8,7 +8,7 @@
             "name": "game",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/learning",
+            "program": "${workspaceFolder}/build/maiaRL",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build/",
