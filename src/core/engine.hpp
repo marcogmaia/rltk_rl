@@ -74,4 +74,3 @@ bool get_mouse_button_state(const int button);
 using namespace radl::component;
 using radl::engine::player;
 using radl::engine::reg;
-entt::entity& ent_player = player;
