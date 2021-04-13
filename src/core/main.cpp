@@ -16,7 +16,7 @@ using engine::console;
 
 
 void run_game(entt::delegate<void(double)> on_game_tick) {
-    auto* main_window  = rltk::get_window();
+    auto* main_window = rltk::get_window();
     state::reset_mouse_state();
     double duration_ms = 0.0;
 
@@ -31,6 +31,14 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
                 main_window->close();
             } break;
             case sf::Event::Resized: {
+                if(event.size.width < 1024) {
+                    event.size.width = 1024;
+                }
+                if(event.size.height < 768) {
+                    event.size.height = 768;
+                }
+                main_window->setSize(
+                    sf::Vector2u(event.size.width, event.size.height));
                 main_window->setView(sf::View(sf::FloatRect(
                     0.f, 0.f, static_cast<float>(event.size.width),
                     static_cast<float>(event.size.height))));
@@ -60,8 +68,7 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
             case sf::Event::KeyReleased: {
                 //
             } break;
-            default:
-                break;
+            default: break;
             }
         }
 

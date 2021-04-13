@@ -162,8 +162,8 @@ void init() {
 
     gui->add_layer(UI_STATUS, status_rect.x1, status_rect.y1, status_rect.x2,
                    status_rect.y2, "8x16", resize_status, true);
-    gui->add_layer(UI_INVENTORY, status_rect.x1, status_rect.y1, status_rect.x2,
-                   status_rect.y2, "8x16", resize_inventory, false);
+    gui->add_layer(UI_INVENTORY, invent_rect.x1, invent_rect.y1, invent_rect.x2,
+                   invent_rect.y2, "8x16", resize_inventory, false);
 
     gui->add_layer(UI_MOUSE, map_rect.x1, map_rect.y1, map_rect.x2, map_rect.y2,
                    "16x16", resize_main, true);
@@ -171,9 +171,6 @@ void init() {
                    map_rect.y2, "8x16", resize_main, true);
     term(UI_MOUSE)->set_alpha(127);
     term(UI_TOOLTIPS)->set_alpha(0xDF);
-
-    // TODO add inventory UI
-    // gui->add_layer(UI_INVENTORY);
 
     engine::console = term(UI_MAP);
 }
