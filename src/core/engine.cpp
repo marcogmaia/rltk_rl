@@ -57,11 +57,10 @@ void add_enemy(const position_t& pos) {
         auto chance = rng::rng.range(1, 3);
         if(chance == 1) {
             e_ent = factory::enemy_factory(pos, vchar_t{'g', DARK_GREEN, BLACK},
-                                           "Goblin");
-        }
-        else {
+                                           name_t{"Goblin", "Dead Goblin"});
+        } else {
             e_ent = factory::enemy_factory(pos, vchar_t{'O', GREEN, BLACK},
-                                           "Orc");
+                                           name_t{"Orc", "Dead Orc"});
         }
         auto chance_to_have_item
             = rng::rng.range(1, 10) == 1;  // 1 chance in 10
@@ -175,8 +174,7 @@ void game_state_system([[maybe_unused]] double elapsed_time) {
 
         if(reg.all_of<dead_t>(player)) {
             game_state = game_state_t::DEFEAT;
-        }
-        else {
+        } else {
             game_state = game_state_t::AWAITING_INPUT;
         }
     } break;
@@ -186,8 +184,7 @@ void game_state_system([[maybe_unused]] double elapsed_time) {
         game_state = game_state_t::PRE_RUN;
     } break;
 
-    default:
-        break;
+    default: break;
     }
 }
 

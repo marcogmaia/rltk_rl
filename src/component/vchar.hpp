@@ -8,6 +8,9 @@
 namespace radl::component {
 
 namespace glyph {
+// items
+constexpr uint32_t POTION = 173;
+
 constexpr uint32_t BLOCK1 = 176;
 constexpr uint32_t BLOCK2 = 177;
 constexpr uint32_t BLOCK3 = 178;

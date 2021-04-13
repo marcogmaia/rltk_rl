@@ -15,7 +15,7 @@ entity healing_potion(bool in_pack) {
                 },
                 .in_pack = in_pack,
             };
-    vchar_t item_vch('!', YELLOW, BLACK);
+    vchar_t item_vch(glyph::POTION, LIGHTER_RED, BLACK);
     auto ent_item
         = engine::factory::item_factory("Healing potion", item, item_vch);
     reg.emplace<item_potion_t>(ent_item, item_potion_t{

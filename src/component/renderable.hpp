@@ -23,6 +23,7 @@ struct renderable_t {
 
 struct name_t {
     std::string name;
+    std::string dead_name;
 };
 
 }  // namespace radl::component

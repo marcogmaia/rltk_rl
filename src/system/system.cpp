@@ -30,8 +30,7 @@ void system_ai() {
     const auto& gstate = engine::reg.ctx<game_state_t>();
     if(gstate == game_state_t::ENEMY_TURN) {
         ai_enemy();
-    }
-    else if(gstate == game_state_t::PLAYER_TURN) {
+    } else if(gstate == game_state_t::PLAYER_TURN) {
     }
 }
 
@@ -50,8 +49,7 @@ void system_melee_combat() {
         if(final_damage > 0) {
             log_entry.log = fmt::format("{} hits {}, for {} hp", being.name,
                                         target_being.name, final_damage);
-        }
-        else {
+        } else {
             log_entry.log = fmt::format("{} is unable to hit {}", being.name,
                                         target_being.name);
         }
@@ -159,7 +157,8 @@ void system_damage() {
             std::copy(e_inventory.items.begin(), e_inventory.items.end(),
                       std::back_inserter(tile.entities_here));
             reg.remove<suffer_damage_t>(ent);
-            reg.remove<name_t>(ent);
+            auto name  = &reg.get<name_t>(ent);
+            name->name = name->dead_name;
             reg.remove<combat_stats_t>(ent);
         }
     }
@@ -195,8 +194,7 @@ void system_item_use() {
                 log_entry.fg  = LIGHT_GREEN;
                 engine::get_game_log().entries.push_back(log_entry);
             } break;
-            default:
-                break;
+            default: break;
             }
             // remove item
             inventory->remove_first(e_what);
