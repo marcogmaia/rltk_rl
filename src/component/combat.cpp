@@ -25,7 +25,7 @@ void attack(const entity& ent_atk, const position_t& pos) {
     auto& ents = engine::get_map().at(pos).entities_here;
 
     auto view_attackable
-        = reg.view<being_t, combat_stats_t>(entt::exclude<dead_t>);
+        = reg.view<name_t, combat_stats_t>(entt::exclude<dead_t>);
 
     auto found = std::ranges::find_if(ents, [&](auto& ent) {
         return view_attackable.contains(ent);

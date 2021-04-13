@@ -59,6 +59,7 @@ void camera_update(entt::entity ent) {
     // render visible tiles
     for(const auto& v_pos : pvshed.visible_coordinates) {
         const auto& tile = map.at(v_pos);
+        auto [rx, ry]    = render_pos(v_pos.first, v_pos.second);
         vchar_t tile_vch = tile.get_vchar();
         if(tile.type == tile_type_t::wall) {
             tile_vch.foreground = color_t(0, 31, 36);
@@ -70,8 +71,10 @@ void camera_update(entt::entity ent) {
             else {
                 tile_vch.foreground = color_t(36, 18, 4);
             }
+            term(gui::UI_ENTITIES)
+                ->set_char(rx, ry, vchar_t{glyph::CDOT, DARK_GREY, BLACK});
         }
-        auto [rx, ry] = render_pos(v_pos.first, v_pos.second);
+
         term(gui::UI_MAP)->set_char(rx, ry, tile_vch);
     }
 

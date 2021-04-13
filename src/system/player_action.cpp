@@ -31,18 +31,22 @@ position_t get_delta_pos(const sf::Event& ev) {
 
     using sf::Keyboard;
     switch(ev.key.code) {
+    case Keyboard::Up:
     case Keyboard::Numpad8:
     case Keyboard::K: {
         --dy;
     } break;
+    case Keyboard::Down:
     case Keyboard::Numpad2:
     case Keyboard::J: {
         ++dy;
     } break;
+    case Keyboard::Left:
     case Keyboard::Numpad4:
     case Keyboard::H: {
         --dx;
     } break;
+    case Keyboard::Right:
     case Keyboard::Numpad6:
     case Keyboard::L: {
         ++dx;
@@ -70,8 +74,7 @@ position_t get_delta_pos(const sf::Event& ev) {
     case sf::Keyboard::Numpad5: {
     } break;
 
-    default:
-        break;
+    default: break;
     }
 
     return delta_pos;
@@ -143,8 +146,7 @@ void perform_action(const sf::Event& ev) {
         pick_item_at(player, player_pos);
     }
 
-    default:
-        break;
+    default: break;
     }
 }
 
@@ -177,8 +179,7 @@ engine::game_state_t player_input() {
                                             .what = inv_items.front(),
                                         });
         } break;
-        default:
-            break;
+        default: break;
         }
         auto target_pos = player_pos + get_delta_pos(ev);
         move_wait_attack(player, target_pos);

@@ -36,12 +36,12 @@ void system_ai() {
 }
 
 void system_melee_combat() {
-    auto ents_melee = reg.view<combat_stats_t, being_t, wants_to_melee_t>(
+    auto ents_melee = reg.view<combat_stats_t, name_t, wants_to_melee_t>(
         entt::exclude<dead_t>);
 
     for(auto [ent, atker_stats, being, want_to_melee] : ents_melee.each()) {
         auto [target_stats, target_being]
-            = reg.get<combat_stats_t, being_t>(want_to_melee.target);
+            = reg.get<combat_stats_t, name_t>(want_to_melee.target);
         auto final_damage = atker_stats.power - target_stats.defense;
         final_damage      = std::max(final_damage, 0);
         new_damage(want_to_melee.target, final_damage);
@@ -119,7 +119,7 @@ void system_item_collection() {
             add_to_inventory(ent, ent_item);
             engine::get_map().at(pos_item).remove_entity(ent_item);
 #ifdef DEBUG
-            const auto& being = reg.get<being_t>(ent);
+            const auto& being = reg.get<name_t>(ent);
             spdlog::debug("item picked up by {}", being.name);
 #endif
             reg.remove<position_t>(ent_item);
@@ -131,7 +131,7 @@ void system_damage() {
     auto& map = engine::get_map();
 
     auto sufferers
-        = reg.view<being_t, suffer_damage_t, combat_stats_t, position_t>(
+        = reg.view<name_t, suffer_damage_t, combat_stats_t, position_t>(
             entt::exclude<dead_t>);
 
     for(auto [ent, being, damage, stats, e_pos] : sufferers.each()) {
@@ -159,7 +159,7 @@ void system_damage() {
             std::copy(e_inventory.items.begin(), e_inventory.items.end(),
                       std::back_inserter(tile.entities_here));
             reg.remove<suffer_damage_t>(ent);
-            reg.remove<being_t>(ent);
+            reg.remove<name_t>(ent);
             reg.remove<combat_stats_t>(ent);
         }
     }

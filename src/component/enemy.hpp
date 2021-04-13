@@ -8,8 +8,4 @@ struct enemy_t {
     position_t memory;
 };
 
-struct being_t {
-    const char* name;
-};
-
 }  // namespace radl

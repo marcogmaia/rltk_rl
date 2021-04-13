@@ -16,7 +16,8 @@ entity healing_potion(bool in_pack) {
                 .in_pack = in_pack,
             };
     vchar_t item_vch('!', YELLOW, BLACK);
-    auto ent_item = engine::factory::item_factory(item, item_vch);
+    auto ent_item
+        = engine::factory::item_factory("Healing potion", item, item_vch);
     reg.emplace<item_potion_t>(ent_item, item_potion_t{
                                              .healing = 10,
                                          });
@@ -24,7 +25,7 @@ entity healing_potion(bool in_pack) {
 }
 
 void add_to_inventory(entity ent, entity item) {
-    auto &inventory = reg.get<inventory_t>(ent);
+    auto& inventory = reg.get<inventory_t>(ent);
     inventory.items.push_back(item);
 }
 

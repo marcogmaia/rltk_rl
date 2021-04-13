@@ -1,14 +1,5 @@
 Language: Cpp
 Standard: Cpp11
-#BasedOnStyle: Google
-BreakBeforeBraces: Custom
-BraceWrapping:
-    AfterEnum: false
-    AfterStruct: false
-    AfterControlStatement: false
-    AfterExternBlock: false
-    BeforeElse: true
-    SplitEmptyFunction: false
 BreakBeforeBinaryOperators: All
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeComma
@@ -29,7 +20,9 @@ AllowAllArgumentsOnNextLine: true
 AlwaysBreakTemplateDeclarations: true
 UseTab: Never
 
+AllowShortBlocksOnASingleLine: Always
 AllowShortFunctionsOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: true
 
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeParens: Never

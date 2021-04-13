@@ -37,7 +37,7 @@ void player_factory(entt::entity ent, const position_t& pos,
                                          .defense = 5,
                                          .power   = 50,
                                      });
-    reg.emplace<being_t>(ent, "Player");
+    reg.emplace<name_t>(ent, "Player");
     reg.emplace<blocks_t>(ent);
     reg.emplace<player_t>(ent);
     add_ent_to_map(ent, pos);
@@ -58,7 +58,7 @@ entity enemy_factory(const position_t& pos, vchar_t vch, const char* name) {
                                          .defense = 5,
                                          .power   = 6,
                                      });
-    reg.emplace<being_t>(ent, name);
+    reg.emplace<name_t>(ent, name);
     reg.emplace<blocks_t>(ent);
     reg.emplace<inventory_t>(ent);
     reg.emplace<enemy_t>(ent);
@@ -66,8 +66,9 @@ entity enemy_factory(const position_t& pos, vchar_t vch, const char* name) {
     return ent;
 }
 
-entity item_factory(item_t item, vchar_t vch) {
+entity item_factory(const char* item_name, item_t item, vchar_t vch) {
     auto ent = reg.create();
+    reg.emplace<name_t>(ent, item_name);
     reg.emplace<item_t>(ent, item);
     reg.emplace<renderable_t>(ent, renderable_t{
                                        vch,

@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include "rltk/rltk.hpp"
 #include "vchar.hpp"
 
@@ -18,6 +19,10 @@ enum z_level_t {
 struct renderable_t {
     vchar_t vchar;
     z_level_t z_level = GROUND;
+};
+
+struct name_t {
+    std::string name;
 };
 
 }  // namespace radl::component
