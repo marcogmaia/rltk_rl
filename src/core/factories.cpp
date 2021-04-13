@@ -1,6 +1,6 @@
 #include <fmt/format.h>
 
-#include "factories.hpp"
+#include "core/factories.hpp"
 #include "system/camera.hpp"
 
 #include "component/component.hpp"
@@ -9,7 +9,7 @@
 
 namespace radl {
 
-namespace engine::factory {
+namespace factory {
 
 /**
  * @brief pushes entity id to tile position's entities
@@ -78,6 +78,6 @@ entity item_factory(const char* item_name, item_t item, vchar_t vch) {
 }
 
 
-}  // namespace engine::factory
+}  // namespace factory
 
 }  // namespace radl

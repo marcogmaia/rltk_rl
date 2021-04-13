@@ -5,6 +5,7 @@ add_library(
     "factories.cpp"
     "gui.cpp"
     "map.cpp"
+    "spawner.cpp"
 )
 
 target_link_libraries(

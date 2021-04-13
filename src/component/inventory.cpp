@@ -1,8 +1,7 @@
 #include "component/inventory.hpp"
 #include "core/factories.hpp"
-#include "utils/colors.hpp"
 #include "core/engine.hpp"
-
+#include "utils/colors.hpp"
 
 namespace radl::component {
 
@@ -16,8 +15,7 @@ entity healing_potion(bool in_pack) {
                 .in_pack = in_pack,
             };
     vchar_t item_vch(glyph::POTION, LIGHTER_RED, BLACK);
-    auto ent_item
-        = engine::factory::item_factory("Healing potion", item, item_vch);
+    auto ent_item = factory::item_factory("Healing potion", item, item_vch);
     reg.emplace<item_potion_t>(ent_item, item_potion_t{
                                              .healing = 10,
                                          });

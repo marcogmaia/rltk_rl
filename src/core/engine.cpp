@@ -5,8 +5,9 @@
 #include "component/component.hpp"
 
 #include "core/engine.hpp"
-#include "core/factories.hpp"
 #include "core/gui.hpp"
+#include "core/spawner.hpp"
+#include "core/factories.hpp"
 
 #include "system/camera.hpp"
 #include "system/player_action.hpp"
@@ -50,46 +51,6 @@ static void rltk_init() {
 
 namespace {
 
-
-void add_enemy(const position_t& pos) {
-    if(!is_occupied(pos)) {
-        entity e_ent;
-        auto chance = rng::rng.range(1, 3);
-        if(chance == 1) {
-            e_ent = factory::enemy_factory(pos, vchar_t{'g', DARK_GREEN, BLACK},
-                                           name_t{"Goblin", "Dead Goblin"});
-        } else {
-            e_ent = factory::enemy_factory(pos, vchar_t{'O', GREEN, BLACK},
-                                           name_t{"Orc", "Dead Orc"});
-        }
-        auto chance_to_have_item
-            = rng::rng.range(1, 10) == 1;  // 1 chance in 10
-        if(chance_to_have_item) {
-            auto& e_inventory = reg.get<inventory_t>(e_ent);
-            e_inventory.items.push_back(healing_potion(true));
-        }
-    }
-}
-
-void add_enemies() {
-    constexpr uint32_t max_enemies_pex_room = 5;
-    using rng::rng;
-
-    const auto& w_map = engine::get_map();
-    for(const auto& room : w_map.rooms) {
-        auto num_enemies = rng.range(0, max_enemies_pex_room);
-        for(int i = 0; i < num_enemies; ++i) {
-            int rand_x          = rng.range(room.x1, room.x2 - 1);
-            int rand_y          = rng.range(room.y1, room.y2 - 1);
-            position_t rand_pos = {rand_x, rand_y};
-            if(!is_occupied(rand_pos)) {
-                add_enemy(rand_pos);
-            }
-        }
-    }
-}
-
-
 }  // namespace
 
 void init() {
@@ -115,18 +76,6 @@ Map& get_map() {
     return reg.ctx<Map>();
 }
 
-namespace {
-
-[[maybe_unused]] void enemy_spawner() {
-    auto& map        = engine::get_map();
-    int random_index = rng::rng.range(0, map.rooms.size() - 1);
-    auto random_pos  = map.rooms.at(random_index).random_pos();
-    add_enemy(random_pos);
-}
-
-}  // namespace
-
-
 component::game_log_t& get_game_log() {
     return reg.ctx<component::game_log_t>();
 }
@@ -148,6 +97,7 @@ void game_state_system([[maybe_unused]] double elapsed_time) {
         player                = reg.create();
         factory::player_factory(player, player_start_pos,
                                 vchar_t{'@', YELLOW, BLACK});
+
         add_enemies();
         spdlog::info("entities created: {}", reg.alive());
         system::systems_run();
