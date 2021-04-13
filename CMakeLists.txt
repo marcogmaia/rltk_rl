@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15.0)
-project(learning VERSION 0.1.0)
+project(maiaRL VERSION 0.1.0)
 
 set(BUILD_SHARED_LIBS ON)
 # set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)

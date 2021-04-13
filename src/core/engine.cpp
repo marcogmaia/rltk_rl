@@ -43,7 +43,7 @@ using rltk::term;
 static void rltk_init() {
     constexpr auto font_file = "../assets";
     rltk::init(rltk::config_advanced(font_file, width * 16, height * 16,
-                                     "Maia Roguelike learning"));
+                                     "MaiaRL"));
 
     // XXX fix this to sync with one variable
 }
