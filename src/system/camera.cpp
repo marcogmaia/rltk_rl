@@ -15,7 +15,6 @@ namespace radl {
 
 
 void camera_update(entt::entity ent) {
-    using namespace world;
     using engine::reg;
     // using rltk::console;
     using engine::console;

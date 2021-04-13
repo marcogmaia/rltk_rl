@@ -3,7 +3,7 @@
 
 #include "rltk/rltk.hpp"
 
-namespace radl {
+namespace radl::component {
 
 using color_t = rltk::color_t;
 

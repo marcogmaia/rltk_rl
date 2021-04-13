@@ -22,8 +22,10 @@ extern rltk::virtual_terminal* console;
 
 extern entt::dispatcher event_dispatcher;
 
-world::Map& get_map();
-component::game_log_t& get_game_log();
+using namespace component;
+
+Map& get_map();
+game_log_t& get_game_log();
 position_t get_position_from_entity(entity ent);
 
 enum game_state_t {
@@ -69,4 +71,7 @@ bool get_mouse_button_state(const int button);
 }  // namespace radl::state
 
 
+using namespace radl::component;
+using radl::engine::player;
 using radl::engine::reg;
+entt::entity& ent_player = player;

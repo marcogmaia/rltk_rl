@@ -16,7 +16,6 @@ namespace radl {
 namespace {
 
 using engine::reg;
-using namespace world;
 
 [[maybe_unused]] bool surrounded(const position_t& pos) {
     auto& map = engine::get_map();
@@ -48,7 +47,6 @@ using namespace world;
 
 
 void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
-    using namespace world;
     using engine::reg;
     viewshed_t& e_vshed = reg.get<viewshed_t>(e_ent);
     auto& vis_coords    = e_vshed.visible_coordinates;
@@ -82,17 +80,9 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
 void ai_enemy() {
     using engine::player;
     using engine::reg;
-    using namespace world;
-
-    // auto v_enemies  = reg.group<being_t, position_t, viewshed_t>();
-    // auto v_enemies = reg.view<being_t, position_t, viewshed_t, enemy_t>(
-    //     entt::exclude<dead_t>);
     auto player_pos = reg.get<position_t>(player);
-
-    // auto player_is_surrounded = surrounded(player_pos);
-
     auto& enemies_near = *get_entities_near_player();
-
+    // function to apply to each enemy
     auto aifunc = [&](auto e_ent) {
         if(!reg.any_of<enemy_t>(e_ent)) {
             return;
@@ -101,7 +91,6 @@ void ai_enemy() {
             = reg.get<position_t, viewshed_t, enemy_t>(e_ent);
 
         auto player_is_visible = vshed.visible_coordinates.contains(player_pos);
-
         //  found player
         if(player_is_visible) {
             ai_enemy_find_path(e_ent, player_pos);

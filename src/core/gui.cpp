@@ -31,7 +31,7 @@ void resize_box(rltk::layer_t* l, int w, int h) {
 }
 
 void render_hp_bar(int x, int y, vchar_t fg_vch, vchar_t bg_vch) {
-    const auto& pstats = reg.get<combat_stats_t>(player);
+    const auto& pstats = reg.get<component::combat_stats_t>(player);
 
     // print HP bar
     auto hp_fmt = fmt::format("HP:{:3d}/{:3d} ", pstats.hp, pstats.max_hp);
@@ -83,6 +83,7 @@ void init() {
                    resize_main, false);
     term(UI_MOUSE)->set_alpha(127);
 
+    // TODO add inventory UI
     // gui->add_layer(UI_INVENTORY);
 
     engine::console = term(UI_MAP);

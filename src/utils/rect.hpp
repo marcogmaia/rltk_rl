@@ -5,7 +5,7 @@
 #include "component/position.hpp"
 
 
-namespace radl {
+namespace radl::component {
 
 struct rect_t {
     int x1;

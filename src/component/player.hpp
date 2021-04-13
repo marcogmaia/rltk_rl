@@ -10,10 +10,10 @@
  */
 #pragma once
 
-namespace radl {
+namespace radl::component {
 
 
 // Tag for the player component
 struct player_t {};
 
-}  // namespace radl
+}  // namespace radl::component

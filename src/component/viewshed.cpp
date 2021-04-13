@@ -9,7 +9,7 @@
 #include "utils/path_finding.hpp"
 #include "system/visibility.hpp"
 
-namespace radl::world {
+namespace radl::component {
 
 namespace {
 [[maybe_unused]] void timeit(std::function<void(void)> func) {
@@ -25,7 +25,6 @@ namespace {
  *
  */
 void fov_update() {
-    using namespace world;
     using engine::reg;
 
     sf::Clock clk;
@@ -90,4 +89,4 @@ void fov_update() {
                  clk.getElapsedTime().asMicroseconds());
 }
 
-}  // namespace radl::world
+}  // namespace radl::component

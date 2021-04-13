@@ -81,7 +81,6 @@ namespace {
 
 using engine::reg;
 using namespace engine;
-using namespace world;
 using namespace rltk::colors;
 
 [[maybe_unused]] static position_t render_pos(int rx, int ry) {
@@ -120,9 +119,6 @@ using namespace rltk::colors;
     event_queue.clear();
 }
 
-// TODO pickable items
-
-
 void pick_item_at(entity ent, position_t pos) {
     auto& ents_here = engine::get_map().at(pos).entities_here;
     auto found      = std::ranges::find_if(ents_here, [](auto ent) {
@@ -130,8 +126,6 @@ void pick_item_at(entity ent, position_t pos) {
     });
     if(found != ents_here.end()) {
         auto ent_item = *found;
-        // ents_here.remove(ent_item);
-        // backpack_insert(ent, ent_item);
         reg.emplace_or_replace<wants_to_pickup_item_t>(ent,
                                                        wants_to_pickup_item_t{
                                                            .picked_by = ent,
@@ -180,7 +174,6 @@ engine::game_state_t player_input() {
             // use item
             reg.emplace<wants_to_use_t>(engine::player,
                                         wants_to_use_t{
-                                            .who  = engine::player,
                                             .what = inv_items.front(),
                                         });
         } break;
@@ -208,7 +201,6 @@ void random_walk(const entt::entity& ent, const position_t& src_pos) {
 }
 
 bool move_wait_attack(entt::entity& ent, const position_t& dst_pos) {
-    using namespace world;
     auto& src_pos = reg.get<position_t>(ent);
     // ## 0. wait turn
     if(dst_pos == src_pos) {

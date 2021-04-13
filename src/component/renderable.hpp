@@ -16,7 +16,7 @@ enum z_level_t {
 };
 
 struct renderable_t {
-    radl::vchar_t vchar;
+    vchar_t vchar;
     z_level_t z_level = GROUND;
 };
 

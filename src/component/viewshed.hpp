@@ -11,7 +11,7 @@
 // #include "boost/container/flat_set.hpp"
 #include <unordered_set>
 
-namespace radl::world {
+namespace radl::component {
 
 struct viewshed_t {
     static constexpr int default_range = 8;
@@ -31,4 +31,4 @@ struct viewshed_t {
  */
 void fov_update();
 
-}  // namespace radl::world
+}  // namespace radl::component

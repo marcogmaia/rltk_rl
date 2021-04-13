@@ -12,7 +12,6 @@ namespace {
 
 using engine::game_state_t;
 using engine::reg;
-using namespace world;
 
 }  // namespace
 
@@ -166,12 +165,12 @@ void system_damage() {
     }
 }
 
-void item_use_system() {
+void system_item_use() {
     auto v_use = reg.view<wants_to_use_t>();
 
-    for(auto [e_use, use] : v_use.each()) {
-        auto [e_who, e_what] = use;
-        auto* inventory      = reg.try_get<inventory_t>(e_who);
+    for(auto [ent, use] : v_use.each()) {
+        auto [e_what]   = use;
+        auto* inventory = reg.try_get<inventory_t>(ent);
         if(!inventory) {
             continue;
         }
@@ -184,7 +183,7 @@ void item_use_system() {
             // use item
             switch(item.type) {
             case item_type_t::POTION: {
-                auto& e_stats  = reg.get<combat_stats_t>(e_who);
+                auto& e_stats  = reg.get<combat_stats_t>(ent);
                 auto& potion   = reg.get<item_potion_t>(e_what);
                 auto prev_heal = e_stats.hp;
                 e_stats.hp += potion.healing;
@@ -201,7 +200,7 @@ void item_use_system() {
             }
             // remove item
             inventory->remove_first(e_what);
-            reg.remove<wants_to_use_t>(e_who);
+            reg.remove<wants_to_use_t>(ent);
             // destroy entity
             reg.destroy(e_what);
         }
@@ -217,7 +216,7 @@ void systems_run() {
     system_damage();
     system_walk();
     system_item_collection();
-    item_use_system();
+    system_item_use();
     system_destroy_deads();
 }
 

@@ -9,7 +9,8 @@
 #include "entt/entity/registry.hpp"
 #include "component/vchar.hpp"
 
-namespace radl::world {
+namespace radl {
+    using namespace component;
 
 using namespace rltk::colors;
 using entt::entity;
@@ -66,7 +67,7 @@ struct tile_t {
     }
 
     void remove_entity(entity ent);
-    void insert_entity(entity ent) ;
+    void insert_entity(entity ent);
 };
 
 // struct visible_t {};
@@ -135,4 +136,4 @@ void move_append(C1& src, C2& dst) {
 //                      const position_t& dst_pos);
 
 
-}  // namespace radl::world
+}  // namespace radl::component

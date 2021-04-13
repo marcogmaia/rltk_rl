@@ -5,7 +5,7 @@
 
 // #include <component/component.hpp>
 
-namespace radl {
+namespace radl::component {
 
 struct combat_stats_t {
     int max_hp;   // maximum health points
@@ -42,4 +42,4 @@ void attack(const entity& ent_atk, const entity& ent_def);
 void attack(const entity& ent_atk, const position_t& pos);
 
 
-}  // namespace radl
+}  // namespace radl::component

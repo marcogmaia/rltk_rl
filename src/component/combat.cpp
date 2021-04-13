@@ -2,7 +2,7 @@
 #include "component/component.hpp"
 #include "core/engine.hpp"
 
-namespace radl {
+namespace radl::component {
 
 namespace {
 
@@ -40,4 +40,4 @@ void attack(const entity& ent_atk, const position_t& pos) {
     attack(ent_atk, ent_def);
 }
 
-}  // namespace radl
+}  // namespace radl::component

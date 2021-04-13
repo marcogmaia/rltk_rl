@@ -1,16 +1,15 @@
+#include <fmt/format.h>
+
 #include "factories.hpp"
 #include "system/camera.hpp"
 
-#include "engine.hpp"
 #include "component/component.hpp"
+#include "core/engine.hpp"
 
-#include <fmt/format.h>
 
 namespace radl {
 
 namespace engine::factory {
-
-using namespace world;
 
 /**
  * @brief pushes entity id to tile position's entities

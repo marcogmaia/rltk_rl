@@ -27,7 +27,6 @@ struct item_characteristics_t {
 };
 
 struct wants_to_use_t {
-    entity who;
     entity what;
 };
 struct item_t {

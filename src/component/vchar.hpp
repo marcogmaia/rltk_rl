@@ -5,7 +5,7 @@
 #include "component/color_t.hpp"
 
 
-namespace radl {
+namespace radl::component {
 
 namespace glyph {
 constexpr uint32_t BLOCK1 = 176;

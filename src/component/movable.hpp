@@ -1,7 +1,7 @@
 #pragma once
 #include "component/component.hpp"
 
-namespace radl {
+namespace radl::component {
 
 
 struct movable_t {};

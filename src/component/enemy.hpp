@@ -1,6 +1,6 @@
 #pragma once
 
-namespace radl {
+namespace radl::component {
 
 struct enemy_t {
     bool remembers_target_position = false;

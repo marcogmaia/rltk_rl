@@ -17,7 +17,6 @@
 
 namespace radl::engine {
 
-using namespace world;
 using namespace rltk::colors;
 std::deque<sf::Event> event_queue;
 
@@ -113,8 +112,8 @@ void init() {
  *
  * @return the map from the register context
  */
-world::Map& get_map() {
-    return reg.ctx<world::Map>();
+Map& get_map() {
+    return reg.ctx<Map>();
 }
 
 namespace {
@@ -205,7 +204,7 @@ void render() {
 }
 
 void terminate() {
-    reg.unset<world::Map>();
+    reg.unset<Map>();
     reg.unset<component::game_log_t>();
     reg.clear();
 }

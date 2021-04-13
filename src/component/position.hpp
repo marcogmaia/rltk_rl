@@ -5,7 +5,7 @@
 
 #include "entt/entt.hpp"
 
-namespace radl {
+namespace radl::component {
 
 template <typename T>
 std::pair<T, T> operator+(const std::pair<T, T>& left,
@@ -28,4 +28,4 @@ struct PosHasher {
     }
 };
 
-}  // namespace radl
+}  // namespace radl::component

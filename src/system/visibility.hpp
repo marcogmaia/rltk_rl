@@ -87,43 +87,4 @@ void visibility_sweep_2d(const location_t& position, const int& range,
 }
 
 
-/*
- * Benchmark results from example 6 (on my desktop):
- * - Using line_func, it averages 0.3625 uS per line.
- * - Using line_func_cancellable, it averages 0.25 uS per line.
- * - Using a naieve float based slope, it averages 0.2 uS per line.
- */
-
-template <class location_t_, class navigator_t>
-void internal_2d_sweep(const location_t_& position, const int& range,
-                       std::function<void(location_t_)> set_visible,
-                       std::function<bool(location_t_)> is_transparent,
-                       const std::pair<int, int> offset) {
-    bool blocked      = false;
-    const int start_x = navigator_t::get_x(position);
-    const int start_y = navigator_t::get_y(position);
-    const int end_x   = start_x + offset.first;
-    const int end_y   = start_y + offset.second;
-
-    auto func = [&blocked, &is_transparent, &set_visible, &range, &start_x,
-                 &start_y](int X, int Y) {
-        if(blocked) {
-            return false;
-        }
-        double distance = distance2d(start_x, start_y, X, Y);
-        if(distance <= range) {
-            location_t_ pos = navigator_t::get_xy(X, Y);
-            if(!blocked) {
-                set_visible(pos);
-            }
-            if(!is_transparent(pos)) {
-                blocked = true;
-            }
-        }
-        return true;
-    };
-    line_func_cancellable(start_x, start_y, end_x, end_y, func);
-}
-
-
 }  // namespace radl

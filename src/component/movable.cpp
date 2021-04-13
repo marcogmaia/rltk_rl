@@ -1,9 +1,8 @@
 
 #include "component/movable.hpp"
 
-namespace radl {
+namespace radl::component {
 namespace {
-
 
 using engine::reg;
 
@@ -22,4 +21,4 @@ void walk(const entt::entity& ent, const position_t& src_pos,
     }
 }
 
-}  // namespace radl
+}  // namespace radl::component

@@ -12,7 +12,7 @@
 #include "core/engine.hpp"
 
 #include <ranges>
-namespace radl::world {
+namespace radl {
 
 
 using namespace rltk::colors;
@@ -187,4 +187,4 @@ void tile_t::insert_entity(entity ent) {
     entities_here.push_back(ent);
 }
 
-}  // namespace radl::world
+}  // namespace radl::component
