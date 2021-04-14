@@ -1,13 +1,10 @@
 #include <algorithm>
+#include <map>
 
 #include "spdlog/spdlog.h"
 
-#include "core/gui.hpp"
+#include "core/gui/gui.hpp"
 #include "core/engine.hpp"
-// #include "component/combat.hpp"
-// #include "component/log.hpp"
-// #include "component/renderable.hpp"
-// #include "component/viewshed.hpp"
 
 #include "component/component.hpp"
 
@@ -183,6 +180,29 @@ void render_mouse_overlay() {
     term(UI_MOUSE)->clear();
     term(UI_MOUSE)->set_char(mx, my, vchar_t{glyph::SOLID1, ORANGE, BLACK});
     draw_tooltips();
+}
+
+// TODO show inventory when I is pressed
+void show_inventory() {
+    // ## O(n*log(n))
+    auto& inventory = reg.get<inventory_t>(player);
+    auto& items     = inventory.items;
+    auto iname      = get_name(items.front());
+
+    std::multimap<std::string, entt::entity> mumap;
+    std::ranges::transform(items, std::inserter(mumap, mumap.begin()),
+                           [](entity ent) {
+                               auto iname = get_name(ent);
+                               return std::make_pair(iname, ent);
+                           });
+
+    std::set<std::string> keys;
+    for(auto& entry : mumap) {
+        keys.insert(entry.first);
+    }
+    for(auto& key : keys) {
+        spdlog::debug("k: {} num: {}", key, mumap.count(key));
+    }
 }
 
 void render_inventory_items() {

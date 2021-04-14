@@ -4,6 +4,7 @@ set(COMPONENT_SCRS
     "movable.cpp"
     "viewshed.cpp"
     "inventory.cpp"
+    "renderable.cpp"
 )
 
 add_library(

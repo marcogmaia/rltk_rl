@@ -3,6 +3,7 @@
 #include "rltk/rltk.hpp"
 #include "vchar.hpp"
 
+#include "core/engine.hpp"
 // To render anything we need to know the position, colors and console
 // the position we get directly from the position_t struct of the entity
 
@@ -25,5 +26,7 @@ struct name_t {
     std::string name;
     std::string dead_name;
 };
+
+const std::string& get_name(entt::entity ent);
 
 }  // namespace radl::component

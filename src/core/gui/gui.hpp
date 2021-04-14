@@ -26,4 +26,7 @@ UI_TOOLTIPS,
 void init();
 void render_gui();
 
+
+void show_inventory();
+
 }  // namespace radl::gui

@@ -3,7 +3,7 @@ add_library(
     game_core
     "engine.cpp"
     "factories.cpp"
-    "gui.cpp"
+    "gui/gui.cpp"
     "map.cpp"
     "spawner.cpp"
 )

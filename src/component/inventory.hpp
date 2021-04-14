@@ -12,7 +12,7 @@ enum item_type_t {
     POTION,
 };
 
-struct item_potion_t {
+struct drinkable_effects_t {
     int healing;
 };
 
@@ -47,12 +47,9 @@ struct inventory_t {
         return reg.get<item_t>(ent);
     }
 
-    inline void remove_first(entity ent) {
-        auto iter = std::ranges::find(items, ent);
-        if(iter != items.end()) {
-            items.erase(iter);
-        }
-    }
+    void remove_first(entity ent);
+
+    std::list<item_t> get_items();
 };
 
 entity healing_potion(bool in_pack = false);

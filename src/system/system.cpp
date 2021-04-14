@@ -164,41 +164,46 @@ void system_damage() {
     }
 }
 
+void quaff_potion(entity who, entity pot) {
+    auto& e_stats  = reg.get<combat_stats_t>(who);
+    auto& potion   = reg.get<drinkable_effects_t>(pot);
+    auto prev_heal = e_stats.hp;
+    e_stats.hp += potion.healing;
+    e_stats.hp = std::min(e_stats.max_hp, e_stats.hp);
+    // log entry
+    auto final_healing = e_stats.hp - prev_heal;
+    log_entry_t log_entry;
+    log_entry.log = fmt::format("healed for {} hp.", final_healing);
+    log_entry.fg  = LIGHT_GREEN;
+    engine::get_game_log().entries.push_back(log_entry);
+}
+
 void system_item_use() {
     auto v_use = reg.view<wants_to_use_t>();
-
-    for(auto [ent, use] : v_use.each()) {
+    for(auto [e_who, use] : v_use.each()) {
         auto [e_what]   = use;
-        auto* inventory = reg.try_get<inventory_t>(ent);
+        auto* inventory = reg.try_get<inventory_t>(e_who);
         if(!inventory) {
             continue;
         }
         if(!inventory->contains(e_what)) {
             continue;
         }
-
+        // inventory contains item
         auto item = inventory->get_item(e_what);
         if(item.in_pack) {
             // use item
             switch(item.type) {
             case item_type_t::POTION: {
-                auto& e_stats  = reg.get<combat_stats_t>(ent);
-                auto& potion   = reg.get<item_potion_t>(e_what);
-                auto prev_heal = e_stats.hp;
-                e_stats.hp += potion.healing;
-                e_stats.hp = std::min(e_stats.max_hp, e_stats.hp);
-                // log entry
-                auto final_healing = e_stats.hp - prev_heal;
-                log_entry_t log_entry;
-                log_entry.log = fmt::format("healed for {} hp.", final_healing);
-                log_entry.fg  = LIGHT_GREEN;
-                engine::get_game_log().entries.push_back(log_entry);
+                if(item.characteristics.drinkable) {
+                    quaff_potion(e_who, e_what);
+                }
             } break;
             default: break;
             }
             // remove item
             inventory->remove_first(e_what);
-            reg.remove<wants_to_use_t>(ent);
+            reg.remove<wants_to_use_t>(e_who);
             // destroy entity
             reg.destroy(e_what);
         }
@@ -217,7 +222,6 @@ void systems_run() {
     system_item_use();
     system_destroy_deads();
 }
-
 
 void player_system(const sf::Event& ev) {
     // using engine::event_dispatcher;

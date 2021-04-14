@@ -6,7 +6,7 @@
 #include "rltk/rltk.hpp"
 
 #include "core/map.hpp"
-#include "core/gui.hpp"
+#include "core/gui/gui.hpp"
 #include "system/camera.hpp"
 #include "component/component.hpp"
 

@@ -5,7 +5,7 @@
 #include "component/component.hpp"
 
 #include "core/engine.hpp"
-#include "core/gui.hpp"
+#include "core/gui/gui.hpp"
 #include "core/spawner.hpp"
 #include "core/factories.hpp"
 
@@ -104,6 +104,7 @@ void game_state_system([[maybe_unused]] double elapsed_time) {
     } break;
 
     case game_state_t::SHOW_INVENTORY: {
+        gui::show_inventory();
         game_state = game_state_t::AWAITING_INPUT;
     } break;
 
