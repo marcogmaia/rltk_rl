@@ -18,8 +18,13 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}-O2 -Wall ${MYW_DISABLES}
 
 
 
+include_directories("lib/imgui")
+include_directories("lib/imgui-sfml")
 add_subdirectory("lib/rltk")
 include_directories("lib/rltk")
+
+set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui")
+add_subdirectory("lib/imgui-sfml")
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -40,7 +45,9 @@ add_executable(
     "src/core/main.cpp"
 )
 
-target_link_libraries(${PROJECT_NAME} fmt game_utils game_core game_system game_component tbb pthread)
+# add_library(imgui "lib/imgui/imgui.cpp")
+
+target_link_libraries(${PROJECT_NAME} fmt game_utils game_core game_system game_component tbb pthread )
 
 # set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 # set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

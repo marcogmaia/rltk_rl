@@ -4,10 +4,11 @@
             "name": "roguelike",
             "includePath": [
                 "${workspaceFolder}/src",
-                "${workspaceFolder}/lib/rltk"
+                "${workspaceFolder}/lib/rltk",
+                "${workspaceFolder}/lib/imgui-sfml",
+                "${workspaceFolder}/lib/imgui"
             ],
             "browse": {
-                "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db",
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
                     "/usr/include/c++/**",

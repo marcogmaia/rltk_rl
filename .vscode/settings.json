@@ -1,4 +1,6 @@
 {
+    "C_Cpp.intelliSenseEngineFallback": "Enabled",
+    "C_Cpp.intelliSenseCacheSize": 5192,
     "files.watcherExclude": {
         "**/.git/objects/**": true,
         "**/.git/subtree-cache/**": true,
@@ -9,8 +11,6 @@
         "**/roguebasin/**": true,
     },
     "files.insertFinalNewline": true,
-    "C_Cpp.intelliSenseCachePath": "${workspaceFolder}/.vscode",
-    "C_Cpp.intelliSenseCacheSize": 5192,
     "cmake.platform": "linux",
     "cmake.parallelJobs": 0,
     "cmake.buildDirectory": "${workspaceFolder}/build",
@@ -162,9 +162,5 @@
         "rpos",
         "sfml",
         "vmap"
-    ],
-    "C_Cpp.intelliSenseEngineFallback": "Disabled",
-    "C_Cpp.default.systemIncludePath": [
-        // ""
     ],
 }

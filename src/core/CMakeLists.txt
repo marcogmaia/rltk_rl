@@ -18,6 +18,7 @@ target_link_libraries(
     
 target_link_libraries(
     game_core PUBLIC
+    ImGui-SFML
     "fmt"
     "pthread"
     "rltk"
