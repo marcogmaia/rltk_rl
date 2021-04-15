@@ -52,7 +52,6 @@ namespace {}  // namespace
 void init() {
 #ifdef DEBUG
     spdlog::set_level(spdlog::level::debug);
-    event_dispatcher.sink<sf::Event>().connect<&system::player_system>();
 #endif
     spdlog::info("Initializing engine.");
     reg.set<game_state_t>(game_state_t::PRE_RUN);
@@ -215,6 +214,7 @@ void terminate() {
     reg.unset<Map>();
     reg.unset<component::game_log_t>();
     reg.clear();
+    gui::terminate();
 }
 
 position_t get_position_from_entity(entity ent) {

@@ -23,9 +23,12 @@ UI_LOG,
 UI_PLAYER_HEALTH,
 UI_MOUSE,
 UI_TOOLTIPS,
+GOD_UI,
 };
 
 void init();
+void terminate();
+
 void render_gui();
 void clear_gui();
 

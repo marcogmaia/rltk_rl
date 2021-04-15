@@ -2,11 +2,6 @@
 #include <chrono>
 #include <fmt/format.h>
 
-
-#include "imgui.h"
-#include "imgui-SFML.h"
-
-
 #include "entt/entt.hpp"
 
 #include "rltk/rltk.hpp"
@@ -22,31 +17,12 @@ using engine::console;
 
 }  // namespace
 
-#ifdef DEBUG
-void imgui_frame(const sf::Event& event, sf::Clock& deltaClock) {
-    auto& main_window = *rltk::get_window();
-    ImGui::SFML::ProcessEvent(event);
-    ImGui::SFML::Update(main_window, deltaClock.restart());
-    ImGui::Begin("Hello, world!");
-    auto pressed = ImGui::Button("Look at this pretty button");
-    if(pressed) {
-        reg.get<inventory_t>(player).add_item(items::potion_healing(true));
-    }
-    ImGui::End();
-    ImGui::EndFrame();
-    ImGui::SFML::Render(main_window);
-}
-#endif
 
 void run_game(entt::delegate<void(double)> on_game_tick) {
     auto& main_window = *rltk::get_window();
     state::reset_mouse_state();
     double duration_ms = 0.0;
 
-#ifdef DEBUG
-    sf::Clock deltaClock;
-    ImGui::SFML::Init(main_window);
-#endif
 
     auto clock = std::chrono::steady_clock();
     while(main_window.isOpen()) {
@@ -54,6 +30,8 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
 
         sf::Event event;
         while(main_window.pollEvent(event)) {
+            engine::event_dispatcher.enqueue<sf::Event>(event);
+
             switch(event.type) {
             case sf::Event::Closed: {
                 main_window.close();
@@ -77,8 +55,6 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
                 //
             } break;
             case sf::Event::GainedFocus: {
-                //
-                imgui_frame(event, deltaClock);
                 spdlog::debug("gained FOCUS");
             } break;
             case sf::Event::MouseMoved: {
@@ -93,7 +69,6 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
             } break;
             case sf::Event::KeyPressed: {
                 engine::event_queue.push_back(event);
-                engine::event_dispatcher.enqueue<sf::Event>(event);
             } break;
             case sf::Event::KeyReleased: {
                 //
@@ -102,19 +77,14 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
             }
         }
 
-
         if(on_game_tick) {
             on_game_tick(duration_ms);
+            engine::event_dispatcher.update();
         }
 
         main_window.clear();
 
         rltk::gui->render(main_window);
-
-
-#ifdef DEBUG
-        imgui_frame(event, deltaClock);
-#endif
 
         main_window.display();
 
@@ -122,15 +92,10 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
                           clock.now() - start_time)
                           .count();
     }
-
-#ifdef DEBUG
-    ImGui::SFML::Shutdown();
-#endif
 }
 
 int main() {
     engine::init();
-
 
     entt::delegate<void(double)> delegate_run_game;
     delegate_run_game.connect<&engine::update>();

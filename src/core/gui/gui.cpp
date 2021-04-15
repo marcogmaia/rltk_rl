@@ -12,6 +12,10 @@
 #include "utils/utils.hpp"
 
 
+#include "imgui.h"
+#include "imgui-SFML.h"
+
+
 namespace radl::gui {
 
 namespace {
@@ -142,6 +146,27 @@ void resize_inventory(rltk::layer_t* l, int w, int h) {
     l->y = (h / fh - l->h / fh) * fh;
 }
 
+#ifdef DEBUG
+
+void imgui_process_event(const sf::Event& event) {
+    ImGui::SFML::ProcessEvent(event);
+}
+
+void imgui_frame(rltk::layer_t* l, sf::RenderTexture& window) {
+    static sf::Clock deltaClock;
+    auto& main_window = *rltk::get_window();
+    ImGui::SFML::Update(main_window, deltaClock.restart());
+    ImGui::Begin("Hello, world!");
+    auto pressed = ImGui::Button("Look at this pretty button");
+    if(pressed) {
+        reg.get<inventory_t>(player).add_item(items::potion_healing(true));
+    }
+    ImGui::End();
+    ImGui::EndFrame();
+    ImGui::SFML::Render(main_window);
+}
+#endif
+
 void init() {
     rect_t invent_rect{
         1024 - 16 * 16,
@@ -179,10 +204,23 @@ void init() {
                    "16x16", resize_main, true);
     gui->add_layer(UI_TOOLTIPS, map_rect.x1, map_rect.y1, map_rect.x2,
                    map_rect.y2, "8x16", resize_main, true);
+
+#ifdef DEBUG
+    ImGui::SFML::Init(*rltk::get_window());
+    engine::event_dispatcher.sink<sf::Event>().connect<imgui_process_event>();
+    gui->add_owner_layer(GOD_UI, 0, 0, 1024, 768, resize_main, imgui_frame);
+#endif
+
     term(UI_MOUSE)->set_alpha(127);
     term(UI_TOOLTIPS)->set_alpha(0xDF);
 
     engine::console = term(UI_MAP);
+}
+
+void terminate() {
+#ifdef DEBUG
+    ImGui::SFML::Shutdown();
+#endif
 }
 
 void render_mouse_overlay() {

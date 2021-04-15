@@ -9,7 +9,7 @@
 
 namespace radl::component {
 
-enum z_level_t {
+enum class z_level_t {
     GROUND = 0,
     DEAD,
     ITEM,
@@ -19,7 +19,7 @@ enum z_level_t {
 
 struct renderable_t {
     vchar_t vchar;
-    z_level_t z_level = GROUND;
+    z_level_t z_level = z_level_t::GROUND;
 };
 
 struct name_t {
