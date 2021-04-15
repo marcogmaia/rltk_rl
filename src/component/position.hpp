@@ -3,8 +3,6 @@
 #include <cmath>
 #include <utility>
 
-#include "entt/entt.hpp"
-
 namespace radl::component {
 
 template <typename T>

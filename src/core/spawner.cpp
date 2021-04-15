@@ -20,7 +20,7 @@ void add_enemy(const position_t& pos) {
             = rng::rng.range(1, 10) == 1;  // 1 chance in 10
         if(chance_to_have_item) {
             auto& e_inventory = reg.get<inventory_t>(e_ent);
-            e_inventory.add_item(healing_potion(true));
+            e_inventory.add_item(items::potion_healing(true));
         }
     }
 }

@@ -15,7 +15,6 @@ namespace radl {
  */
 engine::game_state_t player_input();
 
-engine::game_state_t inventory_input();
 /**
  * @brief move (to tile) or attack something on @a dst_pos
  *

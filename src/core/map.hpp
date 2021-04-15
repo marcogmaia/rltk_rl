@@ -5,9 +5,11 @@
 #include <list>
 #include <set>
 
-#include "utils/rect.hpp"
 #include "entt/entity/registry.hpp"
+
+#include "utils/rect.hpp"
 #include "component/vchar.hpp"
+
 
 namespace radl {
     using namespace component;

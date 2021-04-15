@@ -10,6 +10,8 @@ enum item_menu_result_t {
     SELECTED,
 };
 
-std::tuple<item_menu_result_t, entt::entity> render_inventory();
+std::tuple<item_menu_result_t, entt::entity> render_inventory_use();
+
+std::tuple<item_menu_result_t, entt::entity> render_inventory_drop();
 
 }  // namespace radl::gui

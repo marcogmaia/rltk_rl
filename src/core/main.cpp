@@ -30,7 +30,7 @@ void imgui_frame(const sf::Event& event, sf::Clock& deltaClock) {
     ImGui::Begin("Hello, world!");
     auto pressed = ImGui::Button("Look at this pretty button");
     if(pressed) {
-        reg.get<inventory_t>(player).add_item(healing_potion(true));
+        reg.get<inventory_t>(player).add_item(items::potion_healing(true));
     }
     ImGui::End();
     ImGui::EndFrame();
@@ -78,6 +78,8 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
             } break;
             case sf::Event::GainedFocus: {
                 //
+                imgui_frame(event, deltaClock);
+                spdlog::debug("gained FOCUS");
             } break;
             case sf::Event::MouseMoved: {
                 //

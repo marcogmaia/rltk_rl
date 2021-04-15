@@ -173,6 +173,9 @@ engine::game_state_t player_input() {
         case sf::Keyboard::I: {
             return game_state_t::SHOW_INVENTORY;
         } break;
+        case sf::Keyboard::D: {
+            return game_state_t::SHOW_INVENTORY_DROP;
+        } break;
         case sf::Keyboard::Q: {
             // get first item in inventory if not empty
             // auto& inv_items = reg.get<inventory_t>(engine::player).items;
@@ -200,25 +203,6 @@ engine::game_state_t player_input() {
 
     return game_state_t::PLAYER_TURN;
 }
-
-engine::game_state_t inventory_input() {
-    if(event_queue.empty()) {
-        return game_state_t::SHOW_INVENTORY;
-    }
-
-    auto ev = get_event();
-    switch(ev.key.code) {
-    case sf::Keyboard::Escape: {
-        return game_state_t::AWAITING_INPUT;
-    }
-    case sf::Keyboard::I: {
-        return game_state_t::SHOW_INVENTORY;
-    }
-    default: break;
-    }
-    return game_state_t::SHOW_INVENTORY;
-}
-
 
 void random_walk(const entt::entity& ent, const position_t& src_pos) {
     auto dx               = rng::rng.range(-1, 1);

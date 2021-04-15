@@ -109,7 +109,7 @@ void game_state_update([[maybe_unused]] double elapsed_time) {
     case game_state_t::SHOW_INVENTORY: {
         render();
         using gui::item_menu_result_t;
-        auto [menu_res, ent] = gui::render_inventory();
+        auto [menu_res, ent] = gui::render_inventory_use();
         auto &inv_ui = *term(gui::UI_INVENTORY_POPUP);
 
         switch(menu_res) {
@@ -124,7 +124,26 @@ void game_state_update([[maybe_unused]] double elapsed_time) {
             game_state = game_state_t::PLAYER_TURN;
         } break;
         }
-        // game_state = inventory_input();
+    } break;
+
+     case game_state_t::SHOW_INVENTORY_DROP: {
+        render();
+        using gui::item_menu_result_t;
+        auto [menu_res, ent] = gui::render_inventory_drop();
+        auto &inv_ui = *term(gui::UI_INVENTORY_POPUP);
+
+        switch(menu_res) {
+        case item_menu_result_t::CANCEL: {
+            inv_ui.clear();
+            game_state = game_state_t::AWAITING_INPUT;
+        } break;
+        case item_menu_result_t::NO_RESPONSE: break;
+        case item_menu_result_t::SELECTED: {
+            inv_ui.clear();
+            reg.emplace<wants_to_drop_t>(player, ent);
+            game_state = game_state_t::PLAYER_TURN;
+        } break;
+        }
     } break;
 
     case game_state_t::PLAYER_TURN: {

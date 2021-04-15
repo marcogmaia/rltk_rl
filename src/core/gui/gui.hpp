@@ -29,6 +29,6 @@ void init();
 void render_gui();
 void clear_gui();
 
-// void render_inventory(std::function<char(void)> get_option);
+// void render_inventory_use(std::function<char(void)> get_option);
 
 }  // namespace radl::gui

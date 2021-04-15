@@ -5,7 +5,9 @@
 
 namespace radl::component {
 
-entity healing_potion(bool in_pack) {
+namespace items {
+
+entity potion_healing(bool in_pack) {
     auto item = item_t {
                 .type            = item_type_t::POTION,
                 .id = item_id_t::POTION_HEALING,
@@ -22,6 +24,8 @@ entity healing_potion(bool in_pack) {
                                                });
     return ent_item;
 }
+
+}  // namespace items
 
 void add_to_inventory(entity ent, entity item) {
     auto& inventory     = reg.get<inventory_t>(ent);
@@ -43,7 +47,7 @@ void inventory_t::add_item(entity ent_item) {
     items[item_id].push_back(ent_item);
 }
 
-std::vector<entity> inventory_t::get_items() {
+std::vector<entity> inventory_t::get_items() const {
     std::vector<entity> vec;
     for(auto [item_id, item_bucket] : items) {
         std::ranges::copy(item_bucket, std::back_inserter(vec));
@@ -51,7 +55,7 @@ std::vector<entity> inventory_t::get_items() {
     return vec;
 }
 
-std::vector<std::string> inventory_t::get_unique_item_names() {
+std::vector<std::string> inventory_t::get_unique_item_names() const {
     std::vector<std::string> vec;
     for(auto [item_id, item_bucket] : items) {
         if(item_bucket.empty()) {

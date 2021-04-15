@@ -34,6 +34,11 @@ struct item_characteristics_t {
 struct wants_to_use_t {
     entity what;
 };
+
+struct wants_to_drop_t {
+    entity what;
+};
+
 struct item_t {
     item_type_t type;
     item_id_t id;
@@ -72,13 +77,19 @@ struct inventory_t {
      *
      * @return std::vector<entity>
      */
-    std::vector<entity> get_items();
+    std::vector<entity> get_items() const;
 
-    std::vector<std::string> get_unique_item_names();
+    std::vector<std::string> get_unique_item_names() const;
 };
 
-entity healing_potion(bool in_pack = false);
 
 void add_to_inventory(entity ent, entity item);
+
+
+namespace items {
+
+entity potion_healing(bool in_pack = false);
+
+}
 
 }  // namespace radl::component

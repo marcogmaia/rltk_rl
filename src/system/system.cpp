@@ -108,22 +108,6 @@ void system_walk() {
     std::ranges::for_each(wanting_to_walk, fwalk);
 }
 
-void system_item_collection() {
-    auto v_pick_item = reg.view<wants_to_pickup_item_t, position_t>();
-    v_pick_item.each(
-        [](auto ent, wants_to_pickup_item_t& want_pick, position_t& pos_item) {
-            const auto& ent_item = want_pick.item;
-            add_to_inventory(ent, ent_item);
-            engine::get_map().at(pos_item).remove_entity(ent_item);
-#ifdef DEBUG
-            const auto& being = reg.get<name_t>(ent);
-            spdlog::debug("item picked up by {}", being.name);
-#endif
-            reg.remove<position_t>(ent_item);
-            reg.remove<wants_to_pickup_item_t>(ent);
-        });
-}
-
 void system_damage() {
     auto& map = engine::get_map();
 
@@ -181,34 +165,59 @@ void quaff_potion(entity who, entity pot) {
 }
 
 void system_item_use() {
-    auto v_use = reg.view<wants_to_use_t>();
-    for(auto [e_who, use] : v_use.each()) {
-        auto [e_what]   = use;
-        auto* inventory = reg.try_get<inventory_t>(e_who);
-        if(!inventory) {
-            continue;
-        }
-        if(!inventory->contains(e_what)) {
+    auto v_use = reg.view<wants_to_use_t, inventory_t>();
+    for(auto [e_who, euse, einv] : v_use.each()) {
+        if(!einv.contains(euse.what)) {
             continue;
         }
         // inventory contains item
-        auto item = inventory->get_item(e_what);
+        auto item = einv.get_item(euse.what);
         if(item.in_pack) {
             // use item
             switch(item.type) {
             case item_type_t::POTION: {
                 if(item.characteristics.drinkable) {
-                    quaff_potion(e_who, e_what);
+                    quaff_potion(e_who, euse.what);
                 }
             } break;
             default: break;
             }
             // remove item
-            inventory->remove_item(e_what);
+            einv.remove_item(euse.what);
             reg.remove<wants_to_use_t>(e_who);
             // destroy entity
-            reg.destroy(e_what);
+            reg.destroy(euse.what);
         }
+    }
+}
+
+
+void system_item_collection() {
+    auto v_pick_item
+        = reg.view<wants_to_pickup_item_t, inventory_t, position_t>();
+
+    for(auto [ent, epick, einv, epos] : v_pick_item.each()) {
+        einv.add_item(epick.item);
+        engine::get_map().at(epos).remove_entity(epick.item);
+        reg.remove<position_t>(epick.item);
+        reg.remove<wants_to_pickup_item_t>(ent);
+        auto& item   = reg.get<item_t>(epick.item);
+        item.in_pack = true;
+    }
+}
+
+void system_item_drop() {
+    auto vdrop = reg.view<wants_to_drop_t, inventory_t, position_t>();
+    for(auto [ent, edrop, einv, epos] : vdrop.each()) {
+        if(!einv.contains(edrop.what)) {
+            continue;
+        }
+        einv.get_item(edrop.what).in_pack = false;
+        einv.remove_item(edrop.what);
+        reg.remove<wants_to_drop_t>(ent);
+        // put on the map and give a position component
+        engine::get_map().at(epos).insert_entity(edrop.what);
+        reg.emplace<position_t>(edrop.what, epos);
     }
 }
 
@@ -221,6 +230,7 @@ void systems_run() {
     system_damage();
     system_walk();
     system_item_collection();
+    system_item_drop();
     system_item_use();
     system_destroy_deads();
 }

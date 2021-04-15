@@ -4,7 +4,8 @@
 
 #include "SFML/Window.hpp"
 
-#include "entt/entt.hpp"
+#include "entt/entity/registry.hpp"
+
 #include "core/map.hpp"
 #include "component/log.hpp"
 
@@ -33,6 +34,7 @@ enum game_state_t {
     AWAITING_INPUT,
     PLAYER_TURN,
     SHOW_INVENTORY,
+    SHOW_INVENTORY_DROP,
     ENEMY_TURN,
     VICTORY,
     DEFEAT,
