@@ -8,6 +8,7 @@ namespace radl::component {
 entity healing_potion(bool in_pack) {
     auto item = item_t {
                 .type            = item_type_t::POTION,
+                .id = item_id_t::POTION_HEALING,
                 .characteristics = item_characteristics_t{
                     .drinkable = true,
                     .castable  = false,
@@ -23,24 +24,43 @@ entity healing_potion(bool in_pack) {
 }
 
 void add_to_inventory(entity ent, entity item) {
-    auto& inventory = reg.get<inventory_t>(ent);
-    inventory.items.push_back(item);
+    auto& inventory     = reg.get<inventory_t>(ent);
+    const auto& item_id = reg.get<item_t>(item).id;
+    inventory.items[item_id].push_back(item);
 }
 
-std::list<item_t> inventory_t::get_items() {
-    std::list<item_t> list_items;
-    std::ranges::transform(items, std::back_inserter(list_items),
-                           [&list_items](entity ent) {
-                               return reg.get<item_t>(ent);
-                           });
-    return list_items;
-}
-
-void inventory_t::remove_first(entity ent) {
-    auto iter = std::ranges::find(items, ent);
-    if(iter != items.end()) {
-        items.erase(iter);
+void inventory_t::remove_item(entity ent) {
+    const auto& item_id = reg.get<item_t>(ent).id;
+    auto to_remove      = std::ranges::find(items[item_id], ent);
+    items[item_id].erase(to_remove);
+    if(items[item_id].empty()) {
+        items.extract(item_id);
     }
+}
+
+void inventory_t::add_item(entity ent_item) {
+    const auto& item_id = reg.get<item_t>(ent_item).id;
+    items[item_id].push_back(ent_item);
+}
+
+std::vector<entity> inventory_t::get_items() {
+    std::vector<entity> vec;
+    for(auto [item_id, item_bucket] : items) {
+        std::ranges::copy(item_bucket, std::back_inserter(vec));
+    }
+    return vec;
+}
+
+std::vector<std::string> inventory_t::get_unique_item_names() {
+    std::vector<std::string> vec;
+    for(auto [item_id, item_bucket] : items) {
+        if(item_bucket.empty()) {
+            continue;
+        }
+        auto item_name = reg.get<name_t>(item_bucket.back()).name;
+        vec.push_back(item_name);
+    }
+    return vec;
 }
 
 }  // namespace radl::component

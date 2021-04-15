@@ -17,4 +17,13 @@ void adjacent_pairs(F_Iter begin, F_Iter end, F func) {
     }
 }
 
+template <typename C>
+auto longest_string_in_collection(const C& collection) {
+    auto max_elem = std::max_element(collection.begin(), collection.end(),
+                                     [](auto& lhs, auto& rhs) {
+                                         return lhs.size() < rhs.size();
+                                     });
+    return max_elem;
+}
+
 }  // namespace radl

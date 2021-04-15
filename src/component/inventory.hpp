@@ -7,9 +7,14 @@
 namespace radl::component {
 using entt::entity;
 
-enum item_type_t {
+enum class item_type_t {
     NONE,
     POTION,
+};
+
+enum class item_id_t {
+    NONE = 0,
+    POTION_HEALING,
 };
 
 struct drinkable_effects_t {
@@ -31,25 +36,45 @@ struct wants_to_use_t {
 };
 struct item_t {
     item_type_t type;
+    item_id_t id;
     item_characteristics_t characteristics;
     bool in_pack = false;
 };
 
 struct inventory_t {
-    std::list<entt::entity> items;
+    std::map<item_id_t, std::vector<entt::entity>> items;
 
     inline bool contains(entity ent) {
-        auto f_iter = std::find(items.cbegin(), items.cend(), ent);
-        return f_iter != items.cend();
+        const auto& item_id = reg.get<item_t>(ent).id;
+        if(!items.contains(item_id)) {
+            return false;
+        }
+        bool found
+            = std::ranges::find(items[item_id], ent) != items[item_id].end();
+        return found;
     }
 
     inline item_t& get_item(entity ent) {
         return reg.get<item_t>(ent);
     }
 
-    void remove_first(entity ent);
+    void add_item(entity ent_item);
 
-    std::list<item_t> get_items();
+    /**
+     * @brief remove an entity item from the inventory
+     *
+     * @param ent
+     */
+    void remove_item(entity ent);
+
+    /**
+     * @brief get a vector of all entities in the inventory
+     *
+     * @return std::vector<entity>
+     */
+    std::vector<entity> get_items();
+
+    std::vector<std::string> get_unique_item_names();
 };
 
 entity healing_potion(bool in_pack = false);

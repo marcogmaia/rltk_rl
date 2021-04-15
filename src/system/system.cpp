@@ -113,7 +113,6 @@ void system_item_collection() {
     v_pick_item.each(
         [](auto ent, wants_to_pickup_item_t& want_pick, position_t& pos_item) {
             const auto& ent_item = want_pick.item;
-            // const auto& ent      = want_pick.picked_by;
             add_to_inventory(ent, ent_item);
             engine::get_map().at(pos_item).remove_entity(ent_item);
 #ifdef DEBUG
@@ -151,11 +150,14 @@ void system_damage() {
                           e_inventory.items.size());
             auto& tile = map.at(e_pos);
 
-            for(auto& e_item : e_inventory.items) {
+            for(auto [item_id, item_bucket] : e_inventory.items) {
+                auto& e_item = item_bucket.back();
                 reg.emplace<position_t>(e_item, e_pos);
             }
-            std::copy(e_inventory.items.begin(), e_inventory.items.end(),
-                      std::back_inserter(tile.entities_here));
+
+            std::ranges::copy(e_inventory.get_items(),
+                              std::back_inserter(tile.entities_here));
+
             reg.remove<suffer_damage_t>(ent);
             auto name  = &reg.get<name_t>(ent);
             name->name = name->dead_name;
@@ -202,7 +204,7 @@ void system_item_use() {
             default: break;
             }
             // remove item
-            inventory->remove_first(e_what);
+            inventory->remove_item(e_what);
             reg.remove<wants_to_use_t>(e_who);
             // destroy entity
             reg.destroy(e_what);

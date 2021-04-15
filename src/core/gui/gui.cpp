@@ -4,9 +4,12 @@
 #include "spdlog/spdlog.h"
 
 #include "core/gui/gui.hpp"
+#include "core/gui/item_menu.hpp"
 #include "core/engine.hpp"
 
 #include "component/component.hpp"
+
+#include "utils/utils.hpp"
 
 
 namespace radl::gui {
@@ -17,13 +20,6 @@ using namespace rltk::colors;
 using engine::player;
 using engine::reg;
 using rltk::gui;
-
-
-void resize_main(rltk::layer_t* l, int w, int h) {
-    // Simply set the width to the whole window width
-    l->w = w;
-    l->h = h;
-}
 
 
 void render_hp_bar(int x, int y, vchar_t fg_vch, vchar_t bg_vch) {
@@ -115,10 +111,24 @@ void draw_tooltips() {
     }
 }
 
+void resize_main(rltk::layer_t* l, int w, int h) {
+    // Simply set the width to the whole window width
+    l->w = w;
+    l->h = h;
+}
+
+void resize_inventory_popup(rltk::layer_t* l, int w, int h) {
+    // Simply set the width to the whole window width
+    l->w = l->w;
+    l->h = l->h;
+    l->x = 32;
+    l->y = 32;
+}
+
 void resize_status(rltk::layer_t* l, int w, int h) {
     auto [fw, fh] = term(UI_STATUS)->get_font_size();
 
-    l->w = (w / fw) * fw - (16 + 3) * fw;
+    l->w = (w / fw) * fw - (20 + 3) * fw;
     l->h = (2 + 8) * fh;
     l->y = ((h / fh) - (l->h / fh)) * fh;
 }
@@ -126,7 +136,7 @@ void resize_status(rltk::layer_t* l, int w, int h) {
 void resize_inventory(rltk::layer_t* l, int w, int h) {
     auto [fw, fh] = term(UI_INVENTORY)->get_font_size();
 
-    l->w = (16 + 2) * fw;
+    l->w = (20 + 2) * fw;
     l->h = (h / fh) * fh;
     l->x = ((w / fw) - (l->w / fw)) * fw;
     l->y = (h / fh - l->h / fh) * fh;
@@ -161,6 +171,9 @@ void init() {
                    status_rect.y2, "8x16", resize_status, true);
     gui->add_layer(UI_INVENTORY, invent_rect.x1, invent_rect.y1, invent_rect.x2,
                    invent_rect.y2, "8x16", resize_inventory, false);
+    gui->add_layer(UI_INVENTORY_POPUP, invent_rect.x1, invent_rect.y1,
+                   invent_rect.x2, invent_rect.y2, "8x16",
+                   resize_inventory_popup, false);
 
     gui->add_layer(UI_MOUSE, map_rect.x1, map_rect.y1, map_rect.x2, map_rect.y2,
                    "16x16", resize_main, true);
@@ -182,52 +195,18 @@ void render_mouse_overlay() {
     draw_tooltips();
 }
 
-// TODO show inventory when I is pressed
-void show_inventory() {
-    // ## O(n*log(n))
-    auto& inventory = reg.get<inventory_t>(player);
-    auto& items     = inventory.items;
-    auto iname      = get_name(items.front());
 
-    std::multimap<std::string, entt::entity> mumap;
-    std::ranges::transform(items, std::inserter(mumap, mumap.begin()),
-                           [](entity ent) {
-                               auto iname = get_name(ent);
-                               return std::make_pair(iname, ent);
-                           });
-
-    std::set<std::string> keys;
-    for(auto& entry : mumap) {
-        keys.insert(entry.first);
-    }
-    for(auto& key : keys) {
-        spdlog::debug("k: {} num: {}", key, mumap.count(key));
-    }
-}
-
-void render_inventory_items() {
-    auto* inventory = reg.try_get<inventory_t>(player);
-    if(!inventory) {
-        return;
-    }
-
-    int row = 0;
-    for(auto& item : inventory->items) {
-        auto& item_name = reg.get<name_t>(item).name;
-        term(UI_INVENTORY)->print(2, 1 + row, item_name);
-        ++row;
-    }
-}
-
-void render_gui() {
+void render_log_stats() {
     term(UI_STATUS)->clear();
-
     term(UI_STATUS)->box(GREY, BLACK, true);
-
-    term(UI_INVENTORY)->clear();
-    term(UI_INVENTORY)->box(GREY, BLACK, true);
-    term(UI_INVENTORY)->print_center(0, "Inventory");
-    render_inventory_items();
+    // print game log
+    auto& log = engine::get_game_log().entries;
+    int i     = 1;
+    std::for_each_n(log.crbegin(), std::min(static_cast<int>(log.size()), 8),
+                    [&i](const component::log_entry_t& entry) {
+                        term(UI_STATUS)->print(1, i++, entry.log, entry.fg,
+                                               entry.bg);
+                    });
 
     render_hp_bar(1, 3,
                   vchar_t{
@@ -240,17 +219,43 @@ void render_gui() {
                       DARKEST_RED,
                       BLACK,
                   });
+}
 
-    // print game log
-    auto& log = engine::get_game_log().entries;
-    int i     = 1;
-    std::for_each_n(log.crbegin(), std::min(static_cast<int>(log.size()), 8),
-                    [&i](const component::log_entry_t& entry) {
-                        term(UI_STATUS)->print(1, i++, entry.log, entry.fg,
-                                               entry.bg);
-                    });
+void render_inventory_items() {
+    auto* inventory = reg.try_get<inventory_t>(player);
+    if(!inventory) {
+        return;
+    }
+    int row = 0;
+    for(auto [item_id, item_bucket] : inventory->items) {
+        if(item_bucket.empty()) {
+            continue;
+        }
+        // for(auto& ent_item : item_bucket) {
+        auto first_item = item_bucket.back();
+        auto& item_name = reg.get<name_t>(first_item).name;
+        auto item_str   = fmt::format("{}x {}", item_bucket.size(), item_name);
+        term(UI_INVENTORY)->print(2, 1 + row, item_str);
+        ++row;
+    }
+}
 
+void render_inventory_right_side() {
+    term(UI_INVENTORY)->clear();
+    term(UI_INVENTORY)->box(GREY, BLACK, true);
+    term(UI_INVENTORY)->print_center(0, "Inventory");
+    render_inventory_items();
+}
+
+void render_gui() {
+    render_inventory_right_side();
+    render_log_stats();
     render_mouse_overlay();
+}
+
+void clear_gui() {
+    term(UI_INVENTORY)->clear();
+    term(UI_INVENTORY_POPUP)->clear();
 }
 
 }  // namespace radl::gui

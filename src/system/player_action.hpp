@@ -7,7 +7,6 @@
 #include "core/engine.hpp"
 
 
-
 namespace radl {
 
 /**
@@ -16,6 +15,7 @@ namespace radl {
  */
 engine::game_state_t player_input();
 
+engine::game_state_t inventory_input();
 /**
  * @brief move (to tile) or attack something on @a dst_pos
  *
@@ -31,9 +31,9 @@ void random_walk(const entt::entity& ent, const position_t& src_pos);
 
 /**
  * @brief given an event, return the delta pos that would be occurred
- * 
- * @param ev 
- * @return position_t 
+ *
+ * @param ev
+ * @return position_t
  */
 position_t get_delta_pos(const sf::Event& ev);
 

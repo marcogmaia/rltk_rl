@@ -150,6 +150,14 @@ void perform_action(const sf::Event& ev) {
     }
 }
 
+sf::Event get_event() {
+    auto ev = event_queue.back();
+    event_queue.pop_back();
+    flush_events();
+
+    return ev;
+}
+
 engine::game_state_t player_input() {
     auto player_pos = reg.get<position_t>(engine::player);
 
@@ -157,9 +165,7 @@ engine::game_state_t player_input() {
         return game_state_t::AWAITING_INPUT;
     }
 
-    auto ev = event_queue.back();
-    event_queue.pop_back();
-    flush_events();
+    auto ev = get_event();
 
     switch(ev.type) {
     case sf::Event::KeyPressed: {
@@ -169,15 +175,15 @@ engine::game_state_t player_input() {
         } break;
         case sf::Keyboard::Q: {
             // get first item in inventory if not empty
-            auto& inv_items = reg.get<inventory_t>(engine::player).items;
-            if(inv_items.empty()) {
-                break;
-            }
+            // auto& inv_items = reg.get<inventory_t>(engine::player).items;
+            // if(inv_items.empty()) {
+            //     break;
+            // }
             // use item
-            reg.emplace<wants_to_use_t>(engine::player,
-                                        wants_to_use_t{
-                                            .what = inv_items.front(),
-                                        });
+            // reg.emplace<wants_to_use_t>(engine::player,
+            //                             wants_to_use_t{
+            //                                 .what = inv_items.front(),
+            //                             });
         } break;
         default: break;
         }
@@ -191,8 +197,28 @@ engine::game_state_t player_input() {
         return game_state_t::AWAITING_INPUT;
     } break;
     }
+
     return game_state_t::PLAYER_TURN;
 }
+
+engine::game_state_t inventory_input() {
+    if(event_queue.empty()) {
+        return game_state_t::SHOW_INVENTORY;
+    }
+
+    auto ev = get_event();
+    switch(ev.key.code) {
+    case sf::Keyboard::Escape: {
+        return game_state_t::AWAITING_INPUT;
+    }
+    case sf::Keyboard::I: {
+        return game_state_t::SHOW_INVENTORY;
+    }
+    default: break;
+    }
+    return game_state_t::SHOW_INVENTORY;
+}
+
 
 void random_walk(const entt::entity& ent, const position_t& src_pos) {
     auto dx               = rng::rng.range(-1, 1);

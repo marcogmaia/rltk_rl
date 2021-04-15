@@ -55,9 +55,9 @@ void init() {
     event_dispatcher.sink<sf::Event>().connect<&system::player_system>();
 #endif
     spdlog::info("Initializing engine.");
+    reg.set<game_state_t>(game_state_t::PRE_RUN);
     rltk_init();
     gui::init();
-    reg.set<game_state_t>(game_state_t::PRE_RUN);
 }
 
 /**
@@ -75,26 +75,29 @@ component::game_log_t& get_game_log() {
     return reg.ctx<component::game_log_t>();
 }
 
-void game_state_system([[maybe_unused]] double elapsed_time) {
-    auto& game_state = reg.ctx<game_state_t>();
+void pre_run() {
+    // initialize everything
+    reg.set<Map>();
+    reg.set<component::game_log_t>();
+    auto& map = get_map();
+    map.init(rect_t{0, 0, width * 4, height * 4});
+    create_random_rooms(map);
+    make_corridors_between_rooms(map);
+    auto player_start_pos = map.rooms[0].center();
+    player                = reg.create();
+    factory::player_factory(player, player_start_pos,
+                            vchar_t{'@', YELLOW, BLACK});
+    add_enemies();
+    spdlog::info("entities created: {}", reg.alive());
+    system::systems_run();
+}
 
+void game_state_update([[maybe_unused]] double elapsed_time) {
+    auto& game_state = reg.ctx<game_state_t>();
 
     switch(game_state) {
     case game_state_t::PRE_RUN: {
-        // initialize everything
-        reg.set<Map>();
-        reg.set<component::game_log_t>();
-        auto& map = get_map();
-        map.init(rect_t{0, 0, width * 4, height * 4});
-        create_random_rooms(map);
-        make_corridors_between_rooms(map);
-        auto player_start_pos = map.rooms[0].center();
-        player                = reg.create();
-        factory::player_factory(player, player_start_pos,
-                                vchar_t{'@', YELLOW, BLACK});
-        add_enemies();
-        spdlog::info("entities created: {}", reg.alive());
-        system::systems_run();
+        pre_run();
         game_state = game_state_t::AWAITING_INPUT;
     } break;
 
@@ -104,8 +107,23 @@ void game_state_system([[maybe_unused]] double elapsed_time) {
     } break;
 
     case game_state_t::SHOW_INVENTORY: {
-        gui::show_inventory();
-        game_state = game_state_t::AWAITING_INPUT;
+        using gui::item_menu_result_t;
+        auto [menu_res, ent] = gui::render_inventory();
+        auto &inv_ui = *term(gui::UI_INVENTORY_POPUP);
+
+        switch(menu_res) {
+        case item_menu_result_t::CANCEL: {
+            inv_ui.clear();
+            game_state = game_state_t::AWAITING_INPUT;
+        } break;
+        case item_menu_result_t::NO_RESPONSE: break;
+        case item_menu_result_t::SELECTED: {
+            inv_ui.clear();
+            reg.emplace<wants_to_use_t>(player, ent);
+            game_state = game_state_t::PLAYER_TURN;
+        } break;
+        }
+        // game_state = inventory_input();
     } break;
 
     case game_state_t::PLAYER_TURN: {
@@ -162,7 +180,7 @@ void phase_mouse_cursor(double elapsed_time) {
 
 void update(double elapsed_time) {
     engine::event_dispatcher.update();
-    game_state_system(elapsed_time);
+    game_state_update(elapsed_time);
     phase_mouse_cursor(elapsed_time);
 }
 
@@ -210,6 +228,14 @@ void set_mouse_position(const int x, const int y) {
 
 position_t get_mouse_position() {
     return {mouse_x, mouse_y};
+}
+
+position_t get_mouse_position_coord() {
+    auto [mx, my] = state::get_mouse_position();
+    auto [fw, fh] = term(gui::UI_MOUSE)->get_font_size();
+    mx /= fw;
+    my /= fh;
+    return {mx, my};
 }
 
 void reset_mouse_state() {

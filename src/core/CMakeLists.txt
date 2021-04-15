@@ -4,6 +4,7 @@ add_library(
     "engine.cpp"
     "factories.cpp"
     "gui/gui.cpp"
+    "gui/item_menu.cpp"
     "map.cpp"
     "spawner.cpp"
 )
