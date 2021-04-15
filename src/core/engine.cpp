@@ -107,6 +107,7 @@ void game_state_update([[maybe_unused]] double elapsed_time) {
     } break;
 
     case game_state_t::SHOW_INVENTORY: {
+        render();
         using gui::item_menu_result_t;
         auto [menu_res, ent] = gui::render_inventory();
         auto &inv_ui = *term(gui::UI_INVENTORY_POPUP);
