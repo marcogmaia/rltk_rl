@@ -30,7 +30,7 @@ void render_inventory(const inventory_t& inventory, const char* inv_name) {
     inv_ui.clear();
     const auto& gstate = reg.ctx<engine::game_state_t>();
     if(!(gstate == engine::game_state_t::SHOW_INVENTORY
-        || gstate == engine::game_state_t::SHOW_INVENTORY_DROP)) {
+         || gstate == engine::game_state_t::SHOW_INVENTORY_DROP)) {
         return;
     }
 
@@ -65,8 +65,6 @@ void render_inventory(const inventory_t& inventory, const char* inv_name) {
 
 std::tuple<item_menu_result_t, entity> render_inventory_use() {
     auto& inventory = reg.get<inventory_t>(player);
-    // TODO select item and use
-    // now use a item related to a letter
     // get_option
     entity ent_ret              = entt::null;
     item_menu_result_t menu_res = item_menu_result_t::NO_RESPONSE;
@@ -86,15 +84,13 @@ std::tuple<item_menu_result_t, entity> render_inventory_use() {
 }
 
 std::tuple<item_menu_result_t, entity> render_inventory_drop() {
-    auto& inventory = reg.get<inventory_t>(player);
-    // TODO select item and use
-    // now use a item related to a letter
-    // get_option
+    auto& inventory             = reg.get<inventory_t>(player);
     entity ent_ret              = entt::null;
     item_menu_result_t menu_res = item_menu_result_t::NO_RESPONSE;
+    // get_option
     auto opt                    = static_cast<size_t>(get_option());
 
-    render_inventory(inventory, "inventory-D");
+    render_inventory(inventory, "inventory-drop");
 
     if(opt < inventory.items.size()) {
         menu_res = item_menu_result_t::SELECTED;

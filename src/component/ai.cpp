@@ -2,20 +2,19 @@
 #include <ranges>
 #include <execution>
 #include <memory>
-#include "component/component.hpp"
-#include "core/map.hpp"
-#include "core/engine.hpp"
+
+#include "component/ai.hpp"
+#include "component/combat.hpp"
+#include "component/enemy.hpp"
+#include "component/viewshed.hpp"
+
 #include "system/player_action.hpp"
-
-
 #include "utils/path_finding.hpp"
 
-namespace radl {
+namespace radl::component {
 
 
 namespace {
-
-using engine::reg;
 
 [[maybe_unused]] bool surrounded(const position_t& pos) {
     auto& map = engine::get_map();
@@ -68,8 +67,7 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
                 e_pos.first, e_pos.second, target_pos.first, target_pos.second);
             if(distance_to_target <= atk_range) {
                 attack(e_ent, engine::player);
-            }
-            else if(map.rect.contains(next_step)) {
+            } else if(map.rect.contains(next_step)) {
                 move_wait_attack(e_ent, next_step);
             }
         }
@@ -80,7 +78,7 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
 void ai_enemy() {
     using engine::player;
     using engine::reg;
-    auto player_pos = reg.get<position_t>(player);
+    auto player_pos    = reg.get<position_t>(player);
     auto& enemies_near = *get_entities_near_player();
     // function to apply to each enemy
     auto aifunc = [&](auto e_ent) {

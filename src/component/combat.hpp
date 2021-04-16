@@ -1,9 +1,11 @@
 #pragma once
 #include <vector>
 
-#include <core/engine.hpp>
+// #include <core/engine.hpp>
 
 // #include <component/component.hpp>
+#include "component/common.hpp"
+#include "component/position.hpp"
 
 namespace radl::component {
 

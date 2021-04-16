@@ -109,7 +109,7 @@ void game_state_update([[maybe_unused]] double elapsed_time) {
         render();
         using gui::item_menu_result_t;
         auto [menu_res, ent] = gui::render_inventory_use();
-        auto &inv_ui = *term(gui::UI_INVENTORY_POPUP);
+        auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
 
         switch(menu_res) {
         case item_menu_result_t::CANCEL: {
@@ -125,11 +125,11 @@ void game_state_update([[maybe_unused]] double elapsed_time) {
         }
     } break;
 
-     case game_state_t::SHOW_INVENTORY_DROP: {
+    case game_state_t::SHOW_INVENTORY_DROP: {
         render();
         using gui::item_menu_result_t;
         auto [menu_res, ent] = gui::render_inventory_drop();
-        auto &inv_ui = *term(gui::UI_INVENTORY_POPUP);
+        auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
 
         switch(menu_res) {
         case item_menu_result_t::CANCEL: {

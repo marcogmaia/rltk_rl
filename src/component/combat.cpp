@@ -1,6 +1,5 @@
 
 #include "component/component.hpp"
-#include "core/engine.hpp"
 
 namespace radl::component {
 

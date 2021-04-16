@@ -156,15 +156,29 @@ void imgui_frame(rltk::layer_t* l, sf::RenderTexture& window) {
     static sf::Clock deltaClock;
     auto& main_window = *rltk::get_window();
     ImGui::SFML::Update(main_window, deltaClock.restart());
-    ImGui::Begin("Hello, world!");
-    auto pressed = ImGui::Button("Look at this pretty button");
+
+    ImGui::Begin("Add Items");
+    auto pressed = ImGui::Button("+ healing potion.");
     if(pressed) {
         reg.get<inventory_t>(player).add_item(items::potion_healing(true));
     }
     ImGui::End();
-    ImGui::EndFrame();
+
+    ImGui::Begin("test wind");
+    ImGui::End();
+
+    // ImGui::EndFrame();
     ImGui::SFML::Render(main_window);
 }
+
+void imgui_init() {
+    ImGui::SFML::Init(*rltk::get_window());
+    auto& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    engine::event_dispatcher.sink<sf::Event>().connect<imgui_process_event>();
+    gui->add_owner_layer(GOD_UI, 0, 0, 1024, 768, resize_main, imgui_frame);
+}
+
 #endif
 
 void init() {
@@ -204,17 +218,14 @@ void init() {
                    "16x16", resize_main, true);
     gui->add_layer(UI_TOOLTIPS, map_rect.x1, map_rect.y1, map_rect.x2,
                    map_rect.y2, "8x16", resize_main, true);
-
-#ifdef DEBUG
-    ImGui::SFML::Init(*rltk::get_window());
-    engine::event_dispatcher.sink<sf::Event>().connect<imgui_process_event>();
-    gui->add_owner_layer(GOD_UI, 0, 0, 1024, 768, resize_main, imgui_frame);
-#endif
-
     term(UI_MOUSE)->set_alpha(127);
     term(UI_TOOLTIPS)->set_alpha(0xDF);
 
     engine::console = term(UI_MAP);
+
+#ifdef DEBUG
+    imgui_init();
+#endif
 }
 
 void terminate() {
