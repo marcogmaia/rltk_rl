@@ -5,6 +5,10 @@
 
 namespace radl::system {
 
+/**
+ * @brief runs every system on the ECS
+ * 
+ */
 void systems_run();
 
 void systems_player();
