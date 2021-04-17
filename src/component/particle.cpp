@@ -5,7 +5,7 @@
 
 namespace radl::component {
 
-void create_particle(particle_type_t type, double duration_ms,
+void particle_create(particle_type_t type, double duration_ms,
                      const position_t& pos) {
     vchar_t particle_vch;
     switch(type) {

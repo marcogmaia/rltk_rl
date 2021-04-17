@@ -44,19 +44,17 @@ void system_melee_combat() {
         auto final_damage = atker_stats.power - target_stats.defense;
         final_damage      = std::max(final_damage, 0);
         new_damage(want_to_melee.target, final_damage);
-        create_particle(particle_type_t::ATTACK, 200.0,
+        particle_create(particle_type_t::ATTACK, 200.0,
                         reg.get<position_t>(want_to_melee.target));
 
-        log_entry_t log_entry;
         if(final_damage > 0) {
-            log_entry.log = fmt::format("{} hits {}, for {} hp", being.name,
-                                        target_being.name, final_damage);
+            color_t dmg_color = (ent == engine::player) ? RED : LIGHT_RED;
+            log_add_entry(reg, dmg_color, "{} hits {}, for {} hp.", being.name,
+                          target_being.name, final_damage);
         } else {
-            log_entry.log = fmt::format("{} is unable to hit {}", being.name,
-                                        target_being.name);
+            log_add_entry(reg, WHITE, "{} is unable to hit {}.", being.name,
+                          target_being.name);
         }
-        engine::get_game_log().entries.push_back(log_entry);
-
         reg.remove<wants_to_melee_t>(ent);
     }
 }
@@ -160,11 +158,8 @@ void quaff_potion(entity who, entity pot) {
     e_stats.hp = std::min(e_stats.max_hp, e_stats.hp);
     // log entry
     auto final_healing = e_stats.hp - prev_heal;
-    create_particle(particle_type_t::HEALING, 200.0, reg.get<position_t>(who));
-    log_entry_t log_entry;
-    log_entry.log = fmt::format("healed for {} hp.", final_healing);
-    log_entry.fg  = LIGHT_GREEN;
-    engine::get_game_log().entries.push_back(log_entry);
+    particle_create(particle_type_t::HEALING, 200.0, reg.get<position_t>(who));
+    log_add_entry(reg, LIGHT_GREEN, "healed for {} hp.", final_healing);
 }
 
 void system_item_use() {
