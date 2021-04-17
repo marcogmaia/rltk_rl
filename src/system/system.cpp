@@ -34,6 +34,14 @@ void system_ai() {
     }
 }
 
+void apply_melee_particle_at_position(const position_t& pos) {
+    auto ent = reg.create();
+    reg.emplace<particle_t>(ent, 150.0);
+    reg.emplace<position_t>(ent, pos);
+    vchar_t vch = {glyph::ATTACK, RED, BLACK};
+    reg.emplace<renderable_t>(ent, renderable_t{vch, z_level_t::MAX});
+}
+
 void system_melee_combat() {
     auto ents_melee = reg.view<combat_stats_t, name_t, wants_to_melee_t>(
         entt::exclude<dead_t>);
@@ -44,6 +52,8 @@ void system_melee_combat() {
         auto final_damage = atker_stats.power - target_stats.defense;
         final_damage      = std::max(final_damage, 0);
         new_damage(want_to_melee.target, final_damage);
+        apply_melee_particle_at_position(
+            reg.get<position_t>(want_to_melee.target));
 
         log_entry_t log_entry;
         if(final_damage > 0) {
@@ -218,6 +228,19 @@ void system_item_drop() {
         // put on the map and give a position component
         engine::get_map().at(epos).insert_entity(edrop.what);
         reg.emplace<position_t>(edrop.what, epos);
+    }
+}
+
+// I can use an event dispatcher and connect this function to its sink
+void system_particle(double elapsed_time) {
+    const auto& v_particles = reg.view<particle_t>();
+    for(auto [ent, e_particle] : v_particles.each()) {
+        e_particle.lifetime_ms -= elapsed_time;
+        if(e_particle.lifetime_ms <= 0) {
+            // destroy the entity, since the entity purpose is only to
+            // display the particle effect
+            reg.destroy(ent);
+        }
     }
 }
 

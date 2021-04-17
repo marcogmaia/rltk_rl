@@ -7,13 +7,15 @@ namespace radl::system {
 
 /**
  * @brief runs every system on the ECS
- * 
+ *
  */
 void systems_run();
+
+void system_particle(double elapsed_time);
 
 void systems_player();
 
 // XXX debugando
-void player_system(const sf::Event &ev) ;
+void player_system(const sf::Event& ev);
 
 }  // namespace radl::system

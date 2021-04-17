@@ -63,12 +63,10 @@ void camera_update(entt::entity ent) {
         vchar_t tile_vch = tile.get_vchar();
         if(tile.type == tile_type_t::wall) {
             tile_vch.foreground = color_t(0, 31, 36);
-        }
-        else if(tile.type == tile_type_t::floor) {
+        } else if(tile.type == tile_type_t::floor) {
             if(tile.status == tile_status_t::BLOODIED) {
                 tile_vch.foreground = DARKER_RED;
-            }
-            else {
+            } else {
                 tile_vch.foreground = color_t(36, 18, 4);
             }
             term(gui::UI_ENTITIES)
@@ -106,6 +104,13 @@ void camera_update(entt::entity ent) {
     for(auto& rend_pair : renderable_entities) {
         auto& [rend, rpos] = rend_pair;
         term(gui::UI_ENTITIES)->set_char(rpos.first, rpos.second, rend.vchar);
+    }
+
+    auto v_particles = reg.view<position_t, renderable_t, particle_t>();
+    term(gui::UI_PARTICLES)->clear();
+    for(auto [ent, pos, rend, particle] : v_particles.each()) {
+        auto [rx, ry] = render_pos(pos.first, pos.second);
+        term(gui::UI_PARTICLES)->set_char(rx, ry, rend.vchar);
     }
 
     // render player

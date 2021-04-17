@@ -10,6 +10,7 @@ using entt::registry;
 #include "component/enemy.hpp"
 #include "component/inventory.hpp"
 #include "component/movable.hpp"
+#include "component/particle.hpp"
 #include "component/player.hpp"
 #include "component/position.hpp"
 #include "component/renderable.hpp"
