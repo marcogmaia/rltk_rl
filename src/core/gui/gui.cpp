@@ -149,6 +149,12 @@ void resize_inventory(rltk::layer_t* l, int w, int h) {
 #ifdef DEBUG
 
 void imgui_process_event(const sf::Event& event) {
+    if(event.type == sf::Event::EventType::KeyPressed
+       || event.type == sf::Event::EventType::KeyReleased) {
+        if(event.key.code < 0) {
+            return;
+        }
+    }
     ImGui::SFML::ProcessEvent(event);
 }
 
@@ -202,24 +208,24 @@ void init() {
     };
 
     gui->add_layer(UI_MAP, map_rect.x1, map_rect.y1, map_rect.x2, map_rect.y2,
-                   "16x16", resize_main, true);
+                   "16x16cheepicus", resize_main, true);
     gui->add_layer(UI_ENTITIES, map_rect.x1, map_rect.y1, map_rect.x2,
-                   map_rect.y2, "16x16", resize_main, false);
-    gui->add_layer(UI_PARTICLES, map_rect.x1, map_rect.y1, map_rect.x2,
-                   map_rect.y2, "16x16", resize_main, false);
+                   map_rect.y2, "16x16cheepicus", resize_main, false);
+    gui->add_sparse_layer(UI_PARTICLES, map_rect.x1, map_rect.y1, map_rect.x2,
+                          map_rect.y2, "16x16cheepicus", resize_main, true);
 
     gui->add_layer(UI_STATUS, status_rect.x1, status_rect.y1, status_rect.x2,
-                   status_rect.y2, "8x16", resize_status, true);
+                   status_rect.y2, "12x12cheepicus", resize_status, true);
     gui->add_layer(UI_INVENTORY, invent_rect.x1, invent_rect.y1, invent_rect.x2,
-                   invent_rect.y2, "8x16", resize_inventory, false);
+                   invent_rect.y2, "12x12cheepicus", resize_inventory, false);
     gui->add_layer(UI_INVENTORY_POPUP, invent_rect.x1, invent_rect.y1,
-                   invent_rect.x2, invent_rect.y2, "8x16",
+                   invent_rect.x2, invent_rect.y2, "12x12cheepicus",
                    resize_inventory_popup, false);
 
     gui->add_layer(UI_MOUSE, map_rect.x1, map_rect.y1, map_rect.x2, map_rect.y2,
-                   "16x16", resize_main, true);
+                   "16x16cheepicus", resize_main, true);
     gui->add_layer(UI_TOOLTIPS, map_rect.x1, map_rect.y1, map_rect.x2,
-                   map_rect.y2, "8x16", resize_main, true);
+                   map_rect.y2, "16x16cheepicus", resize_main, true);
     term(UI_MOUSE)->set_alpha(127);
     term(UI_TOOLTIPS)->set_alpha(0xDF);
 

@@ -1,5 +1,6 @@
 set(COMPONENT_SCRS
     "ai.cpp"
+    "particle.cpp"
     "combat.cpp"
     "movable.cpp"
     "viewshed.cpp"

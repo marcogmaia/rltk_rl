@@ -25,7 +25,7 @@ struct suffer_damage_t {
 };
 
 struct dead_t {
-    int decompose_turns = 20;
+    int decompose_turns = 200;
 };
 
 inline void new_damage(entt::entity ent_target, int damage) {

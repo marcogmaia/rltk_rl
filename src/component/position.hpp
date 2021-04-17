@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <utility>
+#include <functional>
 
 namespace radl::component {
 

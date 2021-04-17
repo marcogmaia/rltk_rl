@@ -8,19 +8,16 @@
 #include "core/map.hpp"
 #include "core/gui/gui.hpp"
 #include "system/camera.hpp"
-#include "component/component.hpp"
 
 
 namespace radl {
 
 
 void camera_update(entt::entity ent) {
-    using engine::reg;
-    // using rltk::console;
     using engine::console;
+    using engine::reg;
     auto& map = engine::get_map();
 
-    // console->clear();
     term(gui::UI_MAP)->clear();
     term(gui::UI_ENTITIES)->clear();
 
@@ -106,11 +103,20 @@ void camera_update(entt::entity ent) {
         term(gui::UI_ENTITIES)->set_char(rpos.first, rpos.second, rend.vchar);
     }
 
+    // render particles
     auto v_particles = reg.view<position_t, renderable_t, particle_t>();
-    term(gui::UI_PARTICLES)->clear();
+    rltk::sterm(gui::UI_PARTICLES)->clear();
     for(auto [ent, pos, rend, particle] : v_particles.each()) {
         auto [rx, ry] = render_pos(pos.first, pos.second);
-        term(gui::UI_PARTICLES)->set_char(rx, ry, rend.vchar);
+        // rltk::sterm(gui::UI_PARTICLES)->set_char(rx, ry, rend.vchar);
+        auto& vch       = rend.vchar;
+        rltk::xchar xch = {
+            vch.glyph,
+            vch.foreground,
+            static_cast<float>(rx),
+            static_cast<float>(ry),
+        };
+        rltk::sterm(gui::UI_PARTICLES)->add(xch);
     }
 
     // render player

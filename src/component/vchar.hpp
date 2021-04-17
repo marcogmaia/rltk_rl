@@ -2,7 +2,7 @@
 #include <cinttypes>
 
 #include "rltk/rltk.hpp"
-#include "component/color_t.hpp"
+#include "component/colors.hpp"
 
 
 namespace radl::component {
@@ -11,6 +11,7 @@ using vchar_t = rltk::vchar;
 namespace glyph {
 
 // particles
+constexpr uint32_t HEALING = 3;
 constexpr uint32_t ATTACK = 19;
 
 // items
