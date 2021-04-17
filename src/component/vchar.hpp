@@ -7,7 +7,12 @@
 
 namespace radl::component {
 
+using vchar_t = rltk::vchar;
 namespace glyph {
+
+// particles
+constexpr uint32_t ATTACK = 19;
+
 // items
 constexpr uint32_t POTION = 173;
 
@@ -23,7 +28,5 @@ constexpr uint32_t SOLID1 = 219;
 constexpr uint32_t CDOT = 250;
 
 }  // namespace glyph
-
-using vchar_t = rltk::vchar;
 
 }  // namespace radl::component

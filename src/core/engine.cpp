@@ -91,6 +91,12 @@ void pre_run() {
     system::systems_run();
 }
 
+void restart_game_state() {
+    reg.unset<Map>();
+    reg.unset<component::game_log_t>();
+    reg.clear();
+}
+
 void game_state_update([[maybe_unused]] double elapsed_time) {
     auto& game_state = reg.ctx<game_state_t>();
 
@@ -162,7 +168,7 @@ void game_state_update([[maybe_unused]] double elapsed_time) {
     } break;
 
     case game_state_t::DEFEAT: {
-        terminate();
+        restart_game_state();
         game_state = game_state_t::PRE_RUN;
     } break;
 
@@ -201,6 +207,7 @@ void update(double elapsed_time) {
     engine::event_dispatcher.update();
     game_state_update(elapsed_time);
     phase_mouse_cursor(elapsed_time);
+    system::system_particle(elapsed_time);
 }
 
 void render() {
@@ -211,9 +218,7 @@ void render() {
 }
 
 void terminate() {
-    reg.unset<Map>();
-    reg.unset<component::game_log_t>();
-    reg.clear();
+    restart_game_state();
     gui::terminate();
 }
 
