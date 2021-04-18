@@ -136,7 +136,17 @@
         "cfloat": "cpp",
         "*.tcc": "cpp",
         "*.inc": "cpp",
-        "*.def": "cpp"
+        "*.def": "cpp",
+        "gsl": "cpp",
+        "gsl_util": "cpp",
+        "span_ext": "cpp",
+        "gsl_algorithm": "cpp",
+        "gsl_assert": "cpp",
+        "gsl_byte": "cpp",
+        "multi_span": "cpp",
+        "pointers": "cpp",
+        "span": "cpp",
+        "string_span": "cpp"
     },
     "cSpell.enableFiletypes": [
         "!c",

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 namespace radl {
 
 template <typename F_Iter, typename F>

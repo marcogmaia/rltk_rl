@@ -100,7 +100,7 @@ struct Map {
         return tiles[x + y * rect.width()];
     }
 
-    [[nodiscard]] inline const tile_t at(int x, int y) const {
+    [[nodiscard]] inline tile_t at(int x, int y) const {
         return tiles[x + y * rect.width()];
     }
 

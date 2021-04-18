@@ -16,6 +16,8 @@
 #include "utils/rng.hpp"
 
 
+#include "gsl/gsl_util"
+
 namespace radl::engine {
 
 using namespace rltk::colors;
@@ -238,11 +240,11 @@ int mouse_y = 0;
 
 
 void set_mouse_button_state(const int button, const bool state) {
-    mouse_button_pressed[button] = state;
+    gsl::at(mouse_button_pressed, button) = state;
 }
 
 bool get_mouse_button_state(const int button) {
-    return mouse_button_pressed[button];
+    return gsl::at(mouse_button_pressed, button);
 }
 
 double scale_factor = 1.0;

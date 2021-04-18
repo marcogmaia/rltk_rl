@@ -59,7 +59,7 @@ struct inventory_t {
         return found;
     }
 
-    inline item_t& get_item(entity ent) {
+    inline static item_t& get_item(entity ent) {
         return reg.get<item_t>(ent);
     }
 
@@ -77,9 +77,9 @@ struct inventory_t {
      *
      * @return std::vector<entity>
      */
-    std::vector<entity> get_items() const;
+    [[nodiscard]] std::vector<entity> get_items() const;
 
-    std::vector<std::string> get_unique_item_names() const;
+    [[nodiscard]] std::vector<std::string> get_unique_item_names() const;
 };
 
 

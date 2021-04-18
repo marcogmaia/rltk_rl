@@ -58,14 +58,14 @@ void set_window_focus_state(const bool& s);
 void reset_mouse_state();
 
 /* Update the stored mouse position. Does not actually move the mouse. */
-void set_mouse_position(const int x, const int y);
+void set_mouse_position(int x, int y);
 
 position_t get_mouse_position();
 position_t get_mouse_position_coord();
 
-    /* Mouse button state */
-    void set_mouse_button_state(const int button, const bool state);
-bool get_mouse_button_state(const int button);
+/* Mouse button state */
+void set_mouse_button_state(int button, bool state);
+bool get_mouse_button_state(int button);
 
 /* Keyboard queue */
 // void enqueue_key_pressed(sf::Event& event);

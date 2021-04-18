@@ -143,7 +143,7 @@ void system_damage() {
                               std::back_inserter(tile.entities_here));
 
             reg.remove<suffer_damage_t>(ent);
-            auto name  = &reg.get<name_t>(ent);
+            auto *name  = &reg.get<name_t>(ent);
             name->name = name->dead_name;
             reg.remove<combat_stats_t>(ent);
         }

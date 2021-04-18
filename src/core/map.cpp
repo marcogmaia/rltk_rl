@@ -101,8 +101,7 @@ void make_corridors_between_rooms(Map& map) {
                        if(chance == 0) {
                            corridor_horizontal(map, px, nx, py);
                            corridor_vertical(map, py, ny, nx);
-                       }
-                       else {
+                       } else {
                            corridor_horizontal(map, px, nx, ny);
                            corridor_vertical(map, py, ny, px);
                        }
@@ -187,4 +186,4 @@ void tile_t::insert_entity(entity ent) {
     entities_here.push_back(ent);
 }
 
-}  // namespace radl::component
+}  // namespace radl

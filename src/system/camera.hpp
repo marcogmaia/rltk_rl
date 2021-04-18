@@ -27,8 +27,6 @@ extern std::unique_ptr<std::vector<entt::entity>> active_entities_near_player;
 
 template <typename... Ts>
 void render_components(int px, int py, int offx, int offy, Ts... comps) {
-    using engine::player;
-    using engine::reg;
     auto view = reg.view<comps...>();
     for(auto ent : view) {
         auto& pos  = reg.get<position_t>(ent);

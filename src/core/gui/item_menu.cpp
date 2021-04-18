@@ -50,7 +50,7 @@ void render_inventory(const inventory_t& inventory, const char* inv_name) {
     // print unique items and their number
     std::vector<std::string> vec_keys;
     int i = 0;
-    for(auto& [item_id, item_bucket] : inventory.items) {
+    for(const auto& [item_id, item_bucket] : inventory.items) {
         auto first_item = item_bucket.back();
         auto item_name  = reg.get<name_t>(first_item).name;
         auto item_str = fmt::format("{:c}) {}x-{}", 'a' + i, item_bucket.size(),

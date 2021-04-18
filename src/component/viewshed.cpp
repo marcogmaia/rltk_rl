@@ -12,7 +12,7 @@
 namespace radl::component {
 
 namespace {
-[[maybe_unused]] void timeit(std::function<void(void)> func) {
+[[maybe_unused]] void timeit(const std::function<void(void)>& func) {
     sf::Clock clk;
     clk.restart();
     func();

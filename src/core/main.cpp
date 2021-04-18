@@ -46,7 +46,7 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
                 main_window.setSize(
                     sf::Vector2u(event.size.width, event.size.height));
                 main_window.setView(sf::View(sf::FloatRect(
-                    0.f, 0.f, static_cast<float>(event.size.width),
+                    0.F, 0.F, static_cast<float>(event.size.width),
                     static_cast<float>(event.size.height))));
                 rltk::gui->on_resize(event.size.width, event.size.height);
                 engine::event_queue.push_back(event);

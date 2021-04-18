@@ -86,7 +86,7 @@ using engine::reg;
 using namespace engine;
 using namespace rltk::colors;
 
-[[maybe_unused]] static position_t render_pos(int rx, int ry) {
+[[maybe_unused]] position_t render_pos(int rx, int ry) {
     using engine::reg;
     using rltk::console;
     auto [px, py] = reg.get<position_t>(engine::player);

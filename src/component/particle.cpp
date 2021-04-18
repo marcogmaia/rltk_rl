@@ -12,11 +12,11 @@ void particle_create(particle_type_t type, double duration_ms,
     case particle_type_t::ATTACK: {
         particle_vch.glyph      = glyph::ATTACK;
         particle_vch.foreground = RED;
-        // particle_vch.foreground = colors::
     } break;
     case particle_type_t::HEALING: {
-        particle_vch.glyph      = glyph::HEALING;
-        particle_vch.foreground = GREEN;
+        particle_vch.glyph        = glyph::HEALING;
+        particle_vch.foreground   = GREEN;
+        particle_vch.foreground.a = 0xCF;
     } break;
     }
     auto ent = reg.create();

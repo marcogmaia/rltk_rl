@@ -88,7 +88,7 @@ void camera_update(entt::entity ent) {
                 const auto& e_rend = reg.get<renderable_t>(ent);
                 const auto& e_pos  = reg.get<position_t>(ent);
                 const auto r_pos   = render_pos(e_pos.first, e_pos.second);
-                renderable_entities.push_back(std::make_pair(e_rend, r_pos));
+                renderable_entities.emplace_back(std::make_pair(e_rend, r_pos));
             }
         });
 
