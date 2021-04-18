@@ -227,7 +227,7 @@ void init() {
                    "16x16", resize_main, true);
     // tooltips
     gui->add_layer(UI_TOOLTIPS, map_rect.x1, map_rect.y1, map_rect.x2,
-                   map_rect.y2, "16x16", resize_main, true);
+                   map_rect.y2, "8x16", resize_main, true);
     term(UI_MOUSE)->set_alpha(127);
     term(UI_TOOLTIPS)->set_alpha(0xDF);
 

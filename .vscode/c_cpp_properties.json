@@ -3,10 +3,10 @@
         {
             "name": "roguelike",
             "includePath": [
-                "${workspaceFolder}/src",
                 "${workspaceFolder}/lib/rltk",
                 "${workspaceFolder}/lib/imgui-sfml",
-                "${workspaceFolder}/lib/imgui"
+                "${workspaceFolder}/lib/imgui",
+                "${workspaceFolder}/src"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
@@ -14,16 +14,15 @@
                     "/usr/include/c++/**",
                     "/usr/include/linux/**",
                     "${workspaceFolder}/lib/rltk/**",
-                    "${workspaceFolder}/src/**"
+                    "${workspaceFolder}/src/**",
+                    "${workspaceFolder}/src"
                 ]
             },
             "defines": [
                 "SPDLOG_FMT_EXTERNAL"
             ],
-            "compilerPath": "/usr/bin/g++",
             "cStandard": "c17",
             "cppStandard": "c++20",
-            "intelliSenseMode": "linux-gcc-x64",
             "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],

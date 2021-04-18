@@ -12,7 +12,7 @@
 
 
 namespace radl {
-    using namespace component;
+using namespace component;
 
 using namespace rltk::colors;
 using entt::entity;
@@ -56,14 +56,9 @@ struct tile_t {
         };
 
         switch(type) {
-        case tile_type_t::wall:
-            vch.glyph = glyph::SOLID1;
-            break;
-        case tile_type_t::floor:
-            vch.glyph = glyph::BLOCK1;
-            break;
-        default:
-            break;
+        case tile_type_t::wall: vch.glyph = glyph::SOLID1; break;
+        case tile_type_t::floor: vch.glyph = glyph::BLOCK1; break;
+        default: break;
         }
         return vch;
     }
@@ -105,9 +100,12 @@ struct Map {
     }
 
     void init(const rect_t& rect);
+
+    std::vector<std::pair<position_t, int>> get_available_exits(const position_t& pos);
 };
 
 void create_random_rooms(Map& map);
+
 void make_corridors_between_rooms(Map& map);
 
 bool is_occupied(position_t target_pos);
@@ -127,8 +125,7 @@ template <typename C1, typename C2>
 void move_append(C1& src, C2& dst) {
     if(dst.empty()) {
         dst = std::move(src);
-    }
-    else {
+    } else {
         dst.reserve(dst.size() + src.size());
         std::move(std::begin(src), std::end(src), std::back_inserter(dst));
         src.clear();
@@ -138,4 +135,4 @@ void move_append(C1& src, C2& dst) {
 //                      const position_t& dst_pos);
 
 
-}  // namespace radl::component
+}  // namespace radl

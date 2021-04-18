@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15.0)
 project(maiaRL VERSION 0.1.0)
 
 set(BUILD_SHARED_LIBS ON)
-# set(CMAKE_EXPORT_COMPILE_COMMANDS OFF)
+# set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(spdlog REQUIRED)
 
 set(MYW_DISABLES "-Wextra -Wno-attributes -Wno-unused-parameter  -Wno-ignored-qualifiers")

@@ -9,6 +9,7 @@
 #include "core/gui/gui.hpp"
 #include "system/camera.hpp"
 
+#include "core/map/dijkstra_map.hpp"
 
 namespace radl {
 

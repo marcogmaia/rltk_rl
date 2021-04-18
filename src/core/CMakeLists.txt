@@ -6,6 +6,7 @@ add_library(
     "gui/gui.cpp"
     "gui/item_menu.cpp"
     "map.cpp"
+    "map/dijkstra_map.cpp"
     "spawner.cpp"
 )
 
