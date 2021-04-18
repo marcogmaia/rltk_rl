@@ -1,14 +1,12 @@
 
+#include <mutex>
+
+#include "component/combat.hpp"
 #include "component/movable.hpp"
 
 namespace radl::component {
-namespace {
 
-using engine::reg;
-
-}  // namespace
-
-void walk(const entt::entity& ent, const position_t& src_pos,
+void walk(registry& reg, const entt::entity& ent, const position_t& src_pos,
           const position_t& target_pos) {
     static std::mutex walk_mutex;
     std::lock_guard lock(walk_mutex);

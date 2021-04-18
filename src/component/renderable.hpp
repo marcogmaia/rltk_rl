@@ -1,9 +1,10 @@
 #pragma once
 #include <string>
+#include "entt/entity/fwd.hpp"
 #include "rltk/rltk.hpp"
 #include "vchar.hpp"
+#include "component/common.hpp"
 
-#include "core/engine.hpp"
 // To render anything we need to know the position, colors and console
 // the position we get directly from the position_t struct of the entity
 
@@ -27,6 +28,6 @@ struct name_t {
     std::string dead_name;
 };
 
-const std::string& get_name(entt::entity ent);
+const std::string& get_name(registry& reg, entt::entity ent);
 
 }  // namespace radl::component

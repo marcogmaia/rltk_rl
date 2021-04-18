@@ -1,8 +1,10 @@
+
 #include "component/particle.hpp"
 #include "component/vchar.hpp"
 #include "component/renderable.hpp"
 #include "component/colors.hpp"
 
+#include "core/game_state.hpp"
 namespace radl::component {
 
 void particle_create(particle_type_t type, double duration_ms,
@@ -19,6 +21,7 @@ void particle_create(particle_type_t type, double duration_ms,
         particle_vch.foreground.a = 0xCF;
     } break;
     }
+    // FIXME this must be implemented inside systems
     auto ent = reg.create();
     reg.emplace<position_t>(ent, pos);
     reg.emplace<renderable_t>(ent, renderable_t{particle_vch});

@@ -42,7 +42,7 @@ add_subdirectory("./src/component")
 
 add_executable(
     ${PROJECT_NAME}
-    "src/core/main.cpp"
+    "src/main.cpp"
 )
 
 # add_library(imgui "lib/imgui/imgui.cpp")

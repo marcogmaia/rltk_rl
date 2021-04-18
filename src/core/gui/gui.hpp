@@ -13,20 +13,6 @@ using rltk::term;
 namespace radl::gui {
 
 
-enum ui_order_t {
-UI_MAP,
-UI_ENTITIES,
-UI_PARTICLES,
-UI_STATUS,
-UI_INVENTORY,
-UI_INVENTORY_POPUP,
-UI_LOG,
-UI_PLAYER_HEALTH,
-UI_MOUSE,
-UI_TOOLTIPS,
-GOD_UI,
-};
-
 void init();
 void terminate();
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "component/position.hpp"
-#include "core/engine.hpp"
 
 namespace radl::component {
 

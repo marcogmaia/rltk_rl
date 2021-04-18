@@ -11,6 +11,8 @@
 #include "system/player_action.hpp"
 #include "utils/path_finding.hpp"
 
+#include "core/game_state.hpp"
+
 namespace radl::component {
 
 
@@ -46,7 +48,7 @@ namespace {
 
 
 void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
-    using engine::reg;
+    // FIXME this must be a system
     viewshed_t& e_vshed = reg.get<viewshed_t>(e_ent);
     auto& vis_coords    = e_vshed.visible_coordinates;
 
@@ -66,7 +68,7 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
             auto distance_to_target    = distance2d_squared(
                 e_pos.first, e_pos.second, target_pos.first, target_pos.second);
             if(distance_to_target <= atk_range) {
-                attack(e_ent, engine::player);
+                attack(e_ent, player);
             } else if(map.rect.contains(next_step)) {
                 move_wait_attack(e_ent, next_step);
             }
@@ -76,8 +78,6 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
 
 // uses being, position, and viewshed
 void ai_enemy() {
-    using engine::player;
-    using engine::reg;
     auto player_pos    = reg.get<position_t>(player);
     auto& enemies_near = *get_entities_near_player();
     // function to apply to each enemy
@@ -98,7 +98,7 @@ void ai_enemy() {
         }
         // can't see the player
         else {
-            random_walk(e_ent, e_pos);
+            random_walk(reg, e_ent, e_pos);
         }
     };
     std::for_each(std::execution::par_unseq, enemies_near.begin(),

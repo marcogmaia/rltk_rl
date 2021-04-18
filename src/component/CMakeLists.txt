@@ -1,11 +1,11 @@
 set(COMPONENT_SCRS
     "ai.cpp"
-    "particle.cpp"
     "combat.cpp"
-    "movable.cpp"
-    "viewshed.cpp"
     "inventory.cpp"
+    "movable.cpp"
+    "particle.cpp"
     "renderable.cpp"
+    "viewshed.cpp"
 )
 
 add_library(

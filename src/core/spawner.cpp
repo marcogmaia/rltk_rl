@@ -1,6 +1,6 @@
 #include "component/component.hpp"
 #include "core/spawner.hpp"
-#include "core/factories.hpp"
+#include "system/factories.hpp"
 
 namespace radl {
 
@@ -20,7 +20,7 @@ void add_enemy(const position_t& pos) {
             = rng::rng.range(1, 10) == 1;  // 1 chance in 10
         if(chance_to_have_item) {
             auto& e_inventory = reg.get<inventory_t>(e_ent);
-            e_inventory.add_item(items::potion_healing(true));
+            e_inventory.add_item(factory::items::potion_healing(true));
         }
     }
 }

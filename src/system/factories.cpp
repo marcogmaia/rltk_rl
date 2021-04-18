@@ -1,11 +1,6 @@
 #include <fmt/format.h>
-
-#include "core/factories.hpp"
-#include "system/camera.hpp"
-
-#include "component/component.hpp"
 #include "core/engine.hpp"
-
+#include "system/factories.hpp"
 
 namespace radl {
 
@@ -77,6 +72,28 @@ entity item_factory(const char* item_name, item_t item, vchar_t vch) {
     return ent;
 }
 
+
+namespace items {
+
+entity potion_healing(bool in_pack) {
+    auto item = item_t {
+                .type            = item_type_t::POTION,
+                .id = item_id_t::POTION_HEALING,
+                .characteristics = item_characteristics_t{
+                    .drinkable = true,
+                    .castable  = false,
+                },
+                .in_pack = in_pack,
+            };
+    vchar_t item_vch(glyph::POTION, LIGHTER_RED, BLACK);
+    auto ent_item = factory::item_factory("Healing potion", item, item_vch);
+    reg.emplace<drinkable_effects_t>(ent_item, drinkable_effects_t{
+                                                   .healing = 10,
+                                               });
+    return ent_item;
+}
+
+}  // namespace items
 
 }  // namespace factory
 

@@ -2,7 +2,7 @@
 add_library(
     game_core
     "engine.cpp"
-    "factories.cpp"
+    "game_state.cpp"
     "gui/gui.cpp"
     "gui/item_menu.cpp"
     "map.cpp"

@@ -5,8 +5,9 @@
 #include "spdlog/spdlog.h"
 #include "rltk/rltk.hpp"
 
-#include "core/map.hpp"
+#include "core/game_state.hpp"
 #include "core/gui/gui.hpp"
+#include "core/map.hpp"
 #include "system/camera.hpp"
 
 #include "core/map/dijkstra_map.hpp"
@@ -16,7 +17,6 @@ namespace radl {
 
 void camera_update(entt::entity ent) {
     using engine::console;
-    using engine::reg;
     auto& map = engine::get_map();
 
     term(gui::UI_MAP)->clear();

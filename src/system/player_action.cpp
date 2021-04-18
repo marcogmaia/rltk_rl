@@ -82,14 +82,11 @@ position_t get_delta_pos(const sf::Event& ev) {
 
 namespace {
 
-using engine::reg;
-using namespace engine;
 using namespace rltk::colors;
 
 [[maybe_unused]] position_t render_pos(int rx, int ry) {
-    using engine::reg;
     using rltk::console;
-    auto [px, py] = reg.get<position_t>(engine::player);
+    auto [px, py] = reg.get<position_t>(player);
     auto xci      = px - console->term_width / 2;
     auto yci      = py - console->term_height / 2;
     return position_t{rx - xci, ry - yci};
@@ -119,7 +116,8 @@ using namespace rltk::colors;
     // while(!ev_queue.empty()) {
     //     ev_queue.pop_front();
     // }
-    event_queue.clear();
+
+    engine::event_queue.clear();
 }
 
 void pick_item_at(entity ent, position_t pos) {
@@ -142,7 +140,7 @@ void perform_action(const sf::Event& ev) {
     switch(ev.key.code) {
     case sf::Keyboard::G: {
         // want to pickup
-        auto player_pos = reg.get<position_t>(engine::player);
+        auto player_pos = reg.get<position_t>(player);
         pick_item_at(player, player_pos);
     }
 
@@ -151,17 +149,17 @@ void perform_action(const sf::Event& ev) {
 }
 
 sf::Event get_event() {
-    auto ev = event_queue.back();
-    event_queue.pop_back();
+    auto ev = engine::event_queue.back();
+    engine::event_queue.pop_back();
     flush_events();
 
     return ev;
 }
 
-engine::game_state_t player_input() {
-    auto player_pos = reg.get<position_t>(engine::player);
+game_state_t player_input() {
+    auto player_pos = reg.get<position_t>(player);
 
-    if(event_queue.empty()) {
+    if(engine::event_queue.empty()) {
         return game_state_t::AWAITING_INPUT;
     }
 
@@ -177,16 +175,6 @@ engine::game_state_t player_input() {
             return game_state_t::SHOW_INVENTORY_DROP;
         } break;
         case sf::Keyboard::Q: {
-            // get first item in inventory if not empty
-            // auto& inv_items = reg.get<inventory_t>(engine::player).items;
-            // if(inv_items.empty()) {
-            //     break;
-            // }
-            // use item
-            // reg.emplace<wants_to_use_t>(engine::player,
-            //                             wants_to_use_t{
-            //                                 .what = inv_items.front(),
-            //                             });
         } break;
         default: break;
         }
@@ -204,11 +192,12 @@ engine::game_state_t player_input() {
     return game_state_t::PLAYER_TURN;
 }
 
-void random_walk(const entt::entity& ent, const position_t& src_pos) {
+void random_walk(registry& reg, const entt::entity& ent,
+                 const position_t& src_pos) {
     auto dx               = rng::rng.range(-1, 1);
     auto dy               = rng::rng.range(-1, 1);
     position_t target_pos = src_pos + position_t{dx, dy};
-    walk(ent, src_pos, target_pos);
+    walk(reg, ent, src_pos, target_pos);
 }
 
 bool move_wait_attack(entt::entity& ent, const position_t& dst_pos) {
@@ -227,7 +216,7 @@ bool move_wait_attack(entt::entity& ent, const position_t& dst_pos) {
     }
     // ## 2. walk if tile is no occupied and walkable
     if(target_tile_chars.walkable) {
-        walk(ent, src_pos, dst_pos);
+        walk(reg, ent, src_pos, dst_pos);
         return true;
     }
     // ## 3. do nothing if is wall

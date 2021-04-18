@@ -1,31 +1,10 @@
+#include "component/common.hpp"
 #include "component/inventory.hpp"
-#include "core/factories.hpp"
+#include "system/factories.hpp"
 #include "core/engine.hpp"
 #include "utils/colors.hpp"
 
 namespace radl::component {
-
-namespace items {
-
-entity potion_healing(bool in_pack) {
-    auto item = item_t {
-                .type            = item_type_t::POTION,
-                .id = item_id_t::POTION_HEALING,
-                .characteristics = item_characteristics_t{
-                    .drinkable = true,
-                    .castable  = false,
-                },
-                .in_pack = in_pack,
-            };
-    vchar_t item_vch(glyph::POTION, LIGHTER_RED, BLACK);
-    auto ent_item = factory::item_factory("Healing potion", item, item_vch);
-    reg.emplace<drinkable_effects_t>(ent_item, drinkable_effects_t{
-                                                   .healing = 10,
-                                               });
-    return ent_item;
-}
-
-}  // namespace items
 
 void add_to_inventory(entity ent, entity item) {
     auto& inventory     = reg.get<inventory_t>(ent);

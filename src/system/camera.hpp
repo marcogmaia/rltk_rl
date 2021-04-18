@@ -1,7 +1,7 @@
 #pragma once
 
 #include "component/component.hpp"
-#include "entt/entt.hpp"
+#include "entt/entity/registry.hpp"
 
 namespace radl {
 
@@ -14,8 +14,6 @@ void camera_update(entt::entity ent);
 
 
 namespace engine {
-extern entt::registry reg;
-extern entt::entity player;
 extern rltk::virtual_terminal* console;
 }  // namespace engine
 

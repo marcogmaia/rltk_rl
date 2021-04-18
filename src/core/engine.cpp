@@ -2,12 +2,12 @@
 
 #include "spdlog/spdlog.h"
 
-#include "component/component.hpp"
 
+#include "core/game_state.hpp"
 #include "core/engine.hpp"
 #include "core/gui/gui.hpp"
 #include "core/spawner.hpp"
-#include "core/factories.hpp"
+#include "system/factories.hpp"
 
 #include "system/camera.hpp"
 #include "system/player_action.hpp"
@@ -23,14 +23,13 @@ namespace radl::engine {
 using namespace rltk::colors;
 std::deque<sf::Event> event_queue;
 
-entt::registry reg;
-entt::entity player;
-
 rltk::virtual_terminal* console;
 
 entt::dispatcher event_dispatcher{};
 entt::sigh<sf::Event()> ev_signal{};
 entt::sink ev_sink{ev_signal};
+
+entt::delegate<void(double)> delegate_run_game;
 
 constexpr int width  = 1024 / 16;
 constexpr int height = 768 / 16;
@@ -56,6 +55,7 @@ void init() {
     spdlog::set_level(spdlog::level::debug);
 #endif
     spdlog::info("Initializing engine.");
+    delegate_run_game.connect<&update>();
     reg.set<game_state_t>(game_state_t::PRE_RUN);
     rltk_init();
     gui::init();

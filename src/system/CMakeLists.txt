@@ -2,11 +2,9 @@
 set(
     GAMESYS_SRC
     "camera.cpp"
+    "factories.cpp"
     "player_action.cpp"
     "system.cpp"
-    # "move_attack.cpp"
-    # "visibility.cpp"
-   
 )
     
 add_library(
@@ -22,5 +20,3 @@ pthread
 tbb
 fmt
 )
-
-set(CMAKE_BUILD_TYPE DEBUG)

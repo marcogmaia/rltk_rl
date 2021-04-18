@@ -4,20 +4,28 @@
 
 #include "SFML/Window.hpp"
 
-#include "entt/entity/registry.hpp"
+#include "entt/entity/fwd.hpp"
 
 #include "core/map.hpp"
 #include "component/log.hpp"
 
+#include "entt/entity/fwd.hpp"
+#include "entt/signal/fwd.hpp"
+
+namespace radl {
+
 using entt::entity;
 using entt::registry;
 
+}  // namespace radl
+
+
 namespace radl::engine {
 
-extern entt::registry reg;
-extern entt::entity player;
 extern std::deque<sf::Event> event_queue;
 extern entt::sigh<sf::Event()> ev_signal;
+
+extern entt::delegate<void(double)> delegate_run_game;
 
 extern rltk::virtual_terminal* console;
 
@@ -29,16 +37,6 @@ Map& get_map();
 game_log_t& get_game_log();
 position_t get_position_from_entity(entity ent);
 
-enum game_state_t {
-    PRE_RUN,
-    AWAITING_INPUT,
-    PLAYER_TURN,
-    SHOW_INVENTORY,
-    SHOW_INVENTORY_DROP,
-    ENEMY_TURN,
-    VICTORY,
-    DEFEAT,
-};
 
 void init();
 void update(double elapsed_time);
@@ -72,8 +70,3 @@ bool get_mouse_button_state(int button);
 
 
 }  // namespace radl::state
-
-
-using namespace radl::component;
-using radl::engine::player;
-using radl::engine::reg;

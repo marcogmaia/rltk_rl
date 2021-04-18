@@ -1,11 +1,11 @@
 #pragma once
 #include <list>
-#include "entt/entity/registry.hpp"
+
 #include "component/position.hpp"
+
 #include "core/engine.hpp"
 
 namespace radl::component {
-using entt::entity;
 
 enum class item_type_t {
     NONE,
@@ -86,10 +86,5 @@ struct inventory_t {
 void add_to_inventory(entity ent, entity item);
 
 
-namespace items {
-
-entity potion_healing(bool in_pack = false);
-
-}
 
 }  // namespace radl::component

@@ -2,18 +2,17 @@
 #include <chrono>
 #include <fmt/format.h>
 
+#include "spdlog/spdlog.h"
+
 #include "entt/entt.hpp"
 
 #include "rltk/rltk.hpp"
 #include "core/engine.hpp"
 
-#include "component/component.hpp"
-
 namespace {
 
 using namespace radl;
 using engine::console;
-// using engine::main_window;
 
 }  // namespace
 
@@ -94,14 +93,10 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
     }
 }
 
+
 int main() {
     engine::init();
-
-    entt::delegate<void(double)> delegate_run_game;
-    delegate_run_game.connect<&engine::update>();
-
-    run_game(delegate_run_game);
-
+    run_game(engine::delegate_run_game);
     engine::terminate();
 
     return 0;

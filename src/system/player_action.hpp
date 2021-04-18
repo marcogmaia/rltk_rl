@@ -1,10 +1,12 @@
 #pragma once
 
-#include "entt/entity/registry.hpp"
+// #include "entt/entity/registry.hpp"
+#include "entt/fwd.hpp"
 // #include "libtcod.hpp"
 #include "rltk/rltk.hpp"
 #include "component/position.hpp"
 #include "core/engine.hpp"
+#include "core/game_state.hpp"
 
 
 namespace radl {
@@ -13,7 +15,7 @@ namespace radl {
  * @return true
  * @return false
  */
-engine::game_state_t player_input();
+game_state_t player_input();
 
 /**
  * @brief move (to tile) or attack something on @a dst_pos
@@ -26,7 +28,8 @@ engine::game_state_t player_input();
 bool move_wait_attack(entt::entity& ent, const position_t& dst_pos);
 
 
-void random_walk(const entt::entity& ent, const position_t& src_pos);
+void random_walk(registry& reg, const entt::entity& ent,
+                 const position_t& src_pos);
 
 /**
  * @brief given an event, return the delta pos that would be occurred

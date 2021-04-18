@@ -4,7 +4,7 @@
 #include "entt/entt.hpp"
 #include "spdlog/spdlog.h"
 
-#include "core/engine.hpp"
+#include "core/game_state.hpp"
 #include "component/viewshed.hpp"
 #include "utils/path_finding.hpp"
 #include "system/visibility.hpp"
@@ -25,8 +25,7 @@ namespace {
  *
  */
 void fov_update() {
-    using engine::reg;
-
+    // FIXME this must be a system
     sf::Clock clk;
     clk.restart();
 
@@ -58,7 +57,7 @@ void fov_update() {
             if(map.rect.contains(reveal_pos)) {
                 auto& reveal_tile = map.at(reveal_pos);
                 new_vis.insert(reveal_pos);
-                if(ent == engine::player) {
+                if(ent == player) {
                     reveal_tile.props.explored = true;
                 }
             }
@@ -83,7 +82,7 @@ void fov_update() {
 
     std::for_each(std::execution::par_unseq, ents_to_calculate_fov.begin(),
                   ents_to_calculate_fov.end(), run_fov_sweep);
-    run_fov_sweep(engine::player);
+    run_fov_sweep(player);
 
     spdlog::info("\tupdated: {} fovs, dT: {}", count_fovs_updated,
                  clk.getElapsedTime().asMicroseconds());

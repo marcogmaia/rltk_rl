@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entt/entt.hpp"
+#include "entt/entity/fwd.hpp"
 #include "component/component.hpp"
 
 
@@ -15,6 +15,12 @@ entity enemy_factory(const position_t& pos, vchar_t vch, const name_t& name);
 
 entity item_factory(const char* item_name, item_t item, vchar_t vch);
 
-// }  // namespace factory
+
+namespace items {
+
+entity potion_healing(bool in_pack = false);
+
+}
+
 
 }  // namespace radl::factory

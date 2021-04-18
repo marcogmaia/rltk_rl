@@ -1,9 +1,7 @@
 #pragma once
 #include <vector>
 
-// #include <core/engine.hpp>
-
-// #include <component/component.hpp>
+#include "entt/entity/registry.hpp"
 #include "component/common.hpp"
 #include "component/position.hpp"
 
@@ -28,13 +26,10 @@ struct dead_t {
     int decompose_turns = 200;
 };
 
-inline void new_damage(entt::entity ent_target, int damage) {
-    using engine::reg;
-
+inline void new_damage(registry& reg, entt::entity ent_target, int damage) {
     if(auto* suffering = reg.try_get<suffer_damage_t>(ent_target)) {
         suffering->amount.push_back(damage);
-    }
-    else {
+    } else {
         reg.emplace<suffer_damage_t>(ent_target).amount.push_back(damage);
     }
 }

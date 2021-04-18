@@ -131,9 +131,8 @@ std::vector<entt::entity>* get_entities_near_player() {
 void query_alive_entities_near_player() {
     active_entities_near_player->clear();
     constexpr int max_size = 32;
-    using engine::reg;
     using rltk::console;
-    auto pos       = reg.get<position_t>(engine::player);
+    auto pos       = reg.get<position_t>(player);
     auto& [px, py] = pos;
     position_t p1  = {px - max_size, py - max_size};
     position_t p2  = {px + max_size, py + max_size};
@@ -144,7 +143,7 @@ void query_alive_entities_near_player() {
            entt::exclude<dead_t, player_t>)
         .each([&active_rect](entt::entity ent, viewshed_t& vshed,
                              const position_t& e_pos, renderable_t& rend) {
-            if(ent != engine::player && active_rect.contains(e_pos)) {
+            if(ent != player && active_rect.contains(e_pos)) {
                 active_entities_near_player->push_back(ent);
             }
         });
@@ -153,7 +152,6 @@ void query_alive_entities_near_player() {
 // XXX change this in the future, now we are only using entities that blocks the
 // path
 bool is_occupied(position_t target_pos) {
-    using engine::reg;
     auto& ents_here = engine::get_map().at(target_pos).entities_here;
     return std::ranges::any_of(ents_here, [&](auto& ent) {
         return reg.any_of<blocks_t>(ent);

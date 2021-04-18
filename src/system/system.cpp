@@ -5,13 +5,13 @@
 
 #include "component/component.hpp"
 #include "core/engine.hpp"
+#include "core/game_state.hpp"
 
 namespace radl::system {
 
 namespace {
 
-using engine::game_state_t;
-using engine::reg;
+
 
 }  // namespace
 
@@ -27,7 +27,7 @@ void system_active_universe() {
 void map_indexer() {}
 
 void system_ai() {
-    const auto& gstate = engine::reg.ctx<game_state_t>();
+    const auto& gstate = reg.ctx<game_state_t>();
     if(gstate == game_state_t::ENEMY_TURN) {
         ai_enemy();
     } else if(gstate == game_state_t::PLAYER_TURN) {
@@ -43,12 +43,12 @@ void system_melee_combat() {
             = reg.get<combat_stats_t, name_t>(want_to_melee.target);
         auto final_damage = atker_stats.power - target_stats.defense;
         final_damage      = std::max(final_damage, 0);
-        new_damage(want_to_melee.target, final_damage);
+        new_damage(reg, want_to_melee.target, final_damage);
         particle_create(particle_type_t::ATTACK, 200.0,
                         reg.get<position_t>(want_to_melee.target));
 
         if(final_damage > 0) {
-            color_t dmg_color = (ent == engine::player) ? RED : LIGHT_RED;
+            color_t dmg_color = (ent == player) ? RED : LIGHT_RED;
             log_add_entry(reg, dmg_color, "{} hits {}, for {} hp.", being.name,
                           target_being.name, final_damage);
         } else {
@@ -143,7 +143,7 @@ void system_damage() {
                               std::back_inserter(tile.entities_here));
 
             reg.remove<suffer_damage_t>(ent);
-            auto *name  = &reg.get<name_t>(ent);
+            auto* name = &reg.get<name_t>(ent);
             name->name = name->dead_name;
             reg.remove<combat_stats_t>(ent);
         }
@@ -247,7 +247,6 @@ void systems_run() {
 }
 
 void player_system(const sf::Event& ev) {
-    // using engine::event_dispatcher;
     auto dpos = get_delta_pos(ev);
     spdlog::debug("player dpos: ({}, {})", dpos.first, dpos.second);
 }

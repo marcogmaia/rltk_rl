@@ -5,7 +5,6 @@ namespace radl::component {
 
 namespace {
 
-using engine::reg;
 std::mutex attack_mutex;
 
 }  // namespace

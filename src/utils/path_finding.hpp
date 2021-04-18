@@ -58,10 +58,9 @@ struct navigator_t {
                 }
                 location_t offset{x, y};
                 auto w_pos = pos + offset;
-                using engine::reg;
                 const auto& map = engine::get_map();
 
-                auto& player_pos = engine::reg.get<position_t>(engine::player);
+                auto& player_pos = reg.get<position_t>(player);
 
                 if(w_pos == player_pos
                    || (map.rect.contains(w_pos)

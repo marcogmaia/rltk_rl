@@ -1,7 +1,7 @@
 #include "component/component.hpp"
 
 #include "core/engine.hpp"
-#include "core/gui/gui.hpp"
+#include "core/game_state.hpp"
 #include "core/gui/item_menu.hpp"
 
 #include "utils/utils.hpp"
@@ -26,11 +26,11 @@ int get_option() {
 }
 
 void render_inventory(const inventory_t& inventory, const char* inv_name) {
-    auto& inv_ui = *term(UI_INVENTORY_POPUP);
+    auto& inv_ui = *rltk::term(UI_INVENTORY_POPUP);
     inv_ui.clear();
-    const auto& gstate = reg.ctx<engine::game_state_t>();
-    if(!(gstate == engine::game_state_t::SHOW_INVENTORY
-         || gstate == engine::game_state_t::SHOW_INVENTORY_DROP)) {
+    const auto& gstate = reg.ctx<game_state_t>();
+    if(!(gstate == game_state_t::SHOW_INVENTORY
+         || gstate == game_state_t::SHOW_INVENTORY_DROP)) {
         return;
     }
 
@@ -88,7 +88,7 @@ std::tuple<item_menu_result_t, entity> render_inventory_drop() {
     entity ent_ret              = entt::null;
     item_menu_result_t menu_res = item_menu_result_t::NO_RESPONSE;
     // get_option
-    auto opt                    = static_cast<size_t>(get_option());
+    auto opt = static_cast<size_t>(get_option());
 
     render_inventory(inventory, "inventory-drop");
 

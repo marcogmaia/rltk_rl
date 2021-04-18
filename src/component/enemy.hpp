@@ -1,5 +1,7 @@
 #pragma once
+
 #include "component/position.hpp"
+
 namespace radl::component {
 
 struct enemy_t {

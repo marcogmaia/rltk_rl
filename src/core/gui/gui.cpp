@@ -5,12 +5,10 @@
 
 #include "core/gui/gui.hpp"
 #include "core/gui/item_menu.hpp"
-#include "core/engine.hpp"
+#include "core/game_state.hpp"
 
 #include "component/component.hpp"
-
-#include "utils/utils.hpp"
-
+#include "system/factories.hpp"
 
 #include "imgui.h"
 #include "imgui-SFML.h"
@@ -21,8 +19,6 @@ namespace radl::gui {
 namespace {
 
 using namespace rltk::colors;
-using engine::player;
-using engine::reg;
 using rltk::gui;
 
 
@@ -77,7 +73,7 @@ void draw_tooltips() {
 
     std::vector<std::string> visible_names;
     for(const auto& ent : map.at(mpos_relative_player).entities_here) {
-        auto *name = reg.try_get<name_t>(ent);
+        auto* name = reg.try_get<name_t>(ent);
         if(name != nullptr) {
             visible_names.push_back(name->name);
             spdlog::debug("range: {}", name->name);
@@ -166,7 +162,8 @@ void imgui_frame(rltk::layer_t* l, sf::RenderTexture& window) {
     ImGui::Begin("Add Items");
     auto pressed = ImGui::Button("+ healing potion.");
     if(pressed) {
-        reg.get<inventory_t>(player).add_item(items::potion_healing(true));
+        reg.get<inventory_t>(player).add_item(
+            factory::items::potion_healing(true));
     }
     ImGui::End();
 
