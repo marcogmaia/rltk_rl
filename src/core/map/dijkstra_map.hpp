@@ -13,7 +13,7 @@ namespace radl {
 struct DijkstraMap {
     size_t width;
     size_t height;
-    uint32_t max_depth;
+    uint32_t max_depth = 32;
 
     std::vector<double> cost_map;
 
@@ -21,6 +21,7 @@ struct DijkstraMap {
         this->width  = width;
         this->height = height;
         cost_map.resize(width * height);
+        std::ranges::fill(cost_map, max_depth);
     }
 
     void clear() {
@@ -30,6 +31,17 @@ struct DijkstraMap {
     size_t to_index(position_t pos) {
         auto [x, y] = pos;
         return x + y * width;
+    }
+
+    position_t from_index(size_t idx) {
+        auto x = idx % width;
+        auto y = idx / width;
+        return position_t{x, y};
+    }
+
+    double at(position_t pos) {
+        auto [x, y] = pos;
+        return cost_map[x + y * width];
     }
 
     /**
@@ -45,6 +57,7 @@ struct DijkstraMap {
      *
      */
     void build(std::vector<position_t> starts, Map& base_map) {
+        create_empty(base_map.rect.width(), base_map.rect.height());
         // node 2d position (x, y) and the cost to travel to that node
         std::deque<std::pair<position_t, double>> open_list;
         open_list.resize(cost_map.size());
@@ -67,6 +80,7 @@ struct DijkstraMap {
                     continue;
                 }
                 if(new_depth >= max_depth) {
+                    cost_map[new_idx] = max_depth;
                     continue;
                 }
                 cost_map[new_idx] = new_depth;

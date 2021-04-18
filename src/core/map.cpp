@@ -183,14 +183,14 @@ void Map::init(const rect_t& rect) {
 std::vector<std::pair<position_t, int>>
 Map::get_available_exits(const position_t& pos) {
     std::vector<std::pair<position_t, int>> vec;
-    vec.resize(8);
+    vec.reserve(8);
     for(int x = -1; x <= 1; ++x) {
         for(int y = -1; y <= 1; ++y) {
             if(x == 0 && y == 0) {
                 continue;
             }
             auto check_pos = (pos + position_t{x, y});
-            if(is_exit(check_pos)) {
+            if(rect.contains(check_pos) && is_exit(check_pos)) {
                 vec.push_back(std::make_pair(check_pos, 1));
             }
         }
