@@ -7,13 +7,10 @@
 #include "core/engine.hpp"
 #include "core/game_state.hpp"
 
+#include "core/map/dijkstra_map.hpp"
 namespace radl::system {
 
-namespace {
-
-
-
-}  // namespace
+namespace {}  // namespace
 
 void system_visibility() {
     // can be multithread
@@ -26,11 +23,48 @@ void system_active_universe() {
 
 void map_indexer() {}
 
+
+void ai_enemy_dijkstra_map(entity ent) {
+    auto& dm                 = reg.ctx<DijkstraMap>();
+    const auto& ent_pos      = reg.get<position_t>(ent);
+    // todo pick random minimum position
+    auto [found, target_pos] = dm.find_lowest_path(ent_pos);
+    auto player_pos          = reg.get<position_t>(player);
+
+    bool somebody_already_wants_to_walk_to = false;
+    // check if anybody already wants to walk to this tile
+    for(auto [e_other, other_walk] : reg.view<want_to_walk_t>().each()) {
+        if(other_walk.to == target_pos) {
+            // random walk
+            somebody_already_wants_to_walk_to = true;
+        }
+    }
+    // if player is next to ent: attack // distance to player is 1
+    if(distance_pythagoras(player_pos, ent_pos) < 1.5) {
+        // attack player
+        attack(ent, player);
+    }
+    // if not found a valid target position: random_walk
+    else if(!found) {
+        random_walk(reg, ent, ent_pos);
+        return;
+    } else if(!somebody_already_wants_to_walk_to) {
+        want_to_walk_t want_walk = {ent_pos, target_pos};
+        reg.emplace<want_to_walk_t>(ent, want_walk);
+    }
+}
+
 void system_ai() {
     const auto& gstate = reg.ctx<game_state_t>();
     if(gstate == game_state_t::ENEMY_TURN) {
-        ai_enemy();
+        for(auto ent_near : *get_entities_near_player()) {
+            if(!reg.all_of<enemy_t, position_t>(ent_near)) {
+                continue;
+            }
+            ai_enemy_dijkstra_map(ent_near);
+        }
     } else if(gstate == game_state_t::PLAYER_TURN) {
+        // player AI ?
     }
 }
 
@@ -96,13 +130,15 @@ void system_walk() {
         if(!can_walk_to) {
             return;
         }
+
         // if can walk
         auto& map = engine::get_map();
         map.at(want_walk.from).remove_entity(ent);
         map.at(want_walk.to).insert_entity(ent);
 
         reg.replace<position_t>(ent, want_walk.to);
-        vshed.dirty = true;
+        vshed.dirty                  = true;
+        reg.ctx<DijkstraMap>().dirty = true;
     };
 
     std::ranges::for_each(wanting_to_walk, fwalk);
@@ -232,6 +268,11 @@ void system_particle(double elapsed_time) {
     }
 }
 
+void system_map() {
+    auto& pos = reg.get<position_t>(player);
+    reg.ctx<DijkstraMap>().compute(std::vector<position_t>{pos});
+}
+
 // later we can group the components and run the groups in parallel
 void systems_run() {
     system_active_universe();
@@ -239,11 +280,12 @@ void systems_run() {
     system_ai();
     system_melee_combat();
     system_damage();
-    system_walk();
     system_item_collection();
     system_item_drop();
     system_item_use();
     system_destroy_deads();
+    system_walk();
+    system_map();
 }
 
 void player_system(const sf::Event& ev) {

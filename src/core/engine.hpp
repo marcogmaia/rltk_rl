@@ -59,10 +59,12 @@ void reset_mouse_state();
 void set_mouse_position(int x, int y);
 
 position_t get_mouse_position();
+
 position_t get_mouse_position_coord();
 
 /* Mouse button state */
 void set_mouse_button_state(int button, bool state);
+
 bool get_mouse_button_state(int button);
 
 /* Keyboard queue */

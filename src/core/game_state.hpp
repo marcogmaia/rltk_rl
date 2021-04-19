@@ -21,4 +21,6 @@ enum game_state_t {
     DEFEAT,
 };
 
+void game_state_init();
+
 }  // namespace radl

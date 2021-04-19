@@ -56,6 +56,7 @@ void init() {
 #endif
     spdlog::info("Initializing engine.");
     delegate_run_game.connect<&update>();
+
     reg.set<game_state_t>(game_state_t::PRE_RUN);
     rltk_init();
     gui::init();
@@ -79,7 +80,6 @@ component::game_log_t& get_game_log() {
 void pre_run() {
     // initialize everything
     reg.set<Map>();
-    reg.set<component::game_log_t>();
     auto& map = get_map();
     map.init(rect_t{0, 0, width * 4, height * 4});
     create_random_rooms(map);
@@ -89,6 +89,9 @@ void pre_run() {
     factory::player_factory(player, player_start_pos,
                             vchar_t{'@', YELLOW, BLACK});
     add_enemies();
+
+    game_state_init();
+
     spdlog::info("entities created: {}", reg.alive());
     system::systems_run();
 }
@@ -201,10 +204,14 @@ void phase_mouse_cursor(double elapsed_time) {
             alpha_cursor = 0;
         }
     }
-
     term(gui::UI_MOUSE)->set_alpha(static_cast<int>(alpha_cursor));
 }
 
+/**
+ * @brief update the game state and run the systems
+ *
+ * @param elapsed_time
+ */
 void update(double elapsed_time) {
     engine::event_dispatcher.update();
     game_state_update(elapsed_time);

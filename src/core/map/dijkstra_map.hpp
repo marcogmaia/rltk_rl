@@ -6,40 +6,55 @@
 
 #include "core/map.hpp"
 
+// objectives, need to think more about this problem (multiple objectives)
+
+// TODO make the DM a template to be useful for every case
+
 namespace radl {
 
-// A dijkstra map is kinda similar to a floodfill
+// A dijkstra map is as flow field
 // base_map_t must return a vector of available walkable tiles, and their costs
 struct DijkstraMap {
     size_t width;
     size_t height;
     uint32_t max_depth = 32;
+    bool dirty         = true;
 
     std::vector<double> cost_map;
 
-    void create_empty(size_t width, size_t height) {
-        this->width  = width;
-        this->height = height;
-        cost_map.resize(width * height);
+    const Map& base_map;
+
+    DijkstraMap(const Map& base_map);
+
+    ~DijkstraMap() = default;
+
+    inline void clear() {
         std::ranges::fill(cost_map, max_depth);
     }
 
-    void clear() {
-        cost_map.clear();
+    inline void create_empty(size_t width, size_t height) {
+        this->width  = width;
+        this->height = height;
+        cost_map.resize(width * height);
+        clear();
     }
 
-    size_t to_index(position_t pos) {
+    inline void create_empty(const Map& map) {
+        create_empty(map.rect.width(), map.rect.height());
+    }
+
+    inline size_t to_index(position_t pos) {
         auto [x, y] = pos;
         return x + y * width;
     }
 
-    position_t from_index(size_t idx) {
+    inline position_t from_index(size_t idx) {
         auto x = idx % width;
         auto y = idx / width;
         return position_t{x, y};
     }
 
-    double at(position_t pos) {
+    inline double at(position_t pos) {
         auto [x, y] = pos;
         return cost_map[x + y * width];
     }
@@ -49,45 +64,24 @@ struct DijkstraMap {
      * exit provided by BaseMap's exits implementation. Each step adds cost to
      * the current depth, and is discarded if the new depth is further than the
      * current depth.
-     * WARNING: Will give incorrect results when used with
+     * @warning Will give incorrect results when used with
      * non-uniform exit costs. Much slower algorithm required to support that.
+     * @note: only recomputes when the dirty flag is set, the function will
+     * set the flag to false when compotation begins
      *
      * @param starts
      * @param base_map
      *
      */
-    void build(std::vector<position_t> starts, Map& base_map) {
-        create_empty(base_map.rect.width(), base_map.rect.height());
-        // node 2d position (x, y) and the cost to travel to that node
-        std::deque<std::pair<position_t, double>> open_list;
-        open_list.resize(cost_map.size());
+    void compute(std::vector<position_t> starts);
 
-        for(const auto& start : starts) {
-            open_list.push_back(std::make_pair(start, 0.0));
-        }
-
-        while(!open_list.empty()) {
-            auto [pos, depth] = open_list.front();
-            open_list.pop_front();
-
-            auto available_exits = base_map.get_available_exits(pos);
-
-            for(auto [new_pos, add_depth] : available_exits) {
-                auto new_idx    = to_index(new_pos);
-                auto new_depth  = depth + add_depth;
-                auto prev_depth = cost_map[new_idx];
-                if(new_depth >= prev_depth) {
-                    continue;
-                }
-                if(new_depth >= max_depth) {
-                    cost_map[new_idx] = max_depth;
-                    continue;
-                }
-                cost_map[new_idx] = new_depth;
-                open_list.push_back(std::make_pair(new_pos, new_depth));
-            }
-        }
-    }
+    /**
+     * @brief finds one of the possible lowest paths
+     *
+     * @param pos starting position
+     * @return position_t of a lower path
+     */
+    std::pair<bool, position_t> find_lowest_path(const position_t& pos);
 };
 
 }  // namespace radl

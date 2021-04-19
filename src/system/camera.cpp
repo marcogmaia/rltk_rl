@@ -14,14 +14,9 @@
 
 namespace radl {
 
-
 void camera_update(entt::entity ent) {
     using engine::console;
     auto& map = engine::get_map();
-
-    DijkstraMap dm;
-    dm.build(std::vector<position_t>{reg.get<position_t>(player)}, map);
-
 
     term(gui::UI_MAP)->clear();
     term(gui::UI_ENTITIES)->clear();
@@ -77,14 +72,19 @@ void camera_update(entt::entity ent) {
 
         term(gui::UI_MAP)->set_char(rx, ry, tile_vch);
 
-        auto cost = static_cast<int>(dm.at(v_pos));
-        vchar_t vch_cost
-            = {glyph::SOLID1, color_t{cost * 8, cost * 8, cost * 8}, BLACK};
+        auto& dm         = reg.ctx<DijkstraMap>();
+        auto cost        = static_cast<int>(dm.at(v_pos));
+        vchar_t vch_cost = {glyph::SOLID1,
+                            color_t{
+                                cost * 8,
+                                cost * 8,
+                                cost * 8,
+                            },
+                            BLACK};
         term(gui::UI_MAP)->set_char(rx, ry, vch_cost);
     }
 
     // search entities in visible positions and print them
-
     std::vector<std::pair<renderable_t, position_t>> renderable_entities;
 
     std::for_each(

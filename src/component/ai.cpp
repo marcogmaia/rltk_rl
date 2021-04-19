@@ -65,6 +65,7 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
             path->steps.pop_front();
             auto& map                  = engine::get_map();
             constexpr double atk_range = 2.1;
+            
             auto distance_to_target    = distance2d_squared(
                 e_pos.first, e_pos.second, target_pos.first, target_pos.second);
             if(distance_to_target <= atk_range) {
@@ -77,7 +78,7 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
 }
 
 // uses being, position, and viewshed
-void ai_enemy() {
+void ai_enemy_astar() {
     auto player_pos    = reg.get<position_t>(player);
     auto& enemies_near = *get_entities_near_player();
     // function to apply to each enemy
@@ -104,5 +105,6 @@ void ai_enemy() {
     std::for_each(std::execution::par_unseq, enemies_near.begin(),
                   enemies_near.end(), aifunc);
 }
+
 
 }  // namespace radl
