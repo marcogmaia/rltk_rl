@@ -34,8 +34,20 @@ inline void new_damage(registry& reg, entt::entity ent_target, int damage) {
     }
 }
 
+/**
+ * @brief perform the attack on the defender
+ *
+ * @param ent_atk attacking entity
+ * @param ent_def defender entity
+ */
 void attack(const entity& ent_atk, const entity& ent_def);
 
+/**
+ * @brief try an attack at the position
+ *
+ * @param ent_atk attacking entity
+ * @param pos position which to try to attack
+ */
 void attack(const entity& ent_atk, const position_t& pos);
 
 
