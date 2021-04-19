@@ -1,10 +1,11 @@
 #pragma once
-#include "spdlog/spdlog.h"
 
 #include "component/common.hpp"
 #include "component/position.hpp"
 
-namespace radl::component {
+namespace radl::system {
+
+using namespace component;
 
 struct ai_t {};
 
@@ -12,4 +13,6 @@ void ai_enemy();
 
 void ai_enemy_find_path(entity e_ent, const position_t& target_pos);
 
-}  // namespace radl::component
+void ai_enemy_dijkstra_map(entity ent);
+
+}  // namespace radl::system

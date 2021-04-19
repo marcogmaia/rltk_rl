@@ -1,5 +1,4 @@
 set(COMPONENT_SCRS
-    "ai.cpp"
     "combat.cpp"
     "inventory.cpp"
     "movable.cpp"

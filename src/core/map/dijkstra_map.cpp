@@ -64,7 +64,7 @@ DijkstraMap::find_lowest_path(const position_t& pos) {
         });
 
     auto [target_pos, weight] = vec_pos_weight[0];
-    if(weight == max_depth) {
+    if(static_cast<uint32_t>(weight) == max_depth) {
         valid_pos = false;
     }
     return std::make_pair(valid_pos, target_pos);

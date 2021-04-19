@@ -1,6 +1,7 @@
 
 set(
     GAMESYS_SRC
+    "ai.cpp"
     "camera.cpp"
     "factories.cpp"
     "player_action.cpp"
@@ -14,8 +15,8 @@ add_library(
 
 target_link_libraries(
 game_system 
-spdlog::spdlog
 game_component
+spdlog::spdlog
 pthread
 tbb
 fmt

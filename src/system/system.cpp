@@ -1,6 +1,9 @@
 #include <ranges>
 #include <algorithm>
 
+#include "spdlog/spdlog.h"
+
+#include "system/ai.hpp"
 #include "system/system.hpp"
 
 #include "component/component.hpp"
@@ -22,37 +25,6 @@ void system_active_universe() {
 }
 
 void map_indexer() {}
-
-
-void ai_enemy_dijkstra_map(entity ent) {
-    auto& dm                 = reg.ctx<DijkstraMap>();
-    const auto& ent_pos      = reg.get<position_t>(ent);
-    // todo pick random minimum position
-    auto [found, target_pos] = dm.find_lowest_path(ent_pos);
-    auto player_pos          = reg.get<position_t>(player);
-
-    bool somebody_already_wants_to_walk_to = false;
-    // check if anybody already wants to walk to this tile
-    for(auto [e_other, other_walk] : reg.view<want_to_walk_t>().each()) {
-        if(other_walk.to == target_pos) {
-            // random walk
-            somebody_already_wants_to_walk_to = true;
-        }
-    }
-    // if player is next to ent: attack // distance to player is 1
-    if(distance_pythagoras(player_pos, ent_pos) < 1.5) {
-        // attack player
-        attack(ent, player);
-    }
-    // if not found a valid target position: random_walk
-    else if(!found) {
-        random_walk(reg, ent, ent_pos);
-        return;
-    } else if(!somebody_already_wants_to_walk_to) {
-        want_to_walk_t want_walk = {ent_pos, target_pos};
-        reg.emplace<want_to_walk_t>(ent, want_walk);
-    }
-}
 
 void system_ai() {
     const auto& gstate = reg.ctx<game_state_t>();

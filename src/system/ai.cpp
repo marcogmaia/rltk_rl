@@ -1,19 +1,22 @@
 #include <algorithm>
-#include <ranges>
 #include <execution>
 #include <memory>
+#include <ranges>
 
-#include "component/ai.hpp"
 #include "component/combat.hpp"
 #include "component/enemy.hpp"
 #include "component/viewshed.hpp"
-
-#include "system/player_action.hpp"
-#include "utils/path_finding.hpp"
+#include "component/movable.hpp"
 
 #include "core/game_state.hpp"
+#include "core/map/dijkstra_map.hpp"
 
-namespace radl::component {
+#include "system/ai.hpp"
+#include "system/player_action.hpp"
+
+#include "utils/path_finding.hpp"
+
+namespace radl::system {
 
 
 namespace {
@@ -39,8 +42,7 @@ namespace {
 
 [[maybe_unused]] bool is_near(const position_t& src_pos,
                               const position_t& dst_pos) {
-    auto delta_pos = dst_pos - src_pos;
-    auto& [dx, dy] = delta_pos;
+    auto [dx, dy] = dst_pos - src_pos;
     return !(dx > 1 && dy > 1);
 }
 
@@ -65,8 +67,8 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
             path->steps.pop_front();
             auto& map                  = engine::get_map();
             constexpr double atk_range = 2.1;
-            
-            auto distance_to_target    = distance2d_squared(
+
+            auto distance_to_target = distance2d_squared(
                 e_pos.first, e_pos.second, target_pos.first, target_pos.second);
             if(distance_to_target <= atk_range) {
                 attack(e_ent, player);
@@ -107,4 +109,35 @@ void ai_enemy_astar() {
 }
 
 
-}  // namespace radl
+void ai_enemy_dijkstra_map(entity ent) {
+    auto& dm            = reg.ctx<DijkstraMap>();
+    const auto& ent_pos = reg.get<position_t>(ent);
+    // todo pick random minimum position
+    auto [found, target_pos] = dm.find_lowest_path(ent_pos);
+    auto player_pos          = reg.get<position_t>(player);
+
+    bool somebody_already_wants_to_walk_to = false;
+    // check if anybody already wants to walk to this tile
+    for(auto [e_other, other_walk] : reg.view<want_to_walk_t>().each()) {
+        if(other_walk.to == target_pos) {
+            // random walk
+            somebody_already_wants_to_walk_to = true;
+        }
+    }
+    // if player is next to ent: attack // distance to player is 1
+    if(distance_pythagoras(player_pos, ent_pos) < 1.5) {
+        // attack player
+        attack(ent, player);
+    }
+    // if not found a valid target position: random_walk
+    else if(!found) {
+        random_walk(reg, ent, ent_pos);
+        return;
+    } else if(!somebody_already_wants_to_walk_to) {
+        want_to_walk_t want_walk = {ent_pos, target_pos};
+        reg.emplace<want_to_walk_t>(ent, want_walk);
+    }
+}
+
+
+}  // namespace radl::system
