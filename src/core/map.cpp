@@ -181,7 +181,7 @@ void Map::init(const rect_t& rect) {
 }
 
 std::vector<std::pair<position_t, int>>
-Map::get_available_exits(const position_t& pos) {
+Map::get_available_exits(const position_t& pos) const {
     std::vector<std::pair<position_t, int>> vec;
     vec.reserve(8);
     for(int x = -1; x <= 1; ++x) {

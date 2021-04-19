@@ -101,7 +101,8 @@ struct Map {
 
     void init(const rect_t& rect);
 
-    std::vector<std::pair<position_t, int>> get_available_exits(const position_t& pos);
+    std::vector<std::pair<position_t, int>>
+    get_available_exits(const position_t& pos) const;
 };
 
 void create_random_rooms(Map& map);
