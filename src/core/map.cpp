@@ -10,6 +10,7 @@
 #include "utils/utils.hpp"
 #include "utils/rng.hpp"
 #include "core/engine.hpp"
+#include "core/game_state.hpp"
 
 #include <ranges>
 namespace radl {
@@ -152,14 +153,14 @@ void query_alive_entities_near_player() {
 // XXX change this in the future, now we are only using entities that blocks the
 // path
 bool is_occupied(position_t target_pos) {
-    auto& ents_here = engine::get_map().at(target_pos).entities_here;
+    auto& ents_here = get_map().at(target_pos).entities_here;
     return std::ranges::any_of(ents_here, [&](auto& ent) {
         return reg.any_of<blocks_t>(ent);
     });
 }
 
 bool is_exit(position_t target_pos) {
-    auto& map = engine::get_map();
+    auto& map = get_map();
     return !is_occupied(target_pos) && map.at(target_pos).props.walkable;
 }
 

@@ -22,7 +22,7 @@ struct navigator_t {
     }
 
     static bool is_walkable(const location_t& pos) {
-        const auto& map = engine::get_map();
+        const auto& map = get_map();
         return map.rect.contains(pos) && map[pos].props.walkable
                && !is_occupied(pos);
     }
@@ -58,7 +58,7 @@ struct navigator_t {
                 }
                 location_t offset{x, y};
                 auto w_pos = pos + offset;
-                const auto& map = engine::get_map();
+                const auto& map = get_map();
 
                 auto& player_pos = reg.get<position_t>(player);
 

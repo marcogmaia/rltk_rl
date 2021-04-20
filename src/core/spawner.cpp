@@ -1,6 +1,7 @@
 #include "component/component.hpp"
 #include "core/spawner.hpp"
 #include "system/factories.hpp"
+#include "core/game_state.hpp"
 
 namespace radl {
 
@@ -29,7 +30,7 @@ void add_enemies() {
     constexpr uint32_t max_enemies_pex_room = 5;
     using rng::rng;
 
-    const auto& w_map = engine::get_map();
+    const auto& w_map = get_map();
     for(const auto& room : w_map.rooms) {
         auto num_enemies = rng.range(0, max_enemies_pex_room);
         for(int i = 0; i < num_enemies; ++i) {

@@ -3,10 +3,10 @@
 #include <vector>
 #include <string>
 #include <fmt/format.h>
-#include "utils/colors.hpp"
+#include "component/colors.hpp"
 #include "entt/entity/registry.hpp"
 
-namespace radl::component {
+namespace radl {
 
 struct log_entry_t {
     std::string log;

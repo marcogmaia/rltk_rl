@@ -1,8 +1,6 @@
 #include "component/common.hpp"
 #include "component/inventory.hpp"
-#include "system/factories.hpp"
-#include "core/engine.hpp"
-#include "utils/colors.hpp"
+#include "component/renderable.hpp"
 
 namespace radl::component {
 

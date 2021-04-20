@@ -6,6 +6,7 @@
 #include "core/gui/gui.hpp"
 #include "core/gui/item_menu.hpp"
 #include "core/game_state.hpp"
+#include "core/engine.hpp"
 
 #include "component/component.hpp"
 #include "system/factories.hpp"
@@ -49,7 +50,7 @@ void render_hp_bar(int x, int y, vchar_t fg_vch, vchar_t bg_vch) {
 void draw_tooltips() {
     term(UI_TOOLTIPS)->clear();
 
-    auto& map = engine::get_map();
+    auto& map = get_map();
     // auto view_tooltip = reg.view<name_t, position_t>();
 
     auto mouse_pos = state::get_mouse_position();
@@ -281,10 +282,10 @@ void render_log_stats() {
     term(UI_STATUS)->clear();
     term(UI_STATUS)->box(GREY, BLACK, true);
     // print game log
-    auto& log = engine::get_game_log().entries;
+    auto& log = get_game_log().entries;
     int i     = 1;
     std::for_each_n(log.crbegin(), std::min(static_cast<int>(log.size()), 8),
-                    [&i](const component::log_entry_t& entry) {
+                    [&i](const log_entry_t& entry) {
                         term(UI_STATUS)->print(1, i++, entry.log, entry.fg,
                                                entry.bg);
                     });

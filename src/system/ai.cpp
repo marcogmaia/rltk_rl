@@ -7,11 +7,13 @@
 #include "component/enemy.hpp"
 #include "component/viewshed.hpp"
 #include "component/movable.hpp"
+#include "component/renderable.hpp"
 
 #include "core/game_state.hpp"
 #include "core/map/dijkstra_map.hpp"
 
 #include "system/ai.hpp"
+#include "system/combat.hpp"
 #include "system/player_action.hpp"
 
 #include "utils/path_finding.hpp"
@@ -22,7 +24,7 @@ namespace radl::system {
 namespace {
 
 [[maybe_unused]] bool surrounded(const position_t& pos) {
-    auto& map = engine::get_map();
+    auto& map = get_map();
     for(int dx = -1; dx <= 1; ++dx) {
         for(int dy = -1; dy <= 1; ++dy) {
             if(dx == 0 && dy == 0) {
@@ -48,7 +50,6 @@ namespace {
 
 }  // namespace
 
-
 void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
     // FIXME this must be a system
     viewshed_t& e_vshed = reg.get<viewshed_t>(e_ent);
@@ -65,13 +66,13 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
         if(path->success && !path->steps.empty()) {
             auto next_step = path->steps.front();
             path->steps.pop_front();
-            auto& map                  = engine::get_map();
+            auto& map                  = get_map();
             constexpr double atk_range = 2.1;
 
             auto distance_to_target = distance2d_squared(
                 e_pos.first, e_pos.second, target_pos.first, target_pos.second);
             if(distance_to_target <= atk_range) {
-                attack(e_ent, player);
+                system::attack(e_ent, player);
             } else if(map.rect.contains(next_step)) {
                 move_wait_attack(e_ent, next_step);
             }
@@ -127,7 +128,7 @@ void ai_enemy_dijkstra_map(entity ent) {
     // if player is next to ent: attack // distance to player is 1
     if(distance_pythagoras(player_pos, ent_pos) < 1.5) {
         // attack player
-        attack(ent, player);
+        system::attack(ent, player);
     }
     // if not found a valid target position: random_walk
     else if(!found) {

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "entt/entity/registry.hpp"
+#include "core/map.hpp"
+#include "core/log.hpp"
 
 namespace radl {
 
@@ -22,5 +24,27 @@ enum game_state_t {
 };
 
 void game_state_init();
+
+
+/**
+ * @brief Get the map from the register context
+ *
+ * @warning call this function only after setting the map on the register
+ *
+ * @return the map from the register context
+ */
+inline Map& get_map() {
+    return reg.ctx<Map>();
+}
+
+
+inline game_log_t& get_game_log() {
+    return reg.ctx<game_log_t>();
+}
+
+position_t get_position_from_entity(entity ent);
+
+
+
 
 }  // namespace radl

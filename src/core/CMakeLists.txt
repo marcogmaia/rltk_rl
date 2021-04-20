@@ -16,13 +16,13 @@ target_link_libraries(
     "game_component"
     "game_system"
     "game_utils"
+    "fmt"
+    "pthread"
+    "rltk"
+    "tbb"
 )
     
 target_link_libraries(
     game_core PUBLIC
-    "fmt"
-    "pthread"
-    "rltk"
     "spdlog::spdlog"
-    "tbb"
 )

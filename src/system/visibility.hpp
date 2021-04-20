@@ -1,10 +1,10 @@
 #pragma once
 #include <functional>
 #include <unordered_set>
-#include "entt/entt.hpp"
+#include "entt/entity/registry.hpp"
 #include "utils/geometry.hpp"
 
-namespace radl {
+namespace radl::system {
 void visibility_system(entt::registry& reg, entt::entity& ent);
 
 
@@ -93,6 +93,15 @@ template <typename location_t, typename navigator_t>
 std::unordered_set<location_t>
 field_of_view_set(location_t center, uint32_t range,
                   std::function<bool(location_t)> is_transparent) {}
+
+
+/**
+ * @brief
+ *
+ * @param reg
+ * @param ent
+ */
+void fov_update();
 
 
 }  // namespace radl

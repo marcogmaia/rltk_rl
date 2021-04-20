@@ -1,5 +1,6 @@
 #include <fmt/format.h>
 #include "core/engine.hpp"
+#include "core/game_state.hpp"
 #include "system/factories.hpp"
 
 namespace radl {
@@ -13,7 +14,7 @@ namespace factory {
  * @param dst_post
  */
 static void add_ent_to_map(entity ent, const position_t& dst_post) {
-    auto& map = engine::get_map();
+    auto& map = get_map();
     map[dst_post].entities_here.push_back(ent);
 }
 

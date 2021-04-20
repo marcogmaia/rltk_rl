@@ -62,20 +62,8 @@ void init() {
     gui::init();
 }
 
-/**
- * @brief Get the map from the register context
- *
- * @warning call this function only after setting the map on the register
- *
- * @return the map from the register context
- */
-Map& get_map() {
-    return reg.ctx<Map>();
-}
 
-component::game_log_t& get_game_log() {
-    return reg.ctx<component::game_log_t>();
-}
+
 
 void pre_run() {
     // initialize everything
@@ -98,7 +86,7 @@ void pre_run() {
 
 void restart_game_state() {
     reg.unset<Map>();
-    reg.unset<component::game_log_t>();
+    reg.unset<game_log_t>();
     reg.clear();
 }
 
@@ -231,10 +219,7 @@ void terminate() {
     gui::terminate();
 }
 
-position_t get_position_from_entity(entity ent) {
-    auto pos = reg.get<position_t>(ent);
-    return pos;
-}
+
 
 }  // namespace radl::engine
 

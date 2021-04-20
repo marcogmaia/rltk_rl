@@ -8,6 +8,7 @@
 #include "utils/geometry.hpp"
 #include "component/component.hpp"
 #include "system/camera.hpp"
+#include "system/combat.hpp"
 
 namespace radl {
 
@@ -121,7 +122,7 @@ using namespace rltk::colors;
 }
 
 void pick_item_at(entity ent, position_t pos) {
-    auto& ents_here = engine::get_map().at(pos).entities_here;
+    auto& ents_here = get_map().at(pos).entities_here;
     auto found      = std::ranges::find_if(ents_here, [](auto ent) {
         return reg.all_of<item_t>(ent);
     });
@@ -206,12 +207,12 @@ bool move_wait_attack(entt::entity& ent, const position_t& dst_pos) {
     if(dst_pos == src_pos) {
         return false;
     }
-    auto& map                     = engine::get_map();
+    auto& map                     = get_map();
     const auto& target_tile_chars = map[{dst_pos}].props;
     // ## 1. attack if enemy is in the targeted pos
     if(is_occupied(dst_pos)) {
         // attack
-        attack(ent, dst_pos);
+       system::attack(ent, dst_pos);
         return false;
     }
     // ## 2. walk if tile is no occupied and walkable

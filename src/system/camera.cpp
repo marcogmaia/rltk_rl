@@ -16,7 +16,7 @@ namespace radl {
 
 void camera_update(entt::entity ent) {
     using engine::console;
-    auto& map = engine::get_map();
+    auto& map = get_map();
 
     term(gui::UI_MAP)->clear();
     term(gui::UI_ENTITIES)->clear();

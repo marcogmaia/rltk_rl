@@ -47,7 +47,7 @@ add_executable(
 
 # add_library(imgui "lib/imgui/imgui.cpp")
 
-target_link_libraries(${PROJECT_NAME} fmt game_utils game_core game_system game_component tbb pthread )
+target_link_libraries(${PROJECT_NAME} game_utils game_core fmt tbb pthread )
 
 # set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 # set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

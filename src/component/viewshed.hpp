@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "component/position.hpp"
-#include "core/map.hpp"
 #include "entt/entt.hpp"
 
 namespace radl::component {
@@ -20,12 +19,5 @@ struct viewshed_t {
         = true;  // dirty flag signals that the viewshed needs to be updated
 };
 
-/**
- * @brief
- *
- * @param reg
- * @param ent
- */
-void fov_update();
 
 }  // namespace radl::component

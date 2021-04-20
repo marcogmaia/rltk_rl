@@ -13,7 +13,7 @@
 #include "core/map/dijkstra_map.hpp"
 namespace radl::system {
 
-namespace {}  // namespace
+
 
 void system_visibility() {
     // can be multithread
@@ -79,7 +79,7 @@ void system_destroy_deads() {
         --dead.decompose_turns;
         if(dead.decompose_turns <= 0) {
             // remove from map
-            auto& map = engine::get_map();
+            auto& map = get_map();
             map[dead_pos].entities_here.remove(ent);
             query_alive_entities_near_player();
             reg.destroy(ent);
@@ -90,7 +90,7 @@ void system_destroy_deads() {
 void system_walk() {
     auto wanting_to_walk
         = reg.view<want_to_walk_t, viewshed_t>(entt::exclude<dead_t>);
-    auto& map = engine::get_map();
+    auto& map = get_map();
 
     auto fwalk = [&](auto ent) -> void {
         // want_to_walk_t& want_walk = wanting_to_walk.get<want_to_walk_t>(ent);
@@ -104,7 +104,7 @@ void system_walk() {
         }
 
         // if can walk
-        auto& map = engine::get_map();
+        auto& map = get_map();
         map.at(want_walk.from).remove_entity(ent);
         map.at(want_walk.to).insert_entity(ent);
 
@@ -117,7 +117,7 @@ void system_walk() {
 }
 
 void system_damage() {
-    auto& map = engine::get_map();
+    auto& map = get_map();
 
     auto sufferers
         = reg.view<name_t, suffer_damage_t, combat_stats_t, position_t>(
@@ -204,7 +204,7 @@ void system_item_collection() {
 
     for(auto [ent, epick, einv, epos] : v_pick_item.each()) {
         einv.add_item(epick.item);
-        engine::get_map().at(epos).remove_entity(epick.item);
+        get_map().at(epos).remove_entity(epick.item);
         reg.remove<position_t>(epick.item);
         reg.remove<wants_to_pickup_item_t>(ent);
         auto& item   = reg.get<item_t>(epick.item);
@@ -222,7 +222,7 @@ void system_item_drop() {
         einv.remove_item(edrop.what);
         reg.remove<wants_to_drop_t>(ent);
         // put on the map and give a position component
-        engine::get_map().at(epos).insert_entity(edrop.what);
+        get_map().at(epos).insert_entity(edrop.what);
         reg.emplace<position_t>(edrop.what, epos);
     }
 }
@@ -268,5 +268,6 @@ void player_system(const sf::Event& ev) {
 void init_player() {
     engine::event_dispatcher.sink<sf::Event>().connect<&player_system>();
 }
+
 
 }  // namespace radl::system

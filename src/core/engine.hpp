@@ -7,7 +7,6 @@
 #include "entt/entity/fwd.hpp"
 
 #include "core/map.hpp"
-#include "component/log.hpp"
 
 #include "entt/entity/fwd.hpp"
 #include "entt/signal/fwd.hpp"
@@ -32,10 +31,6 @@ extern rltk::virtual_terminal* console;
 extern entt::dispatcher event_dispatcher;
 
 using namespace component;
-
-Map& get_map();
-game_log_t& get_game_log();
-position_t get_position_from_entity(entity ent);
 
 
 void init();

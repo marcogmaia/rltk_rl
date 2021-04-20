@@ -4,6 +4,7 @@
 #include <utility>
 #include <functional>
 
+#include "entt/entity/registry.hpp"
 #include "utils/geometry.hpp"
 
 namespace radl::component {
@@ -21,6 +22,12 @@ std::pair<T, T> operator-(const std::pair<T, T>& left,
 }
 
 using position_t = std::pair<int, int>;
+
+inline position_t get_position_from_entity(entt::registry& reg,
+                                           entt::entity ent) {
+    auto pos = reg.get<position_t>(ent);
+    return pos;
+}
 
 inline double distance_manhattan(const position_t& pos1,
                                  const position_t& pos2) {

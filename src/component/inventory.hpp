@@ -1,9 +1,9 @@
 #pragma once
-#include <list>
+
+#include <map>
+#include <vector>
 
 #include "component/position.hpp"
-
-#include "core/engine.hpp"
 
 namespace radl::component {
 

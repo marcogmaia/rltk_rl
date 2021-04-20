@@ -12,4 +12,4 @@ add_library(
     ${COMPONENT_SCRS}
 )
 
-target_link_libraries(game_component PUBLIC tbb spdlog::spdlog)
+target_link_libraries(game_component PUBLIC spdlog::spdlog)
