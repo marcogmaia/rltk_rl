@@ -155,6 +155,9 @@ void imgui_process_event(const sf::Event& event) {
 }
 
 void imgui_frame(rltk::layer_t* l, sf::RenderTexture& window) {
+    if(!reg.valid(player) || !reg.all_of<player_t, combat_stats_t>(player)) {
+        return;
+    }
     static sf::Clock deltaClock;
     auto& main_window = *rltk::get_window();
     ImGui::SFML::Update(main_window, deltaClock.restart());
@@ -167,10 +170,32 @@ void imgui_frame(rltk::layer_t* l, sf::RenderTexture& window) {
     }
     ImGui::End();
 
-    ImGui::Begin("test wind");
+    ImGui::Begin("Stats");
+    {
+        // change defense
+        {
+            auto& player_stats = reg.get<combat_stats_t>(player);
+            ImGui::Text("Set def:");
+            ImGui::SameLine();
+            if(ImGui::ArrowButton("##def_up", ImGuiDir_Up)) {
+                ++player_stats.defense;
+            }
+            ImGui::SameLine(0.0, 0.0);
+            if(ImGui::ArrowButton("##def_down", ImGuiDir_Down)) {
+                --player_stats.defense;
+            }
+            ImGui::SameLine();
+            ImGui::Text("%d", player_stats.defense);
+        }
+        // show position
+        {
+            const auto& [px, py] = reg.get<position_t>(player);
+            auto pos_str         = fmt::format("position: ({}, {})", px, py);
+            ImGui::Text(pos_str.c_str());
+        }
+    }
     ImGui::End();
 
-    // ImGui::EndFrame();
     ImGui::SFML::Render(main_window);
 }
 
