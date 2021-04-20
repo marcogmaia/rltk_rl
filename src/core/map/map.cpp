@@ -109,15 +109,6 @@ void make_corridors_between_rooms(Map& map) {
                    });
 }
 
-
-// std::unique_ptr<Map> new_map(const rect_t& rect) {
-//     std::unique_ptr<Map> map = std::make_unique<Map>();
-//     map->init(rect);
-//     create_random_rooms(*map.get());
-//     make_corridors_between_rooms(*map.get());
-//     return map;
-// }
-
 std::unique_ptr<std::vector<entt::entity>> active_entities_near_player
     = std::make_unique<std::vector<entt::entity>>();
 /**
@@ -163,17 +154,6 @@ bool is_exit(position_t target_pos) {
     auto& map = get_map();
     return !is_occupied(target_pos) && map.at(target_pos).props.walkable;
 }
-
-// void map_entity_walk(entity ent, const position_t& src_pos,
-//                      const position_t& dst_pos) {
-//     using engine::reg;
-//     auto& map = engine::get_map();
-//     map[src_pos].entities_here.remove(ent);
-//     map[dst_pos].entities_here.push_back(ent);
-//     reg.patch<position_t>(ent, [=](position_t& pos) {
-//         pos = dst_pos;
-//     });
-// }
 
 void Map::init(const rect_t& rect) {
     this->rect = rect;

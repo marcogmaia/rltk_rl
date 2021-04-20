@@ -6,7 +6,7 @@
 #include "spdlog/spdlog.h"
 
 #include "core/game_state.hpp"
-#include "core/map.hpp"
+#include "core/map/map.hpp"
 #include "component/viewshed.hpp"
 #include "component/position.hpp"
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "entt/entity/registry.hpp"
-#include "core/map.hpp"
+#include "core/map/map.hpp"
 #include "core/log.hpp"
 
 namespace radl {
@@ -43,8 +43,6 @@ inline game_log_t& get_game_log() {
 }
 
 position_t get_position_from_entity(entity ent);
-
-
 
 
 }  // namespace radl

@@ -7,7 +7,7 @@
 
 #include "core/game_state.hpp"
 #include "core/gui/gui.hpp"
-#include "core/map.hpp"
+#include "core/map/map.hpp"
 #include "system/camera.hpp"
 
 #include "core/map/dijkstra_map.hpp"

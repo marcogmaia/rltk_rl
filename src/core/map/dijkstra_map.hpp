@@ -4,7 +4,7 @@
 #include <tuple>
 #include <vector>
 
-#include "core/map.hpp"
+#include "core/map/map.hpp"
 
 // objectives, need to think more about this problem (multiple objectives)
 
