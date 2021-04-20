@@ -19,7 +19,8 @@
                 ]
             },
             "defines": [
-                "SPDLOG_FMT_EXTERNAL"
+                "SPDLOG_FMT_EXTERNAL",
+                "DEBUG"
             ],
             "cStandard": "c17",
             "cppStandard": "c++20"

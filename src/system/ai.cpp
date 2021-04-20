@@ -134,8 +134,7 @@ void ai_enemy_dijkstra_map(entity ent) {
         random_walk(reg, ent, ent_pos);
         return;
     } else if(!somebody_already_wants_to_walk_to) {
-        want_to_walk_t want_walk = {ent_pos, target_pos};
-        reg.emplace<want_to_walk_t>(ent, want_walk);
+        walk(reg, ent, ent_pos, target_pos);
     }
 }
 

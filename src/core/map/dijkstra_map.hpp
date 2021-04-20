@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cinttypes>
+#include <tuple>
 #include <vector>
-#include <deque>
 
 #include "core/map.hpp"
 
@@ -81,7 +81,7 @@ struct DijkstraMap {
      * @param pos starting position
      * @return position_t of a lower path
      */
-    std::pair<bool, position_t> find_lowest_path(const position_t& pos);
+    std::tuple<bool, position_t> find_lowest_path(const position_t& pos);
 };
 
 }  // namespace radl

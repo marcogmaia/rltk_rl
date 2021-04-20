@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <deque>
 #include <ranges>
 #include "core/map/dijkstra_map.hpp"
 
@@ -44,11 +45,12 @@ void DijkstraMap::compute(std::vector<position_t> starts) {
     }
 }
 
-// FIXME not fault tolerant, should return a value to indicate that the position
-// ! is valid
-std::pair<bool, position_t>
+std::tuple<bool, position_t>
 DijkstraMap::find_lowest_path(const position_t& pos) {
-    auto available_paths    = base_map.get_available_exits(pos);
+    auto available_paths = base_map.get_available_exits(pos);
+    if(available_paths.empty()) {
+        return {false, {0, 0}};
+    }
     using pair_pos_weight_t = decltype(available_paths[0]);
     std::vector<std::pair<position_t, int>> vec_pos_weight;
     vec_pos_weight.reserve(8);
@@ -63,11 +65,21 @@ DijkstraMap::find_lowest_path(const position_t& pos) {
             return lhs.second < rhs.second;
         });
 
-    auto [target_pos, weight] = vec_pos_weight[0];
+    auto ret                   = vec_pos_weight[0];
+    auto& [target_pos, weight] = ret;  // binds as a reference
     if(static_cast<uint32_t>(weight) == max_depth) {
         valid_pos = false;
     }
-    return std::make_pair(valid_pos, target_pos);
+
+    // vec_pos_weight[0] is the minimum element, so we search for the partition
+    // point and pick a random value there (in the partition)
+    auto partition_pt = std::ranges::partition_point(
+        vec_pos_weight, [&vec_pos_weight](pair_pos_weight_t& val) {
+            return val.second == vec_pos_weight[0].second;
+        });
+    rng::rng.random_choice(vec_pos_weight.begin(), partition_pt, &ret);
+
+    return {valid_pos, target_pos};
 }
 
 }  // namespace radl

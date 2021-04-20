@@ -7,6 +7,7 @@ namespace radl::system {
 
 using namespace component;
 
+// XXX unused
 struct ai_t {};
 
 void ai_enemy();
