@@ -12,7 +12,7 @@
 
 #include "core/map/dijkstra_map.hpp"
 
-namespace radl {
+namespace radl::system {
 
 void camera_update(entt::entity ent) {
     using engine::console;

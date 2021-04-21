@@ -5,14 +5,15 @@
 
 #include "system/ai.hpp"
 #include "system/system.hpp"
+#include "system/camera.hpp"
 
 #include "component/component.hpp"
 #include "core/engine.hpp"
 #include "core/game_state.hpp"
+#include "core/gui/gui.hpp"
 
 #include "core/map/dijkstra_map.hpp"
 namespace radl::system {
-
 
 
 void system_visibility() {
@@ -21,19 +22,34 @@ void system_visibility() {
 }
 
 void system_active_universe() {
-    query_alive_entities_near_player();
+    // query_alive_entities_near_player();
 }
 
 void map_indexer() {}
 
 void system_ai() {
     const auto& gstate = reg.ctx<game_state_t>();
+    auto v_enemies     = reg.view<enemy_t, viewshed_t>();
     if(gstate == game_state_t::ENEMY_TURN) {
-        for(auto ent_near : *get_entities_near_player()) {
-            if(!reg.all_of<enemy_t, position_t>(ent_near)) {
-                continue;
+        const auto& player_pos = reg.get<position_t>(player);
+        for(auto [e_ent, e_enemy, e_vshed] : v_enemies.each()) {
+            // if player is visible
+            if(e_vshed.visible_coordinates.contains(player_pos)) {
+                e_enemy.memory                    = player_pos;
+                e_enemy.remember_turns            = e_vshed.range * 2;
+                e_enemy.remembers_target_position = true;
+                // TODO an enemy needs to remember a path
+                // every time an enemy sees the player, they construct the path
+                // and store it in his memory
+                // if the player is not adjacente it takes the next step in the
+                // path
+                ai_enemy_dijkstra_map(e_ent);
             }
-            ai_enemy_dijkstra_map(ent_near);
+
+            --e_enemy.remember_turns;
+            if(e_enemy.remember_turns <= 0) {
+                e_enemy.remembers_target_position = false;
+            }
         }
     } else if(gstate == game_state_t::PLAYER_TURN) {
         // player AI ?
@@ -81,7 +97,7 @@ void system_destroy_deads() {
             // remove from map
             auto& map = get_map();
             map[dead_pos].entities_here.remove(ent);
-            query_alive_entities_near_player();
+            // query_alive_entities_near_player();
             reg.destroy(ent);
         }
     });
@@ -133,6 +149,8 @@ void system_damage() {
         if(total_damage > 0) {
             auto& tile  = map.at(e_pos);
             tile.status = tile_status_t::BLOODIED;
+            // recomputes the map only if any damage occurred
+            reg.ctx<DijkstraMap>().dirty = true;
         }
 
         if(stats.hp <= 0) {
@@ -245,6 +263,22 @@ void system_map() {
     reg.ctx<DijkstraMap>().compute(std::vector<position_t>{pos});
 }
 
+void system_render(double duration_ms) {
+    static const auto& gstate = reg.ctx<game_state_t>();
+    switch(gstate) {
+    case game_state_t::SHOW_INVENTORY:
+    case game_state_t::SHOW_INVENTORY_DROP:
+    case game_state_t::AWAITING_INPUT: {
+        // render
+        if(reg.valid(player) && reg.all_of<player_t>(player)) {
+            system::camera_update(player);
+            gui::render_gui();
+        }
+    }
+    default: break;
+    }
+}
+
 // later we can group the components and run the groups in parallel
 void systems_run() {
     system_active_universe();
@@ -265,8 +299,10 @@ void player_system(const sf::Event& ev) {
     spdlog::debug("player dpos: ({}, {})", dpos.first, dpos.second);
 }
 
-void init_player() {
-    engine::event_dispatcher.sink<sf::Event>().connect<&player_system>();
+void init_systems() {
+    // engine::event_dispatcher.sink<sf::Event>().connect<&player_system>();
+    engine::event_dispatcher.sink<double>().connect<&system_render>();
+    engine::event_dispatcher.sink<double>().connect<&system_particle>();
 }
 
 

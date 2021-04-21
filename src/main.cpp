@@ -4,7 +4,7 @@
 
 #include "spdlog/spdlog.h"
 
-#include "entt/entt.hpp"
+#include "entt/signal/dispatcher.hpp"
 
 #include "rltk/rltk.hpp"
 #include "core/engine.hpp"
@@ -16,8 +16,7 @@ using engine::console;
 
 }  // namespace
 
-
-void run_game(entt::delegate<void(double)> on_game_tick) {
+void run_game() {
     auto& main_window = *rltk::get_window();
     state::reset_mouse_state();
     double duration_ms = 0.0;
@@ -76,10 +75,8 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
             }
         }
 
-        if(on_game_tick) {
-            on_game_tick(duration_ms);
-            engine::event_dispatcher.update();
-        }
+        engine::event_dispatcher.trigger<double>(duration_ms);
+        engine::event_dispatcher.update();
 
         main_window.clear();
 
@@ -96,7 +93,7 @@ void run_game(entt::delegate<void(double)> on_game_tick) {
 
 int main() {
     engine::init();
-    run_game(engine::delegate_run_game);
+    run_game();
     engine::terminate();
 
     return 0;

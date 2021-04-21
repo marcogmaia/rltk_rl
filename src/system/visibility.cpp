@@ -36,13 +36,14 @@ void fov_update() {
 
     const auto& view_vshed = reg.view<viewshed_t>();
 
-    auto& ents_near = *get_entities_near_player();
+    // auto& ents_near = *get_entities_near_player();
     std::vector<entity> ents_to_calculate_fov;
-    ents_to_calculate_fov.reserve(64);
-    std::ranges::copy_if(ents_near, std::back_inserter(ents_to_calculate_fov),
-                         [&view_vshed](auto ent) {
-                             return view_vshed.contains(ent);
-                         });
+    // ents_to_calculate_fov.reserve(64);
+    // std::ranges::copy_if(ents_near,
+    // std::back_inserter(ents_to_calculate_fov),
+    //                      [&view_vshed](auto ent) {
+    //                          return view_vshed.contains(ent);
+    //                      });
 
     int count_fovs_updated = 0;
     static std::mutex cntmutex;
@@ -83,14 +84,18 @@ void fov_update() {
         ++count_fovs_updated;
     };
 
-    spdlog::info("updating_fov {} entities", ents_to_calculate_fov.size());
+    auto v_ents_to_update = reg.view<viewshed_t>();
+    std::for_each(std::execution::par_unseq, v_ents_to_update.begin(),
+                  v_ents_to_update.end(), run_fov_sweep);
 
-    std::for_each(std::execution::par_unseq, ents_to_calculate_fov.begin(),
-                  ents_to_calculate_fov.end(), run_fov_sweep);
-    run_fov_sweep(player);
+    // spdlog::info("updating_fov {} entities", ents_to_calculate_fov.size());
 
-    spdlog::info("\tupdated: {} fovs, dT: {}", count_fovs_updated,
-                 clk.getElapsedTime().asMicroseconds());
+    // std::for_each(std::execution::par_unseq, ents_to_calculate_fov.begin(),
+    //               ents_to_calculate_fov.end(), run_fov_sweep);
+    // run_fov_sweep(player);
+
+    // spdlog::info("\tupdated: {} fovs, dT: {}", count_fovs_updated,
+    //              clk.getElapsedTime().asMicroseconds());
 }
 
 }  // namespace radl::system

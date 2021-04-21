@@ -3,7 +3,11 @@
 #include "component/component.hpp"
 #include "entt/entity/registry.hpp"
 
-namespace radl {
+namespace radl::engine {
+extern rltk::virtual_terminal* console;
+}  // namespace engine
+
+namespace radl::system {
 
 /**
  * @brief update the player camera and render order
@@ -12,10 +16,6 @@ namespace radl {
  */
 void camera_update(entt::entity ent);
 
-
-namespace engine {
-extern rltk::virtual_terminal* console;
-}  // namespace engine
 
 extern std::unique_ptr<std::vector<entt::entity>> active_entities_near_player;
 

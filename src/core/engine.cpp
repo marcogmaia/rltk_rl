@@ -29,8 +29,6 @@ entt::dispatcher event_dispatcher{};
 entt::sigh<sf::Event()> ev_signal{};
 entt::sink ev_sink{ev_signal};
 
-entt::delegate<void(double)> delegate_run_game;
-
 constexpr int width  = 1024 / 16;
 constexpr int height = 768 / 16;
 
@@ -55,21 +53,21 @@ void init() {
     spdlog::set_level(spdlog::level::debug);
 #endif
     spdlog::info("Initializing engine.");
-    delegate_run_game.connect<&update>();
+    event_dispatcher.sink<double>().connect<&update>();
 
+    system::init_systems();
     reg.set<game_state_t>(game_state_t::PRE_RUN);
     rltk_init();
     gui::init();
 }
 
 
-
-
 void pre_run() {
     // initialize everything
+    // create the map
     reg.set<Map>();
     auto& map = get_map();
-    map.init(rect_t{0, 0, width * 4, height * 4});
+    map.init(rect_t{0, 0, width, height});
     create_random_rooms(map);
     make_corridors_between_rooms(map);
     auto player_start_pos = map.rooms[0].center();
@@ -100,12 +98,10 @@ void game_state_update([[maybe_unused]] double elapsed_time) {
     } break;
 
     case game_state_t::AWAITING_INPUT: {
-        render();
-        game_state = player_input();
+        game_state = system::player_input();
     } break;
 
     case game_state_t::SHOW_INVENTORY: {
-        render();
         using gui::item_menu_result_t;
         auto [menu_res, ent] = gui::render_inventory_use();
         auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
@@ -125,7 +121,6 @@ void game_state_update([[maybe_unused]] double elapsed_time) {
     } break;
 
     case game_state_t::SHOW_INVENTORY_DROP: {
-        render();
         using gui::item_menu_result_t;
         auto [menu_res, ent] = gui::render_inventory_drop();
         auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
@@ -204,21 +199,13 @@ void update(double elapsed_time) {
     engine::event_dispatcher.update();
     game_state_update(elapsed_time);
     phase_mouse_cursor(elapsed_time);
-    system::system_particle(elapsed_time);
 }
 
-void render() {
-    if(reg.valid(player)) {
-        camera_update(player);
-        gui::render_gui();
-    }
-}
 
 void terminate() {
     restart_game_state();
     gui::terminate();
 }
-
 
 
 }  // namespace radl::engine

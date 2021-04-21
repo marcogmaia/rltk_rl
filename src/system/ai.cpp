@@ -82,13 +82,13 @@ void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
 
 // uses being, position, and viewshed
 void ai_enemy_astar() {
-    auto player_pos    = reg.get<position_t>(player);
-    auto& enemies_near = *get_entities_near_player();
+    auto player_pos = reg.get<position_t>(player);
+    // auto& enemies_near = *get_entities_near_player();
     // function to apply to each enemy
     auto aifunc = [&](auto e_ent) {
-        if(!reg.any_of<enemy_t>(e_ent)) {
-            return;
-        }
+        // if(!reg.any_of<enemy_t>(e_ent)) {
+        //     return;
+        // }
         auto [e_pos, vshed, enemy]
             = reg.get<position_t, viewshed_t, enemy_t>(e_ent);
 
@@ -105,23 +105,35 @@ void ai_enemy_astar() {
             random_walk(reg, e_ent, e_pos);
         }
     };
-    std::for_each(std::execution::par_unseq, enemies_near.begin(),
-                  enemies_near.end(), aifunc);
+
+    auto v_enemies = reg.view<enemy_t>();
+    std::for_each(std::execution::par_unseq, v_enemies.begin(), v_enemies.end(),
+                  aifunc);
 }
 
 
 void ai_enemy_dijkstra_map(entity ent) {
-    auto& dm            = reg.ctx<DijkstraMap>();
-    const auto& ent_pos = reg.get<position_t>(ent);
-    // todo pick random minimum position
-    auto [found, target_pos] = dm.find_lowest_path(ent_pos);
-    auto player_pos          = reg.get<position_t>(player);
+    if(!reg.any_of<enemy_t>(ent)) {
+        return;
+    }
+    auto& dm                 = reg.ctx<DijkstraMap>();
+    const auto& ent_pos      = reg.get<position_t>(ent);
+    auto [found, target_pos] = dm.pick_random_min_path(ent_pos);
+
+    auto& enemy = reg.get<enemy_t>(ent);
+    if(!enemy.remembers_target_position) {
+        random_walk(reg, ent, ent_pos);
+        return;
+    }
+
+    // auto player_pos = reg.get<position_t>(player);
+    auto player_pos = enemy.memory;
 
     bool somebody_already_wants_to_walk_to = false;
     // check if anybody already wants to walk to this tile
     for(auto [e_other, other_walk] : reg.view<want_to_walk_t>().each()) {
         if(other_walk.to == target_pos) {
-            // random walk
+            // try to pick another minimum tile
             somebody_already_wants_to_walk_to = true;
         }
     }

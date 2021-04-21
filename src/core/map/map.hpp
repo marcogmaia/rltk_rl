@@ -116,9 +116,11 @@ Map make_test_map(const rect_t& dimension, const position_t& player_pos);
 // Map new_map(entt::registry& reg, const rect_t& rect);
 std::unique_ptr<Map> new_map(registry& reg, const rect_t& rect);
 
-std::vector<entt::entity>* get_entities_near_player();
+// TODO create map chunks and keep only the entities of these chunks, serialize
+// the others and save the deltas to filesytem
+// std::vector<entt::entity>* get_entities_near_player();
 
-void query_alive_entities_near_player();
+// void query_alive_entities_near_player();
 // void update_enemies_visibility(entt::registry& reg, entt::entity ent);
 
 

@@ -10,7 +10,7 @@
 #include "system/camera.hpp"
 #include "system/combat.hpp"
 
-namespace radl {
+namespace radl::system {
 
 void handle_screen_resize(const sf::Event& ev, entt::registry& reg,
                           entt::entity e) {
@@ -212,7 +212,7 @@ bool move_wait_attack(entt::entity& ent, const position_t& dst_pos) {
     // ## 1. attack if enemy is in the targeted pos
     if(is_occupied(dst_pos)) {
         // attack
-       system::attack(ent, dst_pos);
+        system::attack(ent, dst_pos);
         return false;
     }
     // ## 2. walk if tile is no occupied and walkable
@@ -224,4 +224,4 @@ bool move_wait_attack(entt::entity& ent, const position_t& dst_pos) {
     return false;
 }
 
-}  // namespace radl
+}  // namespace radl::system

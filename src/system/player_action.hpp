@@ -9,7 +9,7 @@
 #include "core/game_state.hpp"
 
 
-namespace radl {
+namespace radl::system {
 
 /**
  * @return true

@@ -46,7 +46,7 @@ void DijkstraMap::compute(std::vector<position_t> starts) {
 }
 
 std::tuple<bool, position_t>
-DijkstraMap::find_lowest_path(const position_t& pos) {
+DijkstraMap::pick_random_min_path(const position_t& pos) {
     namespace ranges     = std::ranges;
     auto available_paths = base_map.get_available_exits(pos);
     if(available_paths.empty()) {

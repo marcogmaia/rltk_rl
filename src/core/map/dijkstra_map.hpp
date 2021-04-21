@@ -81,7 +81,7 @@ struct DijkstraMap {
      * @param pos starting position
      * @return position_t of a lower path
      */
-    std::tuple<bool, position_t> find_lowest_path(const position_t& pos);
+    std::tuple<bool, position_t> pick_random_min_path(const position_t& pos);
 };
 
 }  // namespace radl

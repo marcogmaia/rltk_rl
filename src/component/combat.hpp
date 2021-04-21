@@ -12,6 +12,11 @@ struct combat_stats_t {
     int hp;       // current health points
     int defense;  // hit points deflected
     int power;    // atk power
+
+    template <typename Archive>
+    void serialize(Archive& archive) {
+        archive(max_hp, hp, defense, power);
+    }
 };
 
 struct wants_to_melee_t {
