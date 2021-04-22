@@ -1,5 +1,6 @@
 #pragma once
 
+#include "component/camera.hpp"
 #include "component/component.hpp"
 #include "entt/entity/registry.hpp"
 
@@ -14,8 +15,9 @@ namespace radl::system {
  *
  * @param ent
  */
-void camera_update(entt::entity ent);
+// void camera_update(entt::entity ent);
 
+void camera();
 
 extern std::unique_ptr<std::vector<entt::entity>> active_entities_near_player;
 

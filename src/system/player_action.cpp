@@ -16,7 +16,7 @@ void handle_screen_resize(const sf::Event& ev, entt::registry& reg,
                           entt::entity e) {
     if(ev.type == sf::Event::Resized) {
         using engine::console;
-        camera_update(e);
+        // camera_update(e);
         spdlog::debug("screen resize: x: {}, y: {}", console->term_width,
                       console->term_height);
     }

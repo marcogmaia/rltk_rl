@@ -24,7 +24,7 @@ void player_factory(entt::entity ent, const position_t& pos,
     reg.emplace<inventory_t>(ent);
     reg.emplace<renderable_t>(ent, renderable_t{
                                        vch,
-                                       z_level_t::BEING,
+                                       z_level_t::PLAYER,
                                    });
     reg.emplace<position_t>(ent, pos);
     reg.emplace<combat_stats_t>(ent, combat_stats_t{

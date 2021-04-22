@@ -127,6 +127,7 @@ void system_walk() {
         reg.replace<position_t>(ent, want_walk.to);
         vshed.dirty                  = true;
         reg.ctx<DijkstraMap>().dirty = true;
+        reg.ctx<camera_t>().dirty    = true;
     };
 
     std::ranges::for_each(wanting_to_walk, fwalk);
@@ -255,6 +256,7 @@ void system_particle(double elapsed_time) {
             // display the particle effect
             reg.destroy(ent);
         }
+        reg.ctx<camera_t>().dirty = true;
     }
 }
 
@@ -264,19 +266,28 @@ void system_map() {
 }
 
 void system_render(double duration_ms) {
-    static const auto& gstate = reg.ctx<game_state_t>();
+    static const auto& gstate      = reg.ctx<game_state_t>();
+    reg.ctx<camera_t>().frame_time = duration_ms;
     switch(gstate) {
     case game_state_t::SHOW_INVENTORY:
     case game_state_t::SHOW_INVENTORY_DROP:
     case game_state_t::AWAITING_INPUT: {
         // render
         if(reg.valid(player) && reg.all_of<player_t>(player)) {
-            system::camera_update(player);
+            system::camera();
             gui::render_gui();
         }
     }
-    default: break;
+    default: {
+    } break;
     }
+}
+
+void system_camera() {
+    auto& camera    = reg.ctx<camera_t>();
+    camera.width    = engine::console->term_width;
+    camera.height   = engine::console->term_height;
+    camera.position = reg.get<position_t>(player);
 }
 
 // later we can group the components and run the groups in parallel
@@ -292,6 +303,7 @@ void systems_run() {
     system_destroy_deads();
     system_walk();
     system_map();
+    system_camera();
 }
 
 void player_system(const sf::Event& ev) {
@@ -301,6 +313,7 @@ void player_system(const sf::Event& ev) {
 
 void init_systems() {
     // engine::event_dispatcher.sink<sf::Event>().connect<&player_system>();
+    reg.set<camera_t>();
     engine::event_dispatcher.sink<double>().connect<&system_render>();
     engine::event_dispatcher.sink<double>().connect<&system_particle>();
 }

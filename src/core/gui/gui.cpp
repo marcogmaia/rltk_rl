@@ -10,6 +10,7 @@
 
 #include "component/component.hpp"
 #include "system/factories.hpp"
+#include "component/camera.hpp"
 
 #include "imgui.h"
 #include "imgui-SFML.h"
@@ -193,6 +194,13 @@ void imgui_frame(rltk::layer_t* l, sf::RenderTexture& window) {
             const auto& [px, py] = reg.get<position_t>(player);
             auto pos_str         = fmt::format("position: ({}, {})", px, py);
             ImGui::Text(pos_str.c_str());
+        }
+        // show fps
+        {
+            static auto& camera = reg.ctx<camera_t>();
+            auto fps            = 1000.0 / camera.frame_time;
+            ImGui::Text(fmt::format("time: {}, fps: {}", camera.frame_time, fps)
+                            .c_str());
         }
     }
     ImGui::End();

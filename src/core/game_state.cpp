@@ -16,5 +16,4 @@ void game_state_init() {
     reg.set<DijkstraMap>(map);
 }
 
-
 }  // namespace radl

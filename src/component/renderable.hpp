@@ -15,6 +15,7 @@ enum class z_level_t {
     DEAD,
     ITEM,
     BEING,
+    PLAYER,
     MAX,
 };
 

@@ -55,7 +55,7 @@ void init() {
     spdlog::info("Initializing engine.");
     event_dispatcher.sink<double>().connect<&update>();
 
-    system::init_systems();
+    
     reg.set<game_state_t>(game_state_t::PRE_RUN);
     rltk_init();
     gui::init();
@@ -65,6 +65,7 @@ void init() {
 void pre_run() {
     // initialize everything
     // create the map
+    system::init_systems();
     reg.set<Map>();
     auto& map = get_map();
     map.init(rect_t{0, 0, width, height});
