@@ -8,13 +8,15 @@
 #include "system/camera.hpp"
 
 #include "component/component.hpp"
-#include "core/engine.hpp"
-#include "core/game_state.hpp"
+#include "system/game_state.hpp"
 #include "core/gui/gui.hpp"
 
-#include "core/map/dijkstra_map.hpp"
+#include "system/map/dijkstra_map.hpp"
 namespace radl::system {
 
+// TODO move the "state" code to system i.e. all the related code
+// e.g. map, player_action, game_state, etc
+// the system is the only thing the engine needs.
 
 void system_visibility() {
     // can be multithread

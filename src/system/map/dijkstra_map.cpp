@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <deque>
 #include <ranges>
-#include "core/map/dijkstra_map.hpp"
+#include "system/map/dijkstra_map.hpp"
 
 namespace radl {
 

@@ -1,7 +1,7 @@
 #include "component/component.hpp"
-#include "core/spawner.hpp"
+#include "system/spawner.hpp"
 #include "system/factories.hpp"
-#include "core/game_state.hpp"
+#include "system/game_state.hpp"
 
 namespace radl {
 

@@ -4,7 +4,6 @@
 #include "component/renderable.hpp"
 #include "component/colors.hpp"
 
-#include "core/game_state.hpp"
 namespace radl::component {
 
 void particle_create(particle_type_t type, double duration_ms,

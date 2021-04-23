@@ -9,8 +9,8 @@
 #include "component/movable.hpp"
 #include "component/renderable.hpp"
 
-#include "core/game_state.hpp"
-#include "core/map/dijkstra_map.hpp"
+#include "system/game_state.hpp"
+#include "system/map/dijkstra_map.hpp"
 
 #include "system/ai.hpp"
 #include "system/combat.hpp"

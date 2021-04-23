@@ -1,6 +1,6 @@
 #include "system/combat.hpp"
 
-#include "core/game_state.hpp"
+#include "system/game_state.hpp"
 #include "component/component.hpp"
 
 namespace radl::system {

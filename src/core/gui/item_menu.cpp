@@ -1,9 +1,9 @@
 #include "component/component.hpp"
 
 #include "core/engine.hpp"
-#include "core/game_state.hpp"
 #include "core/gui/item_menu.hpp"
 
+#include "system/game_state.hpp"
 #include "utils/utils.hpp"
 
 

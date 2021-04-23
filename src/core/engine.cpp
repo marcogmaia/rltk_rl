@@ -3,18 +3,17 @@
 #include "spdlog/spdlog.h"
 
 
-#include "core/game_state.hpp"
 #include "core/engine.hpp"
 #include "core/gui/gui.hpp"
-#include "core/spawner.hpp"
-#include "system/factories.hpp"
+#include "system/spawner.hpp"
 
 #include "system/camera.hpp"
+#include "system/factories.hpp"
+#include "system/game_state.hpp"
 #include "system/player_action.hpp"
 #include "system/system.hpp"
 
 #include "utils/rng.hpp"
-
 
 #include "gsl/gsl_util"
 

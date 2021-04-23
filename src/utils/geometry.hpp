@@ -152,7 +152,7 @@ inline void line_func_cancellable(const int& x1, const int& y1, const int& x2,
     auto dest_x = static_cast<const double>(x2);
     auto dest_y = static_cast<const double>(y2);
     // XXX good enough for max distance 32
-    const double n_steps = distance2d(x1, y1, x2, y2) * 2.41;
+    const double n_steps = distance2d(x1, y1, x2, y2) * 1;
     const int steps      = static_cast<const int>(std::floor(n_steps) + 1);
     const double slope_x = (dest_x - x) / n_steps;
     const double slope_y = (dest_y - y) / n_steps;

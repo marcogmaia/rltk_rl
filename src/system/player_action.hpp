@@ -6,7 +6,7 @@
 #include "rltk/rltk.hpp"
 #include "component/position.hpp"
 #include "core/engine.hpp"
-#include "core/game_state.hpp"
+#include "system/game_state.hpp"
 
 
 namespace radl::system {

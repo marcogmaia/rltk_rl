@@ -2,12 +2,8 @@
 add_library(
     game_core
     "engine.cpp"
-    "game_state.cpp"
     "gui/gui.cpp"
     "gui/item_menu.cpp"
-    "map/map.cpp"
-    "map/dijkstra_map.cpp"
-    "spawner.cpp"
 )
 
 target_link_libraries(

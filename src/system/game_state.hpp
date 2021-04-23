@@ -1,8 +1,8 @@
 #pragma once
 
 #include "entt/entity/registry.hpp"
-#include "core/map/map.hpp"
-#include "core/log.hpp"
+#include "system/map/map.hpp"
+#include "system/log.hpp"
 
 namespace radl {
 

@@ -5,7 +5,6 @@
 
 #include "utils/astar.hpp"
 #include "utils/geometry.hpp"
-#include "core/engine.hpp"
 
 namespace radl {
 

@@ -5,12 +5,12 @@
 #include "SFML/Window.hpp"
 #include "spdlog/spdlog.h"
 
-#include "core/game_state.hpp"
-#include "core/map/map.hpp"
 #include "component/viewshed.hpp"
 #include "component/position.hpp"
 
 #include "system/visibility.hpp"
+#include "system/game_state.hpp"
+#include "system/map/map.hpp"
 
 #include "utils/path_finding.hpp"
 

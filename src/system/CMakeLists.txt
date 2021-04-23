@@ -5,9 +5,13 @@ set(
     "camera.cpp"
     "combat.cpp"
     "factories.cpp"
-    "player_action.cpp"
+    "game_state.cpp" 
+    "map/dijkstra_map.cpp"
+    "map/map.cpp"
     "system.cpp"
+    "player_action.cpp"
     "visibility.cpp"
+    "spawner.cpp"
 )
     
 add_library(

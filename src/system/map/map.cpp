@@ -9,12 +9,12 @@
 #include "map.hpp"
 #include "utils/utils.hpp"
 #include "utils/rng.hpp"
-#include "core/engine.hpp"
-#include "core/game_state.hpp"
+#include "system/game_state.hpp"
 
 #include <ranges>
 namespace radl {
 
+// TODO Map should be a proper class
 
 using namespace rltk::colors;
 

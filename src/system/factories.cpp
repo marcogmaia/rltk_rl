@@ -1,6 +1,5 @@
 #include <fmt/format.h>
-#include "core/engine.hpp"
-#include "core/game_state.hpp"
+#include "system/game_state.hpp"
 #include "system/factories.hpp"
 
 namespace radl {

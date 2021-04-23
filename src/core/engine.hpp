@@ -6,7 +6,7 @@
 
 #include "entt/entity/fwd.hpp"
 
-#include "core/map/map.hpp"
+#include "system/map/map.hpp"
 
 #include "entt/entity/fwd.hpp"
 #include "entt/signal/fwd.hpp"

@@ -1,7 +1,7 @@
 #include "spdlog/spdlog.h"
-#include "game_state.hpp"
-#include "core/map/dijkstra_map.hpp"
-#include "core/log.hpp"
+#include "system/game_state.hpp"
+#include "system/map/dijkstra_map.hpp"
+#include "system/log.hpp"
 #include "system/factories.hpp"
 
 
