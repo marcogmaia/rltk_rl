@@ -54,7 +54,7 @@ void init() {
     spdlog::info("Initializing engine.");
     event_dispatcher.sink<double>().connect<&update>();
 
-    
+
     reg.set<game_state_t>(game_state_t::PRE_RUN);
     rltk_init();
     gui::init();
@@ -88,6 +88,7 @@ void restart_game_state() {
     reg.clear();
 }
 
+// TODO make this a system
 void game_state_update([[maybe_unused]] double elapsed_time) {
     auto& game_state = reg.ctx<game_state_t>();
 
@@ -251,3 +252,7 @@ void reset_mouse_state() {
 }
 
 }  // namespace radl::state
+
+namespace radl::engine {
+
+}  // namespace radl::engine

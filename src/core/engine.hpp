@@ -9,7 +9,7 @@
 #include "system/map/map.hpp"
 
 #include "entt/entity/fwd.hpp"
-#include "entt/signal/fwd.hpp"
+#include "entt/signal/dispatcher.hpp"
 
 namespace radl {
 
@@ -24,8 +24,6 @@ namespace radl::engine {
 extern std::deque<sf::Event> event_queue;
 extern entt::sigh<sf::Event()> ev_signal;
 
-extern entt::delegate<void(double)> delegate_run_game;
-
 extern rltk::virtual_terminal* console;
 
 extern entt::dispatcher event_dispatcher;
@@ -33,9 +31,30 @@ extern entt::dispatcher event_dispatcher;
 using namespace component;
 
 
+// TODO PImpl to create a "compiler firewall" between main and systems
+class Engine {
+private:
+    class EngineImpl;
+    std::unique_ptr<EngineImpl> engine_impl;
+
+public:
+    Engine();
+    ~Engine();
+
+    entt::dispatcher dispatcher;
+
+    void init();
+    void terminate();
+    void set_kb_event();
+    void get_kb_event();
+    void set_mouse_event();
+    void get_mouse_event();
+    void game_tick();
+    void run_game();
+};
+
 void init();
 void update(double elapsed_time);
-void render();
 void terminate();
 
 }  // namespace radl::engine

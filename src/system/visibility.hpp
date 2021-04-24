@@ -2,7 +2,6 @@
 #include <functional>
 #include <unordered_set>
 #include "entt/entity/registry.hpp"
-#include "utils/geometry.hpp"
 
 namespace radl::system {
 void visibility_system(entt::registry& reg, entt::entity& ent);

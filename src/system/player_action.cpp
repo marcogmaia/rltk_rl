@@ -113,11 +113,6 @@ using namespace rltk::colors;
 }  // namespace
 
 [[maybe_unused]] void flush_events() {
-    // auto& ev_queue = engine::event_queue;
-    // while(!ev_queue.empty()) {
-    //     ev_queue.pop_front();
-    // }
-
     engine::event_queue.clear();
 }
 
@@ -157,6 +152,7 @@ sf::Event get_event() {
     return ev;
 }
 
+// TODO get events from a fixed size event queue from the dispatcher
 game_state_t player_input() {
     auto player_pos = reg.get<position_t>(player);
 

@@ -1,5 +1,4 @@
 set(COMPONENT_SCRS
-    "combat.cpp"
     "inventory.cpp"
     "movable.cpp"
     "particle.cpp"

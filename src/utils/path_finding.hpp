@@ -56,14 +56,11 @@ struct navigator_t {
                     continue;
                 }
                 location_t offset{x, y};
-                auto w_pos = pos + offset;
+                auto w_pos      = pos + offset;
                 const auto& map = get_map();
-
                 auto& player_pos = reg.get<position_t>(player);
-
                 if(w_pos == player_pos
-                   || (map.rect.contains(w_pos)
-                       && map[w_pos].props.walkable
+                   || (map.rect.contains(w_pos) && map[w_pos].props.walkable
                        && !is_occupied(w_pos))) {
                     successors.push_back(w_pos);
                 }
@@ -116,8 +113,7 @@ public:
         std::vector<location_t> successors;
         if(parent_node) {
             navigator_t::get_successors(parent_node->pos, successors);
-        }
-        else {
+        } else {
             map_search_node<location_t, navigator_t> tmp(pos);
             navigator_t::get_successors(pos, successors);
         }
@@ -171,8 +167,7 @@ find_path_2d(const location_t& start, const location_t& end,
             location_t step = navigator_t::get_xy(X, Y);
             if(result->success && navigator_t::is_walkable(step)) {
                 result->steps.push_back(step);
-            }
-            else {
+            } else {
                 result->success = false;
                 return;
             }

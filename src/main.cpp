@@ -66,6 +66,7 @@ void run_game() {
                 //
             } break;
             case sf::Event::KeyPressed: {
+                // engine.set_kb_event(event)
                 engine::event_queue.push_back(event);
             } break;
             case sf::Event::KeyReleased: {
@@ -75,6 +76,7 @@ void run_game() {
             }
         }
 
+        // engine.game_tick
         engine::event_dispatcher.trigger<double>(duration_ms);
         engine::event_dispatcher.update();
 
