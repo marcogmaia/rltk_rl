@@ -6,6 +6,7 @@ using entt::registry;
 
 #include "component/combat.hpp"
 #include "component/common.hpp"
+#include "component/camera.hpp"
 #include "component/enemy.hpp"
 #include "component/inventory.hpp"
 #include "component/movable.hpp"

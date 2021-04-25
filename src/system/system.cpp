@@ -9,7 +9,8 @@
 
 #include "component/component.hpp"
 #include "system/game_state.hpp"
-#include "core/gui/gui.hpp"
+// #include "core/gui/gui.hpp"
+#include "core/engine.hpp"
 
 #include "system/map/dijkstra_map.hpp"
 namespace radl::system {
@@ -23,9 +24,9 @@ void system_visibility() {
     fov_update();
 }
 
-void system_active_universe() {
-    // query_alive_entities_near_player();
-}
+// void system_active_universe() {
+//     // query_alive_entities_near_player();
+// }
 
 void map_indexer() {}
 
@@ -277,7 +278,7 @@ void system_render(double duration_ms) {
         // render
         if(reg.valid(player) && reg.all_of<player_t>(player)) {
             system::camera();
-            gui::render_gui();
+            // gui::render_gui();
         }
     }
     default: {
@@ -292,9 +293,122 @@ void system_camera() {
     camera.position = reg.get<position_t>(player);
 }
 
+void restart_game_state() {
+    reg.unset<Map>();
+    reg.unset<game_log_t>();
+    reg.clear();
+}
+
+constexpr int map_width  = 1024 / 16;
+constexpr int map_height = 768 / 16;
+
+void pre_run() {
+    // initialize everything
+    // create the map
+    system::init_systems();
+    reg.set<Map>();
+    auto& map = get_map();
+    map.init(rect_t{0, 0, map_width, map_height});
+    create_random_rooms(map);
+    make_corridors_between_rooms(map);
+    auto player_start_pos = map.rooms[0].center();
+    player                = reg.create();
+    factory::player_factory(player, player_start_pos,
+                            vchar_t{'@', YELLOW, BLACK});
+    add_enemies();
+
+    game_state_init();
+
+    spdlog::info("entities created: {}", reg.alive());
+    system::systems_run();
+}
+
+// TODO make this a system system_game_state
+void system_game_state([[maybe_unused]] double elapsed_time) {
+    auto& game_state = reg.ctx<game_state_t>();
+
+    switch(game_state) {
+    case game_state_t::PRE_RUN: {
+        pre_run();
+        game_state = game_state_t::AWAITING_INPUT;
+    } break;
+
+    case game_state_t::AWAITING_INPUT: {
+        game_state = system::player_input();
+    } break;
+
+    // TODO create a function to call from gui, instead of calling gui from
+    // this system
+    case game_state_t::SHOW_INVENTORY: {
+        using gui::item_menu_result_t;
+        auto [menu_res, ent] = gui::render_inventory_use();
+        auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
+
+
+        switch(menu_res) {
+        case item_menu_result_t::CANCEL: {
+            inv_ui.clear();
+            game_state = game_state_t::AWAITING_INPUT;
+        } break;
+        case item_menu_result_t::NO_RESPONSE: break;
+        case item_menu_result_t::SELECTED: {
+            inv_ui.clear();
+            reg.emplace<wants_to_use_t>(player, ent);
+            game_state = game_state_t::PLAYER_TURN;
+        } break;
+        }
+    } break;
+
+    case game_state_t::SHOW_INVENTORY_DROP: {
+        using gui::item_menu_result_t;
+        auto [menu_res, ent] = gui::render_inventory_drop();
+        auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
+
+        switch(menu_res) {
+        case item_menu_result_t::CANCEL: {
+            inv_ui.clear();
+            game_state = game_state_t::AWAITING_INPUT;
+        } break;
+        case item_menu_result_t::NO_RESPONSE: break;
+        case item_menu_result_t::SELECTED: {
+            inv_ui.clear();
+            reg.emplace<wants_to_drop_t>(player, ent);
+            game_state = game_state_t::PLAYER_TURN;
+        } break;
+        }
+    } break;
+
+    case game_state_t::PLAYER_TURN: {
+        system::systems_run();
+        game_state = game_state_t::ENEMY_TURN;
+    } break;
+
+    case game_state_t::ENEMY_TURN: {
+        // ## if player is dead then restart game
+        system::systems_run();
+
+        if(reg.all_of<dead_t>(player)) {
+            game_state = game_state_t::DEFEAT;
+        } else {
+            game_state = game_state_t::AWAITING_INPUT;
+        }
+    } break;
+
+    case game_state_t::DEFEAT: {
+        restart_game_state();
+        game_state = game_state_t::PRE_RUN;
+    } break;
+
+    default: break;
+    }
+}
+
 // later we can group the components and run the groups in parallel
 void systems_run() {
-    system_active_universe();
+    // fixme
+    system_game_state();
+
+    // system_active_universe();
     system_visibility();
     system_ai();
     system_melee_combat();
@@ -313,11 +427,40 @@ void player_system(const sf::Event& ev) {
     spdlog::debug("player dpos: ({}, {})", dpos.first, dpos.second);
 }
 
+void phase_mouse_cursor(double elapsed_time) {
+    static double alpha_cursor = 0.0;
+    static double time_frame   = 0.0;
+    static bool increasing     = true;
+    time_frame += elapsed_time * 0.42;
+
+    if(time_frame >= 1.0) {
+        auto inc = static_cast<int>(time_frame);
+        time_frame -= inc;
+        if(increasing) {
+            alpha_cursor += inc;
+        } else {
+            alpha_cursor -= inc;
+        }
+        if(alpha_cursor >= 255) {
+            increasing   = false;
+            alpha_cursor = 255;
+        }
+        if(alpha_cursor <= 0) {
+            increasing   = true;
+            alpha_cursor = 0;
+        }
+    }
+    // term(gui::UI_MOUSE)->set_alpha(static_cast<int>(alpha_cursor));
+    // reg.ctx<gui_t>().cursor_alpha = alpha_cursor?
+}
+
+
 void init_systems() {
     // engine::event_dispatcher.sink<sf::Event>().connect<&player_system>();
     reg.set<camera_t>();
     engine::event_dispatcher.sink<double>().connect<&system_render>();
     engine::event_dispatcher.sink<double>().connect<&system_particle>();
+    engine::event_dispatcher.sink<double>().connect<&phase_mouse_cursor>();
 }
 
 

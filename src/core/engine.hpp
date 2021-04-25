@@ -45,10 +45,10 @@ public:
 
     void init();
     void terminate();
-    void set_kb_event();
-    void get_kb_event();
-    void set_mouse_event();
-    void get_mouse_event();
+    void set_kb_event(const sf::Event& event);
+    void set_mouse_event(const sf::Event& event);
+    sf::Event get_kb_event();
+    sf::Event get_mouse_event();
     void game_tick();
     void run_game();
 };

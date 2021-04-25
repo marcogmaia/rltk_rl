@@ -1,8 +1,6 @@
 #include "spdlog/spdlog.h"
 #include "system/game_state.hpp"
 #include "system/map/dijkstra_map.hpp"
-#include "system/log.hpp"
-#include "system/factories.hpp"
 
 
 namespace radl {

@@ -19,7 +19,7 @@ namespace radl::system {
 
 void camera();
 
-extern std::unique_ptr<std::vector<entt::entity>> active_entities_near_player;
+// extern std::unique_ptr<std::vector<entt::entity>> active_entities_near_player;
 
 // auto render_pos = [&](int xr, int yr) -> position_t {
 //     return position_t{xr - xci, yr - yci};
@@ -29,8 +29,8 @@ template <typename... Ts>
 void render_components(int px, int py, int offx, int offy, Ts... comps) {
     auto view = reg.view<comps...>();
     for(auto ent : view) {
-        auto& pos  = reg.get<position_t>(ent);
-        auto& rend = reg.get<renderable_t>(ent);
+        auto& pos  = view.get<position_t>(ent);
+        auto& rend = view.get<renderable_t>(ent);
     }
 }
 

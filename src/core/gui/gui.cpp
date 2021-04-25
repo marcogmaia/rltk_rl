@@ -4,13 +4,11 @@
 #include "spdlog/spdlog.h"
 
 #include "core/gui/gui.hpp"
-#include "core/gui/item_menu.hpp"
 #include "core/engine.hpp"
 
 #include "component/component.hpp"
 #include "system/factories.hpp"
 #include "system/game_state.hpp"
-#include "system/camera.hpp"
 
 #include "imgui.h"
 #include "imgui-SFML.h"
