@@ -173,4 +173,5 @@
         "sfml",
         "vmap"
     ],
+    "todo-tree.tree.scanMode": "workspace only",
 }

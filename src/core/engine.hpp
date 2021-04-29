@@ -43,19 +43,16 @@ public:
 
     entt::dispatcher dispatcher;
 
-    void init();
-    void terminate();
     void set_kb_event(const sf::Event& event);
     void set_mouse_event(const sf::Event& event);
     sf::Event get_kb_event();
     sf::Event get_mouse_event();
+    
+    position_t get_mouse_position();
+
     void game_tick();
     void run_game();
 };
-
-void init();
-void update(double elapsed_time);
-void terminate();
 
 }  // namespace radl::engine
 
@@ -83,6 +80,5 @@ bool get_mouse_button_state(int button);
 
 /* Keyboard queue */
 // void enqueue_key_pressed(sf::Event& event);
-
 
 }  // namespace radl::state

@@ -38,7 +38,6 @@ void player_factory(entt::entity ent, const position_t& pos,
     add_ent_to_map(ent, pos);
 }
 
-
 entity enemy_factory(const position_t& pos, vchar_t vch, const name_t& name) {
     auto ent = reg.create();
     reg.emplace<renderable_t>(ent, renderable_t{

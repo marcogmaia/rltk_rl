@@ -25,13 +25,13 @@ void camera();
 //     return position_t{xr - xci, yr - yci};
 // };
 
-template <typename... Ts>
-void render_components(int px, int py, int offx, int offy, Ts... comps) {
-    auto view = reg.view<comps...>();
-    for(auto ent : view) {
-        auto& pos  = view.get<position_t>(ent);
-        auto& rend = view.get<renderable_t>(ent);
-    }
-}
+// template <typename... Ts>
+// void render_components(int px, int py, int offx, int offy, Ts... comps) {
+//     auto view = reg.view<comps...>();
+//     for(auto ent : view) {
+//         auto& pos  = view.get<position_t>(ent);
+//         auto& rend = view.get<renderable_t>(ent);
+//     }
+// }
 
 }  // namespace radl

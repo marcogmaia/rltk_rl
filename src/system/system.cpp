@@ -6,9 +6,11 @@
 #include "system/ai.hpp"
 #include "system/system.hpp"
 #include "system/camera.hpp"
+#include "system/factories.hpp"
 
 #include "component/component.hpp"
 #include "system/game_state.hpp"
+#include "system/spawner.hpp"
 // #include "core/gui/gui.hpp"
 #include "core/engine.hpp"
 
@@ -323,7 +325,11 @@ void pre_run() {
     system::systems_run();
 }
 
-// TODO make this a system system_game_state
+void system_game_set_state(std::function<void ()>) {
+
+}
+
+
 void system_game_state([[maybe_unused]] double elapsed_time) {
     auto& game_state = reg.ctx<game_state_t>();
 
@@ -338,45 +344,46 @@ void system_game_state([[maybe_unused]] double elapsed_time) {
     } break;
 
     // TODO create a function to call from gui, instead of calling gui from
+    // the function should be a callback ?
     // this system
-    case game_state_t::SHOW_INVENTORY: {
-        using gui::item_menu_result_t;
-        auto [menu_res, ent] = gui::render_inventory_use();
-        auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
+    // case game_state_t::SHOW_INVENTORY: {
+    //     // ! Ou faria associação com o reg
+    //     using gui::item_menu_result_t;
+    //     auto [menu_res, ent] = gui::render_inventory_use();
+    //     auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
 
+    //     switch(menu_res) {
+    //     case item_menu_result_t::CANCEL: {
+    //         inv_ui.clear();
+    //         game_state = game_state_t::AWAITING_INPUT;
+    //     } break;
+    //     case item_menu_result_t::NO_RESPONSE: break;
+    //     case item_menu_result_t::SELECTED: {
+    //         inv_ui.clear();
+    //         reg.emplace<wants_to_use_t>(player, ent);
+    //         game_state = game_state_t::PLAYER_TURN;
+    //     } break;
+    //     }
+    // } break;
 
-        switch(menu_res) {
-        case item_menu_result_t::CANCEL: {
-            inv_ui.clear();
-            game_state = game_state_t::AWAITING_INPUT;
-        } break;
-        case item_menu_result_t::NO_RESPONSE: break;
-        case item_menu_result_t::SELECTED: {
-            inv_ui.clear();
-            reg.emplace<wants_to_use_t>(player, ent);
-            game_state = game_state_t::PLAYER_TURN;
-        } break;
-        }
-    } break;
+    // case game_state_t::SHOW_INVENTORY_DROP: {
+    //     using gui::item_menu_result_t;
+    //     auto [menu_res, ent] = gui::render_inventory_drop();
+    //     auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
 
-    case game_state_t::SHOW_INVENTORY_DROP: {
-        using gui::item_menu_result_t;
-        auto [menu_res, ent] = gui::render_inventory_drop();
-        auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
-
-        switch(menu_res) {
-        case item_menu_result_t::CANCEL: {
-            inv_ui.clear();
-            game_state = game_state_t::AWAITING_INPUT;
-        } break;
-        case item_menu_result_t::NO_RESPONSE: break;
-        case item_menu_result_t::SELECTED: {
-            inv_ui.clear();
-            reg.emplace<wants_to_drop_t>(player, ent);
-            game_state = game_state_t::PLAYER_TURN;
-        } break;
-        }
-    } break;
+    //     switch(menu_res) {
+    //     case item_menu_result_t::CANCEL: {
+    //         inv_ui.clear();
+    //         game_state = game_state_t::AWAITING_INPUT;
+    //     } break;
+    //     case item_menu_result_t::NO_RESPONSE: break;
+    //     case item_menu_result_t::SELECTED: {
+    //         inv_ui.clear();
+    //         reg.emplace<wants_to_drop_t>(player, ent);
+    //         game_state = game_state_t::PLAYER_TURN;
+    //     } break;
+    //     }
+    // } break;
 
     case game_state_t::PLAYER_TURN: {
         system::systems_run();
@@ -406,7 +413,7 @@ void system_game_state([[maybe_unused]] double elapsed_time) {
 // later we can group the components and run the groups in parallel
 void systems_run() {
     // fixme
-    system_game_state();
+    system_game_state(0);
 
     // system_active_universe();
     system_visibility();
@@ -461,6 +468,8 @@ void init_systems() {
     engine::event_dispatcher.sink<double>().connect<&system_render>();
     engine::event_dispatcher.sink<double>().connect<&system_particle>();
     engine::event_dispatcher.sink<double>().connect<&phase_mouse_cursor>();
+
+    // TODO connect player_system
 }
 
 

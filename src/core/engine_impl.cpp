@@ -3,6 +3,12 @@
 #include "core/engine.hpp"
 #include "spdlog/spdlog.h"
 
+#include "rltk/rltk.hpp"
+#include "entt/entity/registry.hpp"
+
+#include "system/game_state.hpp"
+#include "core/gui/gui.hpp"
+
 namespace radl {
 
 namespace system {
@@ -20,7 +26,6 @@ bool window_focused = true;
 std::array<bool, 7> mouse_button_pressed;
 int mouse_x = 0;
 int mouse_y = 0;
-
 }  // namespace
 
 class Engine::EngineImpl {
@@ -29,6 +34,14 @@ private:
 
 public:
     EngineImpl() {
+        constexpr auto font_file = "../assets";
+        rltk::init(rltk::config_advanced(font_file, 1024, 768, "MaiaRL"));
+#ifdef DEBUG
+        spdlog::set_level(spdlog::level::debug);
+#endif
+        spdlog::info("Initializing engine.");
+        reg.set<game_state_t>(game_state_t::PRE_RUN);
+        gui::init();
         this->main_window = rltk::get_window();
     }
 
@@ -82,16 +95,11 @@ public:
 };
 
 Engine::Engine() {
-    init();
+    engine_impl = std::make_unique<EngineImpl>();
     system::init_systems();
 }
 
 Engine::~Engine() {
-    terminate();
-}
-
-void Engine::init() {
-    system::init_systems();
 }
 
 void Engine::set_kb_event(const sf::Event& event) {
@@ -124,11 +132,19 @@ void Engine::set_mouse_event(const sf::Event& event) {
     }
 }
 
+/**
+ * @brief get last absolute mouse position
+ *
+ * @return position_t
+ */
+position_t Engine::get_mouse_position() {
+    return {mouse_x, mouse_y};
+}
+
 void Engine::run_game() {
     state::reset_mouse_state();
     auto& main_window  = engine_impl->get_window();
     double duration_ms = 0.0;
-
 
     auto clock = std::chrono::steady_clock();
     while(main_window.isOpen()) {
@@ -147,6 +163,7 @@ void Engine::run_game() {
 
         // engine.game_tick
         engine::event_dispatcher.trigger<double>(duration_ms);
+
         engine::event_dispatcher.update();
 
         main_window.clear();
@@ -160,7 +177,6 @@ void Engine::run_game() {
                           .count();
     }
 }
-
 
 }  // namespace engine
 

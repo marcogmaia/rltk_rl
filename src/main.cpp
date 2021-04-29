@@ -18,9 +18,7 @@ using engine::console;
 
 int main() {
     engine::Engine engine;
-    engine.init();
     engine.run_game();
-    engine.terminate();
 
     // engine::init();
     // run_game();
