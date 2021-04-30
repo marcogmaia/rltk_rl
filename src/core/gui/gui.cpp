@@ -197,8 +197,9 @@ void imgui_frame(rltk::layer_t* l, sf::RenderTexture& window) {
         {
             static auto& camera = reg.ctx<camera_t>();
             auto fps            = 1000.0 / camera.frame_time;
-            ImGui::Text(fmt::format("time: {}, fps: {}", camera.frame_time, fps)
-                            .c_str());
+            ImGui::Text(
+                fmt::format("time: {:.2f}, fps: {:.2f}", camera.frame_time, fps)
+                    .c_str());
         }
     }
     ImGui::End();
@@ -336,7 +337,7 @@ void render_inventory_right_side() {
     render_inventory_items();
 }
 
-void render_gui([[maybe_unused]] double elapsed_time_ms) {
+void render_gui() {
     if(reg.valid(player) && reg.all_of<combat_stats_t>(player)) {
         render_inventory_right_side();
         render_log_stats();

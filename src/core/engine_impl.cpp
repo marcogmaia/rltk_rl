@@ -42,6 +42,7 @@ public:
         spdlog::info("Initializing engine.");
         reg.set<game_state_t>(game_state_t::PRE_RUN);
         gui::init();
+        system::init_systems();
         this->main_window = rltk::get_window();
     }
 
@@ -105,7 +106,6 @@ public:
 
 Engine::Engine() {
     engine_impl = std::make_unique<EngineImpl>();
-    system::init_systems();
 }
 
 Engine::~Engine() {}

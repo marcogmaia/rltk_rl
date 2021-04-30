@@ -280,7 +280,7 @@ void system_render(double duration_ms) {
         // render
         if(reg.valid(player) && reg.all_of<player_t>(player)) {
             system::camera();
-            // gui::render_gui();
+            gui::render_gui();
         }
     }
     default: {
@@ -308,7 +308,6 @@ constexpr int map_height = 768 / 16;
 void pre_run() {
     // initialize everything
     // create the map
-    system::init_systems();
     reg.set<Map>();
     auto& map = get_map();
     map.init(rect_t{0, 0, map_width, map_height});
@@ -325,9 +324,6 @@ void pre_run() {
     spdlog::info("entities created: {}", reg.alive());
     system::systems_run();
 }
-
-void system_game_set_state(std::function<void()>) {}
-
 
 game_state_t game_state_inventory_show() {
     // ! Ou faria associação com o reg
@@ -472,7 +468,6 @@ void init_systems() {
     engine::engine.dispatcher.sink<double>().connect<&system_particle>();
     engine::engine.dispatcher.sink<double>().connect<&phase_mouse_cursor>();
     engine::engine.dispatcher.sink<double>().connect<&system_game_state>();
-    engine::engine.dispatcher.sink<double>().connect<&gui::render_gui>();
 }
 
 
