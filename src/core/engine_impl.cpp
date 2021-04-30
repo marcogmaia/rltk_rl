@@ -22,7 +22,7 @@ namespace engine {
 // state
 namespace {
 
-bool window_focused = true;
+// bool window_focused = true;
 std::array<bool, 7> mouse_button_pressed;
 int mouse_x = 0;
 int mouse_y = 0;
@@ -58,6 +58,13 @@ public:
     void set_mouse_position(const int x, const int y) {
         mouse_x = x;
         mouse_y = y;
+    }
+
+    void reset_mouse_state() {
+        std::fill(mouse_button_pressed.begin(), mouse_button_pressed.end(),
+                  false);
+        mouse_x = 0;
+        mouse_y = 0;
     }
 
     void screen_resize(const sf::Event& event) {
@@ -99,19 +106,27 @@ Engine::Engine() {
     system::init_systems();
 }
 
-Engine::~Engine() {
-}
+Engine::~Engine() {}
 
 void Engine::set_kb_event(const sf::Event& event) {
     switch(event.type) {
     case sf::Event::KeyPressed: {
-        event_dispatcher.enqueue(event);
+        event_queue.push(event);
     } break;
     case sf::Event::KeyReleased: {
         //
     } break;
     default: break;
     }
+}
+
+bool Engine::get_kb_event(sf::Event& event) {
+    if(event_queue.empty()) {
+        return false;
+    }
+    event = event_queue.front();
+    event_queue.pop();
+    return true;
 }
 
 void Engine::set_mouse_event(const sf::Event& event) {
@@ -142,7 +157,8 @@ position_t Engine::get_mouse_position() {
 }
 
 void Engine::run_game() {
-    state::reset_mouse_state();
+    engine_impl->reset_mouse_state();
+
     auto& main_window  = engine_impl->get_window();
     double duration_ms = 0.0;
 
@@ -162,9 +178,8 @@ void Engine::run_game() {
         }
 
         // engine.game_tick
-        engine::event_dispatcher.trigger<double>(duration_ms);
-
-        engine::event_dispatcher.update();
+        dispatcher.trigger<double>(duration_ms);
+        dispatcher.update();
 
         main_window.clear();
 
@@ -176,6 +191,10 @@ void Engine::run_game() {
                           clock.now() - start_time)
                           .count();
     }
+}
+
+void Engine::game_tick() {
+    // TODO ? game_tick ?
 }
 
 }  // namespace engine

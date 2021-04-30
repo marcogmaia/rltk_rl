@@ -132,18 +132,6 @@ void pick_item_at(entity ent, position_t pos) {
 }
 
 
-void perform_action(const sf::Event& ev) {
-    switch(ev.key.code) {
-    case sf::Keyboard::G: {
-        // want to pickup
-        auto player_pos = reg.get<position_t>(player);
-        pick_item_at(player, player_pos);
-    }
-
-    default: break;
-    }
-}
-
 sf::Event get_event() {
     auto ev = engine::event_queue.back();
     engine::event_queue.pop_back();
@@ -152,20 +140,20 @@ sf::Event get_event() {
     return ev;
 }
 
-// TODO get events from a fixed size event queue from the dispatcher
-game_state_t player_input() {
+/**
+ * @brief set the player event input
+ *
+ * @param ev input event
+ * @return return the next game state after the input
+ */
+game_state_t player_input(const sf::Event& ev) {
     auto player_pos = reg.get<position_t>(player);
-
-    if(engine::event_queue.empty()) {
-        return game_state_t::AWAITING_INPUT;
-    }
-
-    auto ev = get_event();
 
     switch(ev.type) {
     case sf::Event::KeyPressed: {
         switch(ev.key.code) {
         case sf::Keyboard::I: {
+            // TODO make a GUI component and treat the UI as a system
             return game_state_t::SHOW_INVENTORY;
         } break;
         case sf::Keyboard::D: {
@@ -173,12 +161,15 @@ game_state_t player_input() {
         } break;
         case sf::Keyboard::Q: {
         } break;
+        case sf::Keyboard::G: {
+            pick_item_at(player, player_pos);
+        }
         default: break;
         }
         auto target_pos = player_pos + get_delta_pos(ev);
         move_wait_attack(player, target_pos);
-        perform_action(ev);
     } break;
+
     case sf::Event::MouseMoved: {
     } break;
     default: {
@@ -189,6 +180,13 @@ game_state_t player_input() {
     return game_state_t::PLAYER_TURN;
 }
 
+/**
+ * @brief make a entity do a random walk
+ *
+ * @param reg register
+ * @param ent entity
+ * @param src_pos initial position
+ */
 void random_walk(registry& reg, const entt::entity& ent,
                  const position_t& src_pos) {
     auto dx               = rng::rng.range(-1, 1);
@@ -218,6 +216,17 @@ bool move_wait_attack(entt::entity& ent, const position_t& dst_pos) {
     }
     // ## 3. do nothing if is wall
     return false;
+}
+
+void system_player() {
+    sf::Event ev;
+    auto& game_state = reg.ctx<game_state_t>();
+
+    while(engine::engine.get_kb_event(ev)) {
+        // every player action may mutate the game state, all the other systems
+        // makes use of the state
+        game_state = player_input(ev);
+    }
 }
 
 }  // namespace radl::system

@@ -11,7 +11,7 @@
 #include "component/component.hpp"
 #include "system/game_state.hpp"
 #include "system/spawner.hpp"
-// #include "core/gui/gui.hpp"
+#include "core/gui/gui.hpp"
 #include "core/engine.hpp"
 
 #include "system/map/dijkstra_map.hpp"
@@ -325,11 +325,51 @@ void pre_run() {
     system::systems_run();
 }
 
-void system_game_set_state(std::function<void ()>) {
+void system_game_set_state(std::function<void()>) {}
 
+
+game_state_t game_state_inventory_show() {
+    // ! Ou faria associação com o reg
+    using gui::item_menu_result_t;
+    auto [menu_res, ent] = gui::render_inventory_use();
+    auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
+
+    switch(menu_res) {
+    case item_menu_result_t::CANCEL: {
+        inv_ui.clear();
+        return game_state_t::AWAITING_INPUT;
+    } break;
+    case item_menu_result_t::NO_RESPONSE: break;
+    case item_menu_result_t::SELECTED: {
+        inv_ui.clear();
+        reg.emplace<wants_to_use_t>(player, ent);
+        return game_state_t::PLAYER_TURN;
+    } break;
+    }
+    return game_state_t::SHOW_INVENTORY;
 }
 
+game_state_t game_state_inventory_drop() {
+    using gui::item_menu_result_t;
+    auto [menu_res, ent] = gui::render_inventory_drop();
+    auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
 
+    switch(menu_res) {
+    case item_menu_result_t::CANCEL: {
+        inv_ui.clear();
+        return game_state_t::AWAITING_INPUT;
+    } break;
+    case item_menu_result_t::NO_RESPONSE: break;
+    case item_menu_result_t::SELECTED: {
+        inv_ui.clear();
+        reg.emplace<wants_to_drop_t>(player, ent);
+        return game_state_t::PLAYER_TURN;
+    } break;
+    }
+    return game_state_t::SHOW_INVENTORY_DROP;
+}
+
+// I need a conventional state machine
 void system_game_state([[maybe_unused]] double elapsed_time) {
     auto& game_state = reg.ctx<game_state_t>();
 
@@ -340,50 +380,18 @@ void system_game_state([[maybe_unused]] double elapsed_time) {
     } break;
 
     case game_state_t::AWAITING_INPUT: {
-        game_state = system::player_input();
+        // game_state = player_input();
+        // TODO modify this
+        system_player();
     } break;
 
-    // TODO create a function to call from gui, instead of calling gui from
-    // the function should be a callback ?
-    // this system
-    // case game_state_t::SHOW_INVENTORY: {
-    //     // ! Ou faria associação com o reg
-    //     using gui::item_menu_result_t;
-    //     auto [menu_res, ent] = gui::render_inventory_use();
-    //     auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
+    case game_state_t::SHOW_INVENTORY: {
+        game_state = game_state_inventory_show();
+    } break;
 
-    //     switch(menu_res) {
-    //     case item_menu_result_t::CANCEL: {
-    //         inv_ui.clear();
-    //         game_state = game_state_t::AWAITING_INPUT;
-    //     } break;
-    //     case item_menu_result_t::NO_RESPONSE: break;
-    //     case item_menu_result_t::SELECTED: {
-    //         inv_ui.clear();
-    //         reg.emplace<wants_to_use_t>(player, ent);
-    //         game_state = game_state_t::PLAYER_TURN;
-    //     } break;
-    //     }
-    // } break;
-
-    // case game_state_t::SHOW_INVENTORY_DROP: {
-    //     using gui::item_menu_result_t;
-    //     auto [menu_res, ent] = gui::render_inventory_drop();
-    //     auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
-
-    //     switch(menu_res) {
-    //     case item_menu_result_t::CANCEL: {
-    //         inv_ui.clear();
-    //         game_state = game_state_t::AWAITING_INPUT;
-    //     } break;
-    //     case item_menu_result_t::NO_RESPONSE: break;
-    //     case item_menu_result_t::SELECTED: {
-    //         inv_ui.clear();
-    //         reg.emplace<wants_to_drop_t>(player, ent);
-    //         game_state = game_state_t::PLAYER_TURN;
-    //     } break;
-    //     }
-    // } break;
+    case game_state_t::SHOW_INVENTORY_DROP: {
+        game_state = game_state_inventory_drop();
+    } break;
 
     case game_state_t::PLAYER_TURN: {
         system::systems_run();
@@ -412,10 +420,6 @@ void system_game_state([[maybe_unused]] double elapsed_time) {
 
 // later we can group the components and run the groups in parallel
 void systems_run() {
-    // fixme
-    system_game_state(0);
-
-    // system_active_universe();
     system_visibility();
     system_ai();
     system_melee_combat();
@@ -457,19 +461,17 @@ void phase_mouse_cursor(double elapsed_time) {
             alpha_cursor = 0;
         }
     }
-    // term(gui::UI_MOUSE)->set_alpha(static_cast<int>(alpha_cursor));
+    term(gui::UI_MOUSE)->set_alpha(static_cast<int>(alpha_cursor));
     // reg.ctx<gui_t>().cursor_alpha = alpha_cursor?
 }
 
 
 void init_systems() {
-    // engine::event_dispatcher.sink<sf::Event>().connect<&player_system>();
     reg.set<camera_t>();
-    engine::event_dispatcher.sink<double>().connect<&system_render>();
-    engine::event_dispatcher.sink<double>().connect<&system_particle>();
-    engine::event_dispatcher.sink<double>().connect<&phase_mouse_cursor>();
-
-    // TODO connect player_system
+    engine::engine.dispatcher.sink<double>().connect<&system_render>();
+    engine::engine.dispatcher.sink<double>().connect<&system_particle>();
+    engine::engine.dispatcher.sink<double>().connect<&phase_mouse_cursor>();
+    engine::engine.dispatcher.sink<double>().connect<&system_game_state>();
 }
 
 

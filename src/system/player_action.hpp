@@ -17,6 +17,8 @@ namespace radl::system {
  */
 game_state_t player_input();
 
+game_state_t player_input(const sf::Event &event);
+void system_player() ;
 /**
  * @brief move (to tile) or attack something on @a dst_pos
  *

@@ -52,7 +52,7 @@ void draw_tooltips() {
     auto& map = get_map();
     // auto view_tooltip = reg.view<name_t, position_t>();
 
-    auto mouse_pos = state::get_mouse_position();
+    auto mouse_pos = engine::engine.get_mouse_position();
     auto [mx, my]  = mouse_pos;
     auto [fw, fh]  = term(UI_MOUSE)->get_font_size();
     mx /= fw;
@@ -274,7 +274,8 @@ void terminate() {
 }
 
 void render_mouse_overlay() {
-    auto [mx, my] = state::get_mouse_position();
+    // auto [mx, my] = state::get_mouse_position();
+    auto [mx, my] = engine::engine.get_mouse_position();
     auto [fw, fh] = term(UI_MOUSE)->get_font_size();
     mx /= fw;
     my /= fh;

@@ -1,28 +1,34 @@
 Language: Cpp
 Standard: Cpp11
+
+UseTab: Never
+ContinuationIndentWidth: 4
+ColumnLimit: 80
+
+AccessModifierOffset: -4
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: false
 BreakBeforeBinaryOperators: All
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeComma
 Cpp11BracedListStyle: true
+IndentWidth: 4
+NamespaceIndentation: None
 PointerAlignment: Left
 PointerBindsToType: true
-TabWidth: 4
-IndentWidth: 4
 SortIncludes: false
-AccessModifierOffset: -4
-ColumnLimit: 80
-NamespaceIndentation: None
-AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: true
-AlignConsecutiveDeclarations: false
-AllowAllParametersOfDeclarationOnNextLine: true
+TabWidth: 4
+
 AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortBlocksOnASingleLine: Always
 AlwaysBreakTemplateDeclarations: true
-UseTab: Never
 
 AllowShortBlocksOnASingleLine: Always
-AllowShortFunctionsOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Empty
 
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeParens: Never
@@ -38,7 +44,6 @@ ReflowComments: true
 
 AlignConsecutiveMacros: true
 AlignTrailingComments: true
-ContinuationIndentWidth: 4
 
 AllowShortLambdasOnASingleLine: Empty
 
