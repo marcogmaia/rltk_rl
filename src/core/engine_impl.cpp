@@ -45,7 +45,9 @@ public:
         this->main_window = rltk::get_window();
     }
 
-    ~EngineImpl() = default;
+    ~EngineImpl() {
+        gui::terminate();
+    }
 
     sf::RenderWindow& get_window() {
         return *main_window;
@@ -175,6 +177,7 @@ void Engine::run_game() {
             engine_impl->focus(event);
             set_mouse_event(event);
             set_kb_event(event);
+            dispatcher.enqueue<sf::Event>(event);
         }
 
         // engine.game_tick

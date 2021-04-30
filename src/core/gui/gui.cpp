@@ -210,7 +210,7 @@ void imgui_init() {
     ImGui::SFML::Init(*rltk::get_window());
     auto& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    engine::event_dispatcher.sink<sf::Event>().connect<imgui_process_event>();
+    engine::engine.dispatcher.sink<sf::Event>().connect<imgui_process_event>();
     gui->add_owner_layer(GOD_UI, 0, 0, 1024, 768, resize_main, imgui_frame);
 }
 
@@ -336,10 +336,12 @@ void render_inventory_right_side() {
     render_inventory_items();
 }
 
-void render_gui() {
-    render_inventory_right_side();
-    render_log_stats();
-    render_mouse_overlay();
+void render_gui([[maybe_unused]] double elapsed_time_ms) {
+    if(reg.valid(player) && reg.all_of<combat_stats_t>(player)) {
+        render_inventory_right_side();
+        render_log_stats();
+        render_mouse_overlay();
+    }
 }
 
 void clear_gui() {

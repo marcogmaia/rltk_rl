@@ -14,14 +14,12 @@ int ev_to_option(sf::Event ev) {
 }
 
 int get_option() {
-    auto& evq = engine::event_queue;
-    if(evq.empty()) {
-        return -1;
+    sf::Event ev;
+    constexpr int invalid_opt = INT32_MAX;
+    if(!engine::engine.get_kb_event(ev)) {
+        return invalid_opt;
     }
-    auto ev = evq.front();
-    evq.pop_front();
     auto opt = ev_to_option(ev);
-
     return opt;
 }
 

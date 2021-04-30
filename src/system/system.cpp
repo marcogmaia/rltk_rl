@@ -293,6 +293,7 @@ void system_camera() {
     camera.width    = engine::console->term_width;
     camera.height   = engine::console->term_height;
     camera.position = reg.get<position_t>(player);
+    // gui::render_gui();
 }
 
 void restart_game_state() {
@@ -462,7 +463,6 @@ void phase_mouse_cursor(double elapsed_time) {
         }
     }
     term(gui::UI_MOUSE)->set_alpha(static_cast<int>(alpha_cursor));
-    // reg.ctx<gui_t>().cursor_alpha = alpha_cursor?
 }
 
 
@@ -472,6 +472,7 @@ void init_systems() {
     engine::engine.dispatcher.sink<double>().connect<&system_particle>();
     engine::engine.dispatcher.sink<double>().connect<&phase_mouse_cursor>();
     engine::engine.dispatcher.sink<double>().connect<&system_game_state>();
+    engine::engine.dispatcher.sink<double>().connect<&gui::render_gui>();
 }
 
 

@@ -12,10 +12,10 @@ void walk(registry& reg, const entt::entity& ent, const position_t& src_pos,
     std::lock_guard lock(walk_mutex);
 
     if(!reg.any_of<dead_t>(ent)) {
-        reg.emplace<want_to_walk_t>(ent, want_to_walk_t{
-                                             .from = src_pos,
-                                             .to   = target_pos,
-                                         });
+        reg.emplace_or_replace<want_to_walk_t>(ent, want_to_walk_t{
+                                                        .from = src_pos,
+                                                        .to   = target_pos,
+                                                    });
     }
 }
 
