@@ -112,9 +112,6 @@ using namespace rltk::colors;
 
 }  // namespace
 
-[[maybe_unused]] void flush_events() {
-    engine::event_queue.clear();
-}
 
 void pick_item_at(entity ent, position_t pos) {
     auto& ents_here = get_map().at(pos).entities_here;
@@ -132,13 +129,6 @@ void pick_item_at(entity ent, position_t pos) {
 }
 
 
-sf::Event get_event() {
-    auto ev = engine::event_queue.back();
-    engine::event_queue.pop_back();
-    flush_events();
-
-    return ev;
-}
 
 /**
  * @brief set the player event input

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <tuple>
 #include <execution>
 #include <ranges>
 
@@ -13,89 +14,91 @@
 #include "system/map/map.hpp"
 
 #include "utils/path_finding.hpp"
+#include "utils/fov.h"
 
 namespace radl::system {
 
 namespace {
+
 [[maybe_unused]] void timeit(const std::function<void(void)>& func) {
     sf::Clock clk;
     clk.restart();
     func();
     spdlog::info("\tran in: {}us", clk.getElapsedTime().asMicroseconds());
 }
+
+
+
+using fov_user_type_t = std::tuple<entity, radl::Map*,
+                                   std::unordered_set<position_t, PosHasher>*>;
+
+bool is_opaque(void* pmap, int x, int y) {
+    // auto& map = *static_cast<radl::Map*>(pmap);
+    auto& [ent, map, vshed] = *static_cast<fov_user_type_t*>(pmap);
+    position_t check_pos{x, y};
+    position_t ent_pos = reg.get<position_t>(ent);
+    if(check_pos == ent_pos) {
+        return false;
+    }
+    if(map->rect.contains(check_pos)) {
+        auto& tile = map->at(check_pos);
+        return !tile.props.transparent;
+    }
+    return true;
+}
+
+// pmap should be a pair of ptrs to map and viewshed
+void set_visibility(void* pmap, int x, int y, int dx, int dy, void* src) {
+    auto& [ent, map, vis] = *static_cast<fov_user_type_t*>(pmap);
+    position_t vis_pos{x, y};
+    if(map->rect.contains(vis_pos)) {
+        if(ent == player) {
+            map->at(vis_pos).props.explored = true;
+        }
+        vis->insert(vis_pos);
+        // vis->visible_coordinates.insert(vis_pos);
+    }
+}
+
+fov_settings_type settings{
+    .opaque       = is_opaque,
+    .apply        = set_visibility,
+    .shape        = FOV_SHAPE_CIRCLE_PRECALCULATE,
+    .corner_peek  = FOV_CORNER_NOPEEK,
+    .opaque_apply = FOV_OPAQUE_APPLY,
+    .heights      = NULL,
+    .numheights   = 0,
+};
+
 }  // namespace
 
 /**
- * @brief Update entitis viewshet parallel
+ * @brief Update entitis viewshed parallel
  *
  */
 void fov_update() {
     // FIXME this must be a system
-    sf::Clock clk;
-    clk.restart();
-
     const auto& view_vshed = reg.view<viewshed_t>();
+    auto& map = get_map();
 
-    // auto& ents_near = *get_entities_near_player();
-    std::vector<entity> ents_to_calculate_fov;
-    // ents_to_calculate_fov.reserve(64);
-    // std::ranges::copy_if(ents_near,
-    // std::back_inserter(ents_to_calculate_fov),
-    //                      [&view_vshed](auto ent) {
-    //                          return view_vshed.contains(ent);
-    //                      });
+    // fov_settings_set_opacity_test_function(&settings, is_opaque);
+    // fov_settings_set_apply_lighting_function(&settings, set_visibility);
 
-    int count_fovs_updated = 0;
-    static std::mutex cntmutex;
-
-    auto run_fov_sweep = [&](auto ent) {
-        auto& vshed = view_vshed.get<viewshed_t>(ent);
-        if(!vshed.dirty) {
-            return;
-        }
-        vshed.dirty   = false;
-        auto& map     = get_map();
-        auto& ent_pos = reg.get<position_t>(ent);
-
-        decltype(vshed.visible_coordinates) new_vis;
-
-        auto set_visibility = [&](const position_t& reveal_pos) {
-            if(map.rect.contains(reveal_pos)) {
-                auto& reveal_tile = map.at(reveal_pos);
-                new_vis.insert(reveal_pos);
-                if(ent == player) {
-                    reveal_tile.props.explored = true;
-                }
-            }
-        };
-
-        auto is_transparent = [&](const position_t& check_pos) {
-            if(map.rect.contains(check_pos)) {
-                auto& tile = map[check_pos];
-                return tile.props.transparent;
-            }
-            return false;
-        };
-
-        visibility_sweep_2d<position_t, navigator_t<position_t>>(
-            ent_pos, vshed.range, set_visibility, is_transparent);
-        vshed.visible_coordinates.swap(new_vis);
-        std::lock_guard lock(cntmutex);
-        ++count_fovs_updated;
-    };
-
-    auto v_ents_to_update = reg.view<viewshed_t>();
-    std::for_each(std::execution::par_unseq, v_ents_to_update.begin(),
-                  v_ents_to_update.end(), run_fov_sweep);
-
-    // spdlog::info("updating_fov {} entities", ents_to_calculate_fov.size());
-
-    // std::for_each(std::execution::par_unseq, ents_to_calculate_fov.begin(),
-    //               ents_to_calculate_fov.end(), run_fov_sweep);
-    // run_fov_sweep(player);
-
-    // spdlog::info("\tupdated: {} fovs, dT: {}", count_fovs_updated,
-    //              clk.getElapsedTime().asMicroseconds());
+    std::for_each(std::execution::par_unseq, view_vshed.begin(),
+                  view_vshed.end(), [&map, &view_vshed](entity ent) {
+                      auto& vshed        = view_vshed.get<viewshed_t>(ent);
+                      position_t src_pos = reg.get<position_t>(ent);
+                      decltype(vshed.visible_coordinates) new_vis;
+                      new_vis.insert(src_pos);
+                      fov_user_type_t s_map{
+                          ent,
+                          &map,
+                          &new_vis,
+                      };
+                      auto [x, y] = src_pos;
+                      fov_circle(&settings, &s_map, nullptr, x, y, vshed.range);
+                      vshed.visible_coordinates.swap(new_vis);
+                  });
 }
 
 }  // namespace radl::system

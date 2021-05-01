@@ -2,9 +2,6 @@
 
 #include "component/position.hpp"
 
-// FIXME camera isn't a component.
-// ## this is part of the game state (?)
-
 namespace radl::component {
 
 struct camera_t {

@@ -21,13 +21,8 @@ namespace radl::engine {
 Engine engine;
 
 using namespace rltk::colors;
-std::deque<sf::Event> event_queue;
 
 rltk::virtual_terminal* console;
-
-entt::dispatcher event_dispatcher{};
-entt::sigh<sf::Event()> ev_signal{};
-entt::sink ev_sink{ev_signal};
 
 namespace {
 

@@ -22,12 +22,8 @@ using entt::registry;
 
 namespace radl::engine {
 
-extern std::deque<sf::Event> event_queue;
-extern entt::sigh<sf::Event()> ev_signal;
 
 extern rltk::virtual_terminal* console;
-
-extern entt::dispatcher event_dispatcher;
 
 using namespace component;
 

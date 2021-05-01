@@ -85,7 +85,7 @@ public:
                 sf::FloatRect(0.F, 0.F, static_cast<float>(screen_width),
                               static_cast<float>(screen_height))));
             rltk::gui->on_resize(screen_width, screen_height);
-            engine::event_queue.push_back(event);
+            // engine::event_queue.push_back(event);
         } break;
         default: break;
         }

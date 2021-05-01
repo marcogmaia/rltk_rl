@@ -17,20 +17,10 @@
 #include "system/map/dijkstra_map.hpp"
 namespace radl::system {
 
-// TODO move the "state" code to system i.e. all the related code
-// e.g. map, player_action, game_state, etc
-// the system is the only thing the engine needs.
 
 void system_visibility() {
-    // can be multithread
     fov_update();
 }
-
-// void system_active_universe() {
-//     // query_alive_entities_near_player();
-// }
-
-void map_indexer() {}
 
 void system_ai() {
     const auto& gstate = reg.ctx<game_state_t>();

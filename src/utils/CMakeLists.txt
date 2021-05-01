@@ -1,6 +1,7 @@
 
 set(
     UTILS_SRC
+    "fov.c"
     "utils.cpp"
     "rng.cpp"
    
