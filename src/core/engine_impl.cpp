@@ -1,3 +1,4 @@
+#include "SFML/Window.hpp"
 #include "gsl/gsl_util"
 
 #include "core/engine.hpp"
@@ -162,6 +163,8 @@ void Engine::run_game() {
     engine_impl->reset_mouse_state();
 
     auto& main_window  = engine_impl->get_window();
+    main_window.setFramerateLimit(140);
+    
     double duration_ms = 0.0;
 
     auto clock = std::chrono::steady_clock();

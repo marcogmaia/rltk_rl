@@ -16,6 +16,8 @@
 #include "utils/path_finding.hpp"
 #include "utils/fov.h"
 
+#include "utils/permissive-fov/permissive-fov.hpp"
+
 namespace radl::system {
 
 namespace {
@@ -66,6 +68,43 @@ fov_settings_type settings{
     .numheights   = 0,
 };
 
+class private_fov_t {
+private:
+    entity m_ent;
+    radl::Map& m_map;
+    std::unordered_set<position_t, PosHasher>& m_vis;
+
+public:
+    private_fov_t(entity ent, radl::Map& map,
+                  std::unordered_set<position_t, PosHasher>& vis)
+        : m_ent(ent)
+        , m_map(map)
+        , m_vis(vis) {}
+
+    bool isBlocked(int destX, int destY) {
+        position_t check_pos{destX, destY};
+        const position_t& ent_pos = reg.get<position_t>(m_ent);
+        if(check_pos == ent_pos) {
+            return false;
+        }
+        if(m_map.rect.contains(check_pos)) {
+            auto& tile = m_map.at(check_pos);
+            return !tile.props.transparent;
+        }
+        return true;
+    }
+
+    void visit(int destX, int destY) {
+        position_t vis_pos{destX, destY};
+        if(m_map.rect.contains(vis_pos)) {
+            if(m_ent == player) {
+                m_map.at(vis_pos).props.explored = true;
+            }
+            m_vis.insert(vis_pos);
+        }
+    }
+};
+
 }  // namespace
 
 /**
@@ -74,21 +113,17 @@ fov_settings_type settings{
  */
 void fov_update() {
     const auto& view_vshed = reg.view<viewshed_t>();
-    auto& map = get_map();
+    auto& map              = get_map();
 
     std::for_each(std::execution::par_unseq, view_vshed.begin(),
                   view_vshed.end(), [&map, &view_vshed](entity ent) {
-                      auto& vshed        = view_vshed.get<viewshed_t>(ent);
-                      position_t src_pos = reg.get<position_t>(ent);
+                      auto& vshed = view_vshed.get<viewshed_t>(ent);
                       decltype(vshed.visible_coordinates) new_vis;
+                      position_t src_pos = reg.get<position_t>(ent);
                       new_vis.insert(src_pos);
-                      fov_user_type_t s_map{
-                          ent,
-                          &map,
-                          &new_vis,
-                      };
+                      private_fov_t pfov{ent, map, new_vis};
                       auto [x, y] = src_pos;
-                      fov_circle(&settings, &s_map, nullptr, x, y, vshed.range);
+                      permissive::squareFov(x, y, vshed.range, pfov);
                       vshed.visible_coordinates.swap(new_vis);
                   });
 }

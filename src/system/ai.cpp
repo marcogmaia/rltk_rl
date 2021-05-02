@@ -127,7 +127,7 @@ void ai_enemy_dijkstra_map(entity ent) {
     }
 
     // auto player_pos = reg.get<position_t>(player);
-    auto player_pos = enemy.memory;
+    auto memory_pos = enemy.memory;
 
     bool somebody_already_wants_to_walk_to = false;
     // check if anybody already wants to walk to this tile
@@ -138,7 +138,7 @@ void ai_enemy_dijkstra_map(entity ent) {
         }
     }
     // if player is next to ent: attack // distance to player is 1
-    if(distance_pythagoras(player_pos, ent_pos) < 1.5) {
+    if(distance_pythagoras(reg.get<position_t>(player), ent_pos) < 1.5) {
         // attack player
         system::attack(ent, player);
     }

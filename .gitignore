@@ -1,12 +1,12 @@
 roguebasin/
 perf.*
+*.zip
 
 lib/libtcod/
 build/
 assets/
 .vscode/browse.*
 .vscode/ipch
-
 
 backblue.gif
 fade.gif

@@ -84,16 +84,16 @@ void camera() {
 
         term(gui::UI_MAP)->set_char(rx, ry, tile_vch);
 
-        auto& dm         = reg.ctx<DijkstraMap>();
-        auto cost        = static_cast<int>(dm.at(v_pos));
-        vchar_t vch_cost = {glyph::SOLID1,
-                            color_t{
-                                cost * 8,
-                                cost * 8,
-                                cost * 8,
-                            },
-                            BLACK};
-        term(gui::UI_MAP)->set_char(rx, ry, vch_cost);
+        // auto& dm         = reg.ctx<DijkstraMap>();
+        // auto cost        = static_cast<int>(dm.at(v_pos));
+        // vchar_t vch_cost = {glyph::SOLID1,
+        //                     color_t{
+        //                         cost * 8,
+        //                         cost * 8,
+        //                         cost * 8,
+        //                     },
+        //                     BLACK};
+        // term(gui::UI_MAP)->set_char(rx, ry, vch_cost);
     }
 
     // render renderables

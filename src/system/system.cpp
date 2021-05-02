@@ -40,10 +40,15 @@ void system_ai() {
                 // path
                 ai_enemy_dijkstra_map(e_ent);
             }
-
-            --e_enemy.remember_turns;
-            if(e_enemy.remember_turns <= 0) {
-                e_enemy.remembers_target_position = false;
+            else if(e_enemy.remember_turns > 0) {
+                --e_enemy.remember_turns;
+                if(e_enemy.remember_turns <= 0) {
+                    e_enemy.remembers_target_position = false;
+                }
+                ai_enemy_dijkstra_map(e_ent);
+            }
+            else {
+                random_walk(reg, e_ent, reg.get<position_t>(e_ent));
             }
         }
     } else if(gstate == game_state_t::PLAYER_TURN) {
