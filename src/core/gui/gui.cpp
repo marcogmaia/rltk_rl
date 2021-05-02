@@ -193,13 +193,16 @@ void imgui_frame(rltk::layer_t* l, sf::RenderTexture& window) {
             auto pos_str         = fmt::format("position: ({}, {})", px, py);
             ImGui::Text(pos_str.c_str());
         }
-        // show fps
+        // camera
         {
             static auto& camera = reg.ctx<camera_t>();
             auto fps            = 1000.0 / camera.frame_time;
             ImGui::Text(
                 fmt::format("time: {:.2f}, fps: {:.2f}", camera.frame_time, fps)
                     .c_str());
+            if(ImGui::Checkbox("reveal map", &camera.reveal_map)) {
+                camera.dirty = true;
+            }
         }
     }
     ImGui::End();

@@ -285,9 +285,9 @@ void system_camera() {
     auto& camera  = reg.ctx<camera_t>();
     camera.width  = engine::console->term_width;
     camera.height = engine::console->term_height;
-    
-    camera.position = reg.get<position_t>(player);
-
+    if(!camera.custom_position) {
+        camera.position = reg.get<position_t>(player);
+    }
     // gui::render_gui();
 }
 
