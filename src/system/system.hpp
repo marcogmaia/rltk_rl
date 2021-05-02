@@ -15,8 +15,6 @@ void system_particle(double elapsed_time);
 
 void systems_player();
 
-// XXX debugging
-void player_system(const sf::Event& ev);
 void init_systems();
 
 }  // namespace radl::system

@@ -14,8 +14,6 @@
 #include <ranges>
 namespace radl {
 
-// TODO Map should be a proper class
-
 using namespace rltk::colors;
 
 void fill(Map& map, const rect_t& rect, tile_property_t characteristics,

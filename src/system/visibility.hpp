@@ -86,8 +86,6 @@ void visibility_sweep_2d(const location_t& position, const int& range,
     }
 }
 
-
-// TODO better FoV based on the bracket lib
 template <typename location_t, typename navigator_t>
 std::unordered_set<location_t>
 field_of_view_set(location_t center, uint32_t range,

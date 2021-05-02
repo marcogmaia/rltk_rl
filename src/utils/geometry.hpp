@@ -151,8 +151,8 @@ inline void line_func_cancellable(const int& x1, const int& y1, const int& x2,
     auto y      = static_cast<double>(y1) + 0.5;
     auto dest_x = static_cast<const double>(x2);
     auto dest_y = static_cast<const double>(y2);
-    // XXX good enough for max distance 32
-    const double n_steps = distance2d(x1, y1, x2, y2) * 1;
+
+    const double n_steps = distance2d(x1, y1, x2, y2);
     const int steps      = static_cast<const int>(std::floor(n_steps) + 1);
     const double slope_x = (dest_x - x) / n_steps;
     const double slope_y = (dest_y - y) / n_steps;
@@ -214,8 +214,7 @@ inline void bresenham(double x1, double y1, double x2, double y2,
                 if(!func(x, y)) {
                     // return;
                 }
-            }
-            else {
+            } else {
                 y = y + sy;
                 // putpixels(x, y);
                 if(!func(x, y)) {
@@ -223,8 +222,7 @@ inline void bresenham(double x1, double y1, double x2, double y2,
                 }
             }
             p = p + 2 * std::abs(dy);
-        }
-        else {
+        } else {
             x = x + sx;
             y = y + sy;
             // putpixels(x, y);

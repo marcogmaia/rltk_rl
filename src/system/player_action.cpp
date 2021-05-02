@@ -143,7 +143,6 @@ game_state_t player_input(const sf::Event& ev) {
     case sf::Event::KeyPressed: {
         switch(ev.key.code) {
         case sf::Keyboard::I: {
-            // TODO make a GUI component and treat the UI as a system
             return game_state_t::SHOW_INVENTORY;
         } break;
         case sf::Keyboard::D: {

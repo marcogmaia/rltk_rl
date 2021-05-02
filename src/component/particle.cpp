@@ -19,8 +19,9 @@ void particle_create(particle_type_t type, double duration_ms,
         particle_vch.foreground   = GREEN;
         particle_vch.foreground.a = 0xCF;
     } break;
+    default: break;
     }
-    // FIXME this must be implemented inside systems
+    // TODO this needs to be implemented inside systems
     auto ent = reg.create();
     reg.emplace<position_t>(ent, pos);
     reg.emplace<renderable_t>(ent, renderable_t{particle_vch});

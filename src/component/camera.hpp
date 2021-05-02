@@ -11,9 +11,10 @@ struct camera_t {
     int height;
     bool dirty = true;  // flag to tell if the camera needs update
     double frame_time;
-#ifdef DEBUG
-    bool reveal_map = false;
-#endif
+    
+    // for debugging purposes
+    bool reveal_map      = false;
+    bool custom_position = false;
 };
 
 }  // namespace radl::component

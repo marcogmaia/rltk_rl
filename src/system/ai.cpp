@@ -51,7 +51,6 @@ namespace {
 }  // namespace
 
 void ai_enemy_find_path(entity e_ent, const position_t& target_pos) {
-    // FIXME this must be a system
     viewshed_t& e_vshed = reg.get<viewshed_t>(e_ent);
     auto& vis_coords    = e_vshed.visible_coordinates;
 

@@ -39,15 +39,13 @@ void system_ai() {
                 // if the player is not adjacente it takes the next step in the
                 // path
                 ai_enemy_dijkstra_map(e_ent);
-            }
-            else if(e_enemy.remember_turns > 0) {
+            } else if(e_enemy.remember_turns > 0) {
                 --e_enemy.remember_turns;
                 if(e_enemy.remember_turns <= 0) {
                     e_enemy.remembers_target_position = false;
                 }
                 ai_enemy_dijkstra_map(e_ent);
-            }
-            else {
+            } else {
                 random_walk(reg, e_ent, reg.get<position_t>(e_ent));
             }
         }
@@ -284,10 +282,12 @@ void system_render(double duration_ms) {
 }
 
 void system_camera() {
-    auto& camera    = reg.ctx<camera_t>();
-    camera.width    = engine::console->term_width;
-    camera.height   = engine::console->term_height;
+    auto& camera  = reg.ctx<camera_t>();
+    camera.width  = engine::console->term_width;
+    camera.height = engine::console->term_height;
+    
     camera.position = reg.get<position_t>(player);
+
     // gui::render_gui();
 }
 
@@ -423,11 +423,6 @@ void systems_run() {
     system_walk();
     system_map();
     system_camera();
-}
-
-void player_system(const sf::Event& ev) {
-    auto dpos = get_delta_pos(ev);
-    spdlog::debug("player dpos: ({}, {})", dpos.first, dpos.second);
 }
 
 void phase_mouse_cursor(double elapsed_time) {

@@ -15,7 +15,7 @@
 
 namespace radl::system {
 
-// TODO camera should be a proper class.
+// TODO make option in GOD ui to show the entire map and change camera position
 namespace {
 
 position_t render_position(const position_t& pos, const camera_t& camera) {
