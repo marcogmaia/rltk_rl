@@ -12,7 +12,6 @@
 
 #include "system/map/dijkstra_map.hpp"
 
-
 namespace radl::system {
 
 // TODO make option in GOD ui to show the entire map and change camera position
@@ -29,8 +28,10 @@ position_t render_position(const position_t& pos, const camera_t& camera) {
 }  // namespace
 
 // template <typename... Component, typename... Exclude, typename Entity>
-template <typename IterView>
-inline void render_particles(const camera_t& camera, IterView&& view) {
+inline void
+render_particles(const camera_t& camera,
+                 entt::basic_view<entt::entity, entt::exclude_t<>, renderable_t,
+                                  position_t, particle_t>&& view) {
     rltk::sterm(gui::UI_PARTICLES)->clear();
     for(auto ent : view) {
         auto [rend, pos, part] = view.get(ent);
@@ -51,7 +52,7 @@ inline void
 render_renderables(const camera_t& camera,
                    entt::basic_view<entt::entity, entt::exclude_t<>,
                                     renderable_t, position_t>&& view) {
-    // only needs to sort when a new renderable is added or removed
+    // TODO only needs to sort when a new renderable is added or removed
     reg.sort<renderable_t>(
         [](const renderable_t& lhs, const renderable_t& rhs) {
             return lhs.z_level < rhs.z_level;
@@ -106,7 +107,6 @@ inline void render_visible_map(const camera_t& camera) {
     auto& pvshed   = reg.get<viewshed_t>(player);
 
     if(camera.reveal_map) {
-        // for(auto& tile : base_map.tiles) {
         for(int x = 0; x < base_map.rect.width(); ++x) {
             for(int y = 0; y < base_map.rect.height(); ++y) {
                 auto& tile    = base_map.at(x, y);
@@ -120,9 +120,6 @@ inline void render_visible_map(const camera_t& camera) {
                     } else {
                         tile_vch.foreground = color_t(36, 18, 4);
                     }
-                    term(gui::UI_ENTITIES)
-                        ->set_char(rx, ry,
-                                   vchar_t{glyph::CDOT, DARK_GREY, BLACK});
                 }
                 term(gui::UI_MAP)->set_char(rx, ry, tile_vch);
             }
@@ -140,24 +137,22 @@ inline void render_visible_map(const camera_t& camera) {
                 } else {
                     tile_vch.foreground = color_t(36, 18, 4);
                 }
-                term(gui::UI_ENTITIES)
-                    ->set_char(rx, ry, vchar_t{glyph::CDOT, DARK_GREY, BLACK});
             }
             term(gui::UI_MAP)->set_char(rx, ry, tile_vch);
         }
     }
+    for(const auto& v_pos : pvshed.visible_coordinates) {
+        const auto& tile = base_map.at(v_pos);
+        if(tile.type == tile_type_t::floor) {
+            auto [rx, ry] = render_position(v_pos, camera);
+            term(gui::UI_ENTITIES)
+                ->set_char(rx, ry, vchar_t{glyph::CDOT, DARK_GREY, BLACK});
+        }
+    }
 }
 
-void camera_player(camera_t& camera) {
-    if(!camera.dirty) {
-        return;
-    }
-    camera.dirty = false;
-    term(gui::UI_MAP)->clear();
-    term(gui::UI_ENTITIES)->clear();
-    render_explored_map(camera);
-    render_visible_map(camera);
-
+// TODO render_dijkstra_map
+void render_dijkstra_map() {
     // auto& dm         = reg.ctx<DijkstraMap>();
     // auto cost        = static_cast<int>(dm.at(v_pos));
     // vchar_t vch_cost = {glyph::SOLID1,
@@ -168,13 +163,9 @@ void camera_player(camera_t& camera) {
     //                     },
     //                     BLACK};
     // term(gui::UI_MAP)->set_char(rx, ry, vch_cost);
-
-    // render renderables
-    render_renderables(camera, reg.view<renderable_t, position_t>());
-    render_particles(camera, reg.view<renderable_t, position_t, particle_t>());
 }
 
-void camera_debug(camera_t& camera) {
+void render_camera(camera_t& camera, [[maybe_unused]] bool debug = false) {
     if(!camera.dirty) {
         return;
     }
@@ -190,9 +181,9 @@ void camera_debug(camera_t& camera) {
 void camera() {
     auto& camera = reg.ctx<camera_t>();
     if(camera.reveal_map) {
-        camera_debug(camera);
+        render_camera(camera, true);
     } else {
-        camera_player(camera);
+        render_camera(camera, false);
     }
 }
 

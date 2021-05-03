@@ -142,83 +142,6 @@ void resize_inventory(rltk::layer_t* l, int w, int h) {
     l->y = (h / fh - l->h / fh) * fh;
 }
 
-#ifdef DEBUG
-
-void imgui_process_event(const sf::Event& event) {
-    if(event.type == sf::Event::EventType::KeyPressed
-       || event.type == sf::Event::EventType::KeyReleased) {
-        if(event.key.code < 0) {
-            return;
-        }
-    }
-    ImGui::SFML::ProcessEvent(event);
-}
-
-void imgui_frame(rltk::layer_t* l, sf::RenderTexture& window) {
-    if(!reg.valid(player) || !reg.all_of<player_t, combat_stats_t>(player)) {
-        return;
-    }
-    static sf::Clock deltaClock;
-    auto& main_window = *rltk::get_window();
-    ImGui::SFML::Update(main_window, deltaClock.restart());
-
-    ImGui::Begin("Add Items");
-    auto pressed = ImGui::Button("+ healing potion.");
-    if(pressed) {
-        reg.get<inventory_t>(player).add_item(
-            factory::items::potion_healing(true));
-    }
-    ImGui::End();
-
-    ImGui::Begin("Stats");
-    {
-        // change defense
-        {
-            auto& player_stats = reg.get<combat_stats_t>(player);
-            ImGui::Text("Set def:");
-            ImGui::SameLine();
-            if(ImGui::ArrowButton("##def_up", ImGuiDir_Up)) {
-                ++player_stats.defense;
-            }
-            ImGui::SameLine(0.0, 0.0);
-            if(ImGui::ArrowButton("##def_down", ImGuiDir_Down)) {
-                --player_stats.defense;
-            }
-            ImGui::SameLine();
-            ImGui::Text("%d", player_stats.defense);
-        }
-        // show position
-        {
-            const auto& [px, py] = reg.get<position_t>(player);
-            auto pos_str         = fmt::format("position: ({}, {})", px, py);
-            ImGui::Text(pos_str.c_str());
-        }
-        // camera
-        {
-            static auto& camera = reg.ctx<camera_t>();
-            auto fps            = 1000.0 / camera.frame_time;
-            ImGui::Text(
-                fmt::format("time: {:.2f}, fps: {:.2f}", camera.frame_time, fps)
-                    .c_str());
-            if(ImGui::Checkbox("reveal map", &camera.reveal_map)) {
-                camera.dirty = true;
-            }
-        }
-    }
-    ImGui::End();
-
-    ImGui::SFML::Render(main_window);
-}
-
-void imgui_init() {
-    ImGui::SFML::Init(*rltk::get_window());
-    auto& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    engine::engine.dispatcher.sink<sf::Event>().connect<imgui_process_event>();
-    gui->add_owner_layer(GOD_UI, 0, 0, 1024, 768, resize_main, imgui_frame);
-}
-
-#endif
 
 void init() {
     rect_t invent_rect{
@@ -266,9 +189,9 @@ void init() {
 
     engine::console = term(UI_MAP);
 
-#ifdef DEBUG
-    imgui_init();
-#endif
+// #ifdef DEBUG
+//     imgui_init();
+// #endif
 }
 
 void terminate() {

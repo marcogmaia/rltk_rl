@@ -32,41 +32,41 @@ namespace {
 using fov_user_type_t = std::tuple<entity, radl::Map*,
                                    std::unordered_set<position_t, PosHasher>*>;
 
-bool is_opaque(void* pmap, int x, int y) {
-    // auto& map = *static_cast<radl::Map*>(pmap);
-    auto& [ent, map, vshed] = *static_cast<fov_user_type_t*>(pmap);
-    position_t check_pos{x, y};
-    position_t ent_pos = reg.get<position_t>(ent);
-    if(check_pos == ent_pos) {
-        return false;
-    }
-    if(map->rect.contains(check_pos)) {
-        auto& tile = map->at(check_pos);
-        return !tile.props.transparent;
-    }
-    return true;
-}
+// bool is_opaque(void* pmap, int x, int y) {
+//     // auto& map = *static_cast<radl::Map*>(pmap);
+//     auto& [ent, map, vshed] = *static_cast<fov_user_type_t*>(pmap);
+//     position_t check_pos{x, y};
+//     position_t ent_pos = reg.get<position_t>(ent);
+//     if(check_pos == ent_pos) {
+//         return false;
+//     }
+//     if(map->rect.contains(check_pos)) {
+//         auto& tile = map->at(check_pos);
+//         return !tile.props.transparent;
+//     }
+//     return true;
+// }
 
-void set_visibility(void* pmap, int x, int y, int dx, int dy, void* src) {
-    auto& [ent, map, vis] = *static_cast<fov_user_type_t*>(pmap);
-    position_t vis_pos{x, y};
-    if(map->rect.contains(vis_pos)) {
-        if(ent == player) {
-            map->at(vis_pos).props.explored = true;
-        }
-        vis->insert(vis_pos);
-    }
-}
+// void set_visibility(void* pmap, int x, int y, int dx, int dy, void* src) {
+//     auto& [ent, map, vis] = *static_cast<fov_user_type_t*>(pmap);
+//     position_t vis_pos{x, y};
+//     if(map->rect.contains(vis_pos)) {
+//         if(ent == player) {
+//             map->at(vis_pos).props.explored = true;
+//         }
+//         vis->insert(vis_pos);
+//     }
+// }
 
-fov_settings_type settings{
-    .opaque       = is_opaque,
-    .apply        = set_visibility,
-    .shape        = FOV_SHAPE_CIRCLE_PRECALCULATE,
-    .corner_peek  = FOV_CORNER_NOPEEK,
-    .opaque_apply = FOV_OPAQUE_APPLY,
-    .heights      = NULL,
-    .numheights   = 0,
-};
+// fov_settings_type settings{
+//     .opaque       = is_opaque,
+//     .apply        = set_visibility,
+//     .shape        = FOV_SHAPE_CIRCLE_PRECALCULATE,
+//     .corner_peek  = FOV_CORNER_NOPEEK,
+//     .opaque_apply = FOV_OPAQUE_APPLY,
+//     .heights      = NULL,
+//     .numheights   = 0,
+// };
 
 class private_fov_t {
 private:
