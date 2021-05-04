@@ -56,6 +56,29 @@ void imgui_frame(const sf::RenderTexture& texture) {
     auto& main_window = *rltk::get_window();
     ImGui::SFML::Update(main_window, deltaClock.restart());
 
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->WorkPos);
+    ImGui::SetNextWindowSize(viewport->WorkSize);
+    ImGui::SetNextWindowViewport(viewport->ID);
+
+    // We are using the ImGuiWindowFlags_NoDocking flag to make the parent
+    // window not dockable into, because it would be confusing to have two
+    // docking targets within each others.
+    ImGuiWindowFlags window_flags
+        = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+    window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
+                    | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+    window_flags
+        |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+    // bool is_open;
+    ImGui::Begin("dockspace", (bool*)nullptr, window_flags);
+    ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+    ImGui::DockSpace(dockspace_id);
+    ImGui::End();
+    // ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    // ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+
     ImGui::Begin("Add Items");
     auto pressed = ImGui::Button("+ healing potion.");
     if(pressed) {

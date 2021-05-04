@@ -188,10 +188,6 @@ void init() {
     term(UI_TOOLTIPS)->set_alpha(0xDF);
 
     engine::console = term(UI_MAP);
-
-// #ifdef DEBUG
-//     imgui_init();
-// #endif
 }
 
 void terminate() {
