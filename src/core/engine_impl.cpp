@@ -33,122 +33,8 @@ namespace {
 std::array<bool, 7> mouse_button_pressed;
 int mouse_x = 0;
 int mouse_y = 0;
+
 }  // namespace
-
-
-#ifdef DEBUG
-
-void imgui_process_event(const sf::Event& event) {
-    if(event.type == sf::Event::EventType::KeyPressed
-       || event.type == sf::Event::EventType::KeyReleased) {
-        if(event.key.code < 0) {
-            return;
-        }
-    }
-    ImGui::SFML::ProcessEvent(event);
-}
-
-void imgui_frame(const sf::RenderTexture& texture) {
-    if(!reg.valid(player) || !reg.all_of<player_t, combat_stats_t>(player)) {
-        return;
-    }
-    static sf::Clock deltaClock;
-    auto& main_window = *rltk::get_window();
-    ImGui::SFML::Update(main_window, deltaClock.restart());
-
-    const ImGuiViewport* viewport = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(viewport->WorkPos);
-    ImGui::SetNextWindowSize(viewport->WorkSize);
-    ImGui::SetNextWindowViewport(viewport->ID);
-
-    // We are using the ImGuiWindowFlags_NoDocking flag to make the parent
-    // window not dockable into, because it would be confusing to have two
-    // docking targets within each others.
-    ImGuiWindowFlags window_flags
-        = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-    window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
-                    | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-    window_flags
-        |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-    // bool is_open;
-    ImGui::Begin("dockspace", (bool*)nullptr, window_flags);
-    ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-    ImGui::DockSpace(dockspace_id);
-    ImGui::End();
-    // ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    // ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-
-
-    ImGui::Begin("Add Items");
-    auto pressed = ImGui::Button("+ healing potion.");
-    if(pressed) {
-        reg.get<inventory_t>(player).add_item(
-            factory::items::potion_healing(true));
-    }
-    ImGui::End();
-
-    ImGui::Begin("Stats");
-    {
-        // change defense
-        {
-            auto& player_stats = reg.get<combat_stats_t>(player);
-            ImGui::Text("Set def:");
-            ImGui::SameLine();
-            if(ImGui::ArrowButton("##def_up", ImGuiDir_Up)) {
-                ++player_stats.defense;
-            }
-            ImGui::SameLine(0.0, 0.0);
-            if(ImGui::ArrowButton("##def_down", ImGuiDir_Down)) {
-                --player_stats.defense;
-            }
-            ImGui::SameLine();
-            ImGui::Text("%d", player_stats.defense);
-        }
-        // show position
-        {
-            const auto& [px, py] = reg.get<position_t>(player);
-            auto pos_str         = fmt::format("position: ({}, {})", px, py);
-            ImGui::Text(pos_str.c_str());
-        }
-        // camera
-        {
-            static auto& camera = reg.ctx<camera_t>();
-            auto fps            = 1000.0 / camera.frame_time;
-            ImGui::Text(
-                fmt::format("time: {:.2f}, fps: {:.2f}", camera.frame_time, fps)
-                    .c_str());
-            if(ImGui::Checkbox("reveal map", &camera.reveal_map)) {
-                camera.dirty = true;
-            }
-            ImGui::Checkbox("mouse map", &camera.custom_position);
-            if(camera.custom_position) {
-                auto [mx, my] = engine::engine.get_mouse_position();
-                auto [fw, fh] = term(gui::UI_MOUSE)->get_font_size();
-                mx /= fw;
-                my /= fh;
-                camera.position = {mx, my};
-                camera.dirty    = true;
-            }
-        }
-    }
-    ImGui::End();
-
-    ImGui::Begin("Game Window");
-    ImGui::Image(texture);
-    ImGui::End();
-
-    ImGui::SFML::Render(main_window);
-}
-
-void imgui_init() {
-    ImGui::SFML::Init(*rltk::get_window());
-    auto& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    engine::engine.dispatcher.sink<sf::Event>().connect<imgui_process_event>();
-    // gui->add_owner_layer(GOD_UI, 0, 0, 1024, 768, resize_main, imgui_frame);
-}
-
-#endif
 
 
 class Engine::EngineImpl {
@@ -158,7 +44,7 @@ private:
 public:
     EngineImpl() {
         constexpr auto font_file = "../assets";
-        rltk::init(rltk::config_advanced(font_file, 1024, 768, "MaiaRL"));
+        rltk::init(rltk::config_advanced(font_file, 1360, 768, "MaiaRL"));
 #ifdef DEBUG
         spdlog::set_level(spdlog::level::debug);
 #endif
@@ -169,9 +55,7 @@ public:
         this->main_window = rltk::get_window();
     }
 
-    ~EngineImpl() {
-        gui::terminate();
-    }
+    ~EngineImpl() {}
 
     sf::RenderWindow& get_window() {
         return *main_window;
@@ -229,7 +113,7 @@ public:
 
 Engine::Engine() {
     engine_impl = std::make_unique<EngineImpl>();
-    imgui_init();
+    ui          = std::make_unique<gui::RadlUI>();
 }
 
 Engine::~Engine() {}
@@ -292,8 +176,7 @@ void Engine::run_game() {
 
     auto clock = std::chrono::steady_clock();
 
-    sf::RenderTexture rtex;
-    rtex.create(1024, 768);
+    // rtex.create(1024, 768);
 
     while(main_window.isOpen()) {
         auto start_time = clock.now();
@@ -308,6 +191,8 @@ void Engine::run_game() {
             set_mouse_event(event);
             set_kb_event(event);
             dispatcher.enqueue<sf::Event>(event);
+
+            ui->process_event(event);
         }
 
         // engine.game_tick
@@ -317,10 +202,8 @@ void Engine::run_game() {
         main_window.clear();
 
         // TODO sync imgui image frame with mouse
-        rtex.clear();
-        rltk::gui->render(rtex);
-        rtex.display();
-        imgui_frame(rtex);
+        ui->frame();
+        ui->display();
 
         main_window.display();
 

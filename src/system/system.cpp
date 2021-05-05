@@ -273,7 +273,6 @@ void system_render(double duration_ms) {
         // render
         if(reg.valid(player) && reg.all_of<player_t>(player)) {
             system::camera();
-            gui::render_gui();
         }
     }
     default: {
@@ -448,7 +447,6 @@ void phase_mouse_cursor(double elapsed_time) {
             alpha_cursor = 0;
         }
     }
-    term(gui::UI_MOUSE)->set_alpha(static_cast<int>(alpha_cursor));
 }
 
 
@@ -456,7 +454,6 @@ void init_systems() {
     reg.set<camera_t>();
     engine::engine.dispatcher.sink<double>().connect<&system_render>();
     engine::engine.dispatcher.sink<double>().connect<&system_particle>();
-    engine::engine.dispatcher.sink<double>().connect<&phase_mouse_cursor>();
     engine::engine.dispatcher.sink<double>().connect<&system_game_state>();
 }
 

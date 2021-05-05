@@ -12,6 +12,8 @@
 #include "entt/entity/fwd.hpp"
 #include "entt/signal/dispatcher.hpp"
 
+#include "core/gui/gui.hpp"
+
 namespace radl {
 
 using entt::entity;
@@ -32,6 +34,8 @@ private:
     class EngineImpl;
     std::unique_ptr<EngineImpl> engine_impl;
     std::queue<sf::Event> event_queue;
+
+    std::unique_ptr<gui::RadlUI> ui;
 
 public:
     Engine();
