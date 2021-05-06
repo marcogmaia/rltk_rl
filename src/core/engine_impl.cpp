@@ -29,7 +29,6 @@ namespace engine {
 // state
 namespace {
 
-// bool window_focused = true;
 std::array<bool, 7> mouse_button_pressed;
 int mouse_x = 0;
 int mouse_y = 0;
@@ -176,8 +175,6 @@ void Engine::run_game() {
 
     auto clock = std::chrono::steady_clock();
 
-    // rtex.create(1024, 768);
-
     while(main_window.isOpen()) {
         auto start_time = clock.now();
 
@@ -202,7 +199,7 @@ void Engine::run_game() {
         main_window.clear();
 
         // TODO sync imgui image frame with mouse
-        ui->frame();
+        ui->render_ui();
         ui->display();
 
         main_window.display();

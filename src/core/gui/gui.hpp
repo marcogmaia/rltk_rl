@@ -15,9 +15,6 @@ namespace radl::gui {
 
 void init();
 
-void render_gui();
-void clear_gui();
-
 class RadlUI {
 private:
     int mouse_x = 0;
@@ -26,16 +23,16 @@ private:
 
     sf::RenderTexture m_game_window_texture;
 
+    void render_game_window();
+    
 public:
     RadlUI();
-
     ~RadlUI();
 
-    void process_event(const sf::Event &event);
+    void process_event(const sf::Event& event);
 
-void update();
-    void frame();
-    void render_game_window();
+    void update();
+    void render_ui();
 
     /**
      * @brief Display the UI

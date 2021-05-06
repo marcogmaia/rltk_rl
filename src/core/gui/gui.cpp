@@ -83,7 +83,7 @@ void RadlUI::update() {
     ImGui::SFML::Update(main_window, deltaClock.restart());
 }
 
-void RadlUI::frame() {
+void RadlUI::render_ui() {
     if(!reg.valid(player) || !reg.all_of<player_t, combat_stats_t>(player)) {
         return;
     }
@@ -164,7 +164,7 @@ void RadlUI::frame() {
         }
     }
     ImGui::End();
-    
+
     render_game_window();
 }
 
