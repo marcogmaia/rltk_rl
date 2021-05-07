@@ -11,6 +11,7 @@
 #include "system/game_state.hpp"
 
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "imgui-SFML.h"
 
 
@@ -100,13 +101,11 @@ void RadlUI::render_ui() {
     // window not dockable into, because it would be confusing to have two
     // docking targets within each others.
     static ImGuiWindowFlags dock_window_flags
-        = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
-          | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
-          | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
-          | ImGuiWindowFlags_NoBringToFrontOnFocus
+        = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
+          | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
+          | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus
           | ImGuiWindowFlags_NoNavFocus;
-    // bool is_open;
-    ImGui::Begin("dockspace", (bool*)nullptr, dock_window_flags);
+    ImGui::Begin("dockspace", nullptr, dock_window_flags);
     ImGuiID dockspace_id = ImGui::GetID("main_dockspace");
     ImGui::DockSpace(dockspace_id);
     ImGui::End();
@@ -180,11 +179,12 @@ void RadlUI::render_game_window() {
 
     static ImGuiWindowFlags game_window_flags
         = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
-          | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse;
+          | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDecoration
+          | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse;
     static ImGuiWindowClass game_window_class;
     game_window_class.DockNodeFlagsOverrideSet
         = game_window_class.DockNodeFlagsOverrideClear
-        = ImGuiDockNodeFlags_AutoHideTabBar;
+        = ImGuiDockNodeFlags_AutoHideTabBar | ImGuiDockNodeFlags_NoTabBar;
     ImGui::SetNextWindowClass(&game_window_class);
 
     ImGui::Begin("Game Window", (bool*)nullptr, game_window_flags);
@@ -199,7 +199,47 @@ void RadlUI::render_game_window() {
             rltk::gui->on_resize(w, h);
         }
     }
+
     ImGui::Image(m_game_window_texture);
+    // ImGui::SetNextWindowSizeConstraints
+
+    // TODO refresh image when window is resized
+
+
+    {
+        auto wpos        = ImGui::GetWindowPos();
+        static float pad = 10.0;
+        wpos.x += pad;
+        wpos.y += pad;
+        ImGui::SetCursorScreenPos(wpos);
+        ImGui::SetCursorPosX(pad);
+        // ImGui::SetNextWindowPos(wpos, ImGuiCond_Always);
+
+
+        // ImGuiWindowFlags window_flags
+        //     = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground;
+        // ImGui::Begin("ChildL", nullptr, window_flags);
+        ImGui::Text("wtf");
+
+        ImGui::SetCursorPosX(pad);
+        static bool show_metrics = false;
+        ImGui::Checkbox("metric", &show_metrics);
+        if(show_metrics) {
+            ImGui::ShowMetricsWindow();
+        }
+
+        ImGui::SetCursorPosX(pad);
+        static bool show_demo_window = false;
+        ImGui::Checkbox("demo", &show_demo_window);
+        if(show_demo_window) {
+            ImGui::ShowDemoWindow();
+        }
+
+        ImGui::SetCursorPosX(pad);
+        ImGui::InputFloat("padding", &pad);
+
+        // ImGui::End();
+    }
     ImGui::End();
 }
 

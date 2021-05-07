@@ -5,6 +5,7 @@ add_library(
     "engine_impl.cpp"
     "gui/gui.cpp"
     "gui/item_menu.cpp"
+    "../../lib/imgui/imgui_demo.cpp"
 )
 
 target_link_libraries(
