@@ -105,9 +105,19 @@ void RadlUI::display() {
 
 namespace {
 
-[[maybe_unused]] void resize_callback(ImGuiSizeCallbackData* data) {
-    system::system_camera();
-    reg.ctx<camera_t>().dirty = true;
+void handle_game_window_resize() {
+    static ImVec2 last_size = ImGui::GetWindowSize();
+    auto actual_size        = ImGui::GetWindowSize();
+    if(last_size.x != actual_size.x || last_size.y != actual_size.y) {
+        last_size      = actual_size;
+        auto& [ww, wh] = actual_size;
+        rltk::gui->on_resize(ww, wh);
+        if(reg.valid(player)) {
+            system::system_camera();
+            reg.ctx<camera_t>().dirty = true;
+        }
+        spdlog::info("game window resized");
+    }
 }
 
 }  // namespace
@@ -121,77 +131,32 @@ void RadlUI::render_game_window() {
     static ImGuiWindowFlags game_window_flags
         = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
           | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDecoration
-          | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse;
-
-    // static ImGuiWindowClass game_window_class;
-    // game_window_class.DockNodeFlagsOverrideSet
-    //     = game_window_class.DockNodeFlagsOverrideClear
-    //     = ImGuiDockNodeFlags_AutoHideTabBar | ImGuiDockNodeFlags_NoTabBar;
-    // ImGui::SetNextWindowClass(&game_window_class);
-    // ImGui::SetNextWindowSizeConstraints()
+          | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse
+          | ImGuiWindowFlags_NoScrollbar
+          | ImGuiWindowFlags_NoBringToFrontOnFocus;
 
     auto& io = ImGui::GetIO();
     ImGui::SetNextWindowSize(io.DisplaySize, ImGuiCond_Always);
     ImGui::SetNextWindowPos({0, 0});
-
-    ImGui::Begin("Game Window", nullptr, game_window_flags);
-    // {
-    //     static bool first_run = true;
-    //     static auto winsize   = ImGui::GetWindowSize();
-    //     auto [w, h]           = ImGui::GetWindowSize();
-    //     if(winsize.x != w || winsize.y != h || first_run) {
-    //         first_run = false;
-    //         winsize   = {w, h};
-    //         // rltk::gui->on_resize(w, h);
-    //     }
-    // }
-
-    ImGui::Image(m_game_window_texture);
-    // ImGui::SetNextWindowSizeConstraints
-
-    // TODO refresh image when window is resized
-
-
-    static float pad = 0.0;
+    ImGui::Begin("Game", nullptr, game_window_flags);
     {
-        auto wpos = ImGui::GetWindowPos();
-        wpos.x += pad;
-        wpos.y += pad;
-        ImGui::SetCursorScreenPos(wpos);
-        ImGui::SetCursorPosX(pad);
-        // ImGui::SetNextWindowPos(wpos, ImGuiCond_Always);
-
-
-        // ImGuiWindowFlags window_flags
-        //     = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground;
-        // ImGui::Begin("ChildL", nullptr, window_flags);
+        ImGui::BeginChild("left", {192, 0}, true);
+        static float pad = 0.0;
         ImGui::Text("wtf");
 
-        ImGui::SetCursorPosX(pad);
         static bool show_metrics = false;
         ImGui::Checkbox("metric", &show_metrics);
         if(show_metrics) {
             ImGui::ShowMetricsWindow();
         }
-
-        ImGui::SetCursorPosX(pad);
+        // ImGui::SetCursorPosX(pad);
         static bool show_demo_window = false;
         ImGui::Checkbox("demo", &show_demo_window);
         if(show_demo_window) {
             ImGui::ShowDemoWindow();
         }
-
-        ImGui::SetCursorPosX(pad);
         ImGui::InputFloat("padding", &pad);
 
-        // ImGui::End();
-    }
-
-    auto wsize = ImGui::GetWindowSize();
-    auto wpos  = ImGui::GetWindowPos();
-    ImGui::SetNextWindowPos({wpos.x + wsize.x, wpos.y}, ImGuiCond_Once, {1, 0});
-    ImGui::BeginChild("Stats", {pad, 128}, true);
-    {
         // change defense
         {
             auto& player_stats = reg.get<combat_stats_t>(player);
@@ -211,41 +176,66 @@ void RadlUI::render_game_window() {
         {
             const auto& [px, py] = reg.get<position_t>(player);
             auto pos_str         = fmt::format("position: ({}, {})", px, py);
-            ImGui::Text(pos_str.c_str());
+            ImGui::TextWrapped(pos_str.c_str());
         }
         // camera
         {
             static auto& camera = reg.ctx<camera_t>();
             auto fps            = 1000.0 / camera.frame_time;
-            ImGui::Text(
+            ImGui::TextWrapped(
                 fmt::format("time: {:.2f}, fps: {:.2f}", camera.frame_time, fps)
                     .c_str());
-            ImGui::Text(fmt::format("window size: ({:.2f}, {:.2f})",
-                                    io.DisplaySize.x, io.DisplaySize.y)
-                            .c_str());
-
+            ImGui::TextWrapped(fmt::format("window size: ({:.2f}, {:.2f})",
+                                           io.DisplaySize.x, io.DisplaySize.y)
+                                   .c_str());
             auto [tsizex, tsizey] = m_game_window_texture.getSize();
-            ImGui::Text(
-                fmt::format("texture size: ({}, {})", tsizex, tsizey).c_str());
             if(ImGui::Checkbox("reveal map", &camera.reveal_map)) {
                 camera.dirty = true;
             }
         }
+        ImGui::EndChild();
     }
-    ImGui::EndChild();
-
-    ImGui::SetNextWindowPos({0 + 20, wpos.y + wsize.y - 20}, ImGuiCond_Always,
-                            {0, 1});
+    ImGui::SameLine();
     {
-        ImGui::BeginChild("Add Items", {256, 128}, true,
-                          ImGuiWindowFlags_NoDecoration);
-        auto pressed = ImGui::Button("+ healing potion.");
-        if(pressed) {
-            reg.get<inventory_t>(player).add_item(
-                factory::items::potion_healing(true));
+        ImGui::BeginChild("center", ImVec2{-192, 0}, false, game_window_flags);
+        {
+            ImGui::BeginChild(
+                "##game_window",
+                ImVec2{0, ImGui::GetWindowContentRegionMax().y * 0.8F}, false,
+                game_window_flags);
+            handle_game_window_resize();
+            ImGui::Image(m_game_window_texture);
+            ImGui::EndChild();
+        }
+        {
+            ImGui::BeginChild(
+                "##log1",
+                ImVec2{0, ImGui::GetWindowContentRegionMax().y * 0.2F - 3.F},
+                true);
+            ImGui::Text("test text log");
+            ImGui::EndChild();
         }
         ImGui::EndChild();
     }
+    ImGui::SameLine();
+    {
+        ImGui::BeginChild("right", ImVec2{192.F - 10.0F, 0}, true);
+        ImGui::Text("test text right");
+        ImGui::EndChild();
+    }
+
+    // ImGui::SetNextWindowPos({0 + 20, wpos.y + wsize.y - 20},
+    // ImGuiCond_Always,
+    //                         {0, 1});
+    // {
+    //     ImGui::BeginChild("Add Items", {256, 128});
+    //     auto pressed = ImGui::Button("+ healing potion.");
+    //     if(pressed) {
+    //         reg.get<inventory_t>(player).add_item(
+    //             factory::items::potion_healing(true));
+    //     }
+    //     ImGui::EndChild();
+    // }
 
     ImGui::End();
 }
@@ -264,7 +254,7 @@ RadlUI::RadlUI() {
     ImGui::SFML::Init(*rltk::get_window());
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-    m_game_window_texture.create(3840, 2160);
+    m_game_window_texture.create(1920, 1080);
 }
 
 RadlUI::~RadlUI() {

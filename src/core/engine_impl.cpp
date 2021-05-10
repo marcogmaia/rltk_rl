@@ -91,13 +91,6 @@ public:
             main_window->setView(sf::View(
                 sf::FloatRect(0.F, 0.F, static_cast<float>(screen_width),
                               static_cast<float>(screen_height))));
-            // TODO refactor screen resize
-            rltk::gui->on_resize(screen_width, screen_height);
-            if(reg.valid(player)) {
-                system::system_camera();
-                reg.ctx<camera_t>().dirty = true;
-            }
-            // engine::event_queue.push_back(event);
         } break;
         default: break;
         }
