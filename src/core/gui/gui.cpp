@@ -93,10 +93,6 @@ void RadlUI::render_ui() {
     auto& main_window = *rltk::get_window();
     ImGui::SFML::Update(main_window, deltaClock.restart());
 
-    auto& io = ImGui::GetIO();
-    ImGui::SetNextWindowSize(io.DisplaySize, ImGuiCond_Once);
-    ImGui::SetNextWindowPos({0, 0});
-
 
     render_game_window();
 }
@@ -132,18 +128,23 @@ void RadlUI::render_game_window() {
     //     = game_window_class.DockNodeFlagsOverrideClear
     //     = ImGuiDockNodeFlags_AutoHideTabBar | ImGuiDockNodeFlags_NoTabBar;
     // ImGui::SetNextWindowClass(&game_window_class);
+    // ImGui::SetNextWindowSizeConstraints()
+
+    auto& io = ImGui::GetIO();
+    ImGui::SetNextWindowSize(io.DisplaySize, ImGuiCond_Always);
+    ImGui::SetNextWindowPos({0, 0});
+
     ImGui::Begin("Game Window", nullptr, game_window_flags);
-    {
-        static bool first_run = true;
-        static auto winsize   = ImGui::GetWindowSize();
-        auto [w, h]           = ImGui::GetWindowSize();
-        if(winsize.x != w || winsize.y != h || first_run) {
-            first_run = false;
-            winsize   = {w, h};
-            m_game_window_texture.create(w, h);
-            rltk::gui->on_resize(w, h);
-        }
-    }
+    // {
+    //     static bool first_run = true;
+    //     static auto winsize   = ImGui::GetWindowSize();
+    //     auto [w, h]           = ImGui::GetWindowSize();
+    //     if(winsize.x != w || winsize.y != h || first_run) {
+    //         first_run = false;
+    //         winsize   = {w, h};
+    //         // rltk::gui->on_resize(w, h);
+    //     }
+    // }
 
     ImGui::Image(m_game_window_texture);
     // ImGui::SetNextWindowSizeConstraints
@@ -151,9 +152,9 @@ void RadlUI::render_game_window() {
     // TODO refresh image when window is resized
 
 
+    static float pad = 0.0;
     {
-        auto wpos        = ImGui::GetWindowPos();
-        static float pad = 10.0;
+        auto wpos = ImGui::GetWindowPos();
         wpos.x += pad;
         wpos.y += pad;
         ImGui::SetCursorScreenPos(wpos);
@@ -189,7 +190,7 @@ void RadlUI::render_game_window() {
     auto wsize = ImGui::GetWindowSize();
     auto wpos  = ImGui::GetWindowPos();
     ImGui::SetNextWindowPos({wpos.x + wsize.x, wpos.y}, ImGuiCond_Once, {1, 0});
-    ImGui::BeginChild("Stats", {256, 128}, true);
+    ImGui::BeginChild("Stats", {pad, 128}, true);
     {
         // change defense
         {
@@ -219,18 +220,16 @@ void RadlUI::render_game_window() {
             ImGui::Text(
                 fmt::format("time: {:.2f}, fps: {:.2f}", camera.frame_time, fps)
                     .c_str());
+            ImGui::Text(fmt::format("window size: ({:.2f}, {:.2f})",
+                                    io.DisplaySize.x, io.DisplaySize.y)
+                            .c_str());
+
+            auto [tsizex, tsizey] = m_game_window_texture.getSize();
+            ImGui::Text(
+                fmt::format("texture size: ({}, {})", tsizex, tsizey).c_str());
             if(ImGui::Checkbox("reveal map", &camera.reveal_map)) {
                 camera.dirty = true;
             }
-            // ImGui::Checkbox("mouse map", &camera.custom_position);
-            // if(camera.custom_position) {
-            //     auto [mx, my] = engine::engine.get_mouse_position();
-            //     auto [fw, fh] = term(gui::UI_MOUSE)->get_font_size();
-            //     mx /= fw;
-            //     my /= fh;
-            //     camera.position = {mx, my};
-            //     camera.dirty    = true;
-            // }
         }
     }
     ImGui::EndChild();
@@ -263,9 +262,9 @@ void RadlUI::process_event(const sf::Event& event) {
 
 RadlUI::RadlUI() {
     ImGui::SFML::Init(*rltk::get_window());
-    // style:
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    m_game_window_texture.create(3840, 2160);
 }
 
 RadlUI::~RadlUI() {
