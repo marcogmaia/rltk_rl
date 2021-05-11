@@ -31,10 +31,10 @@ using namespace component;
 
 class Engine {
 private:
-    class EngineImpl;
+    // class EngineImpl;
     std::queue<sf::Event> event_queue;
 
-    std::unique_ptr<EngineImpl> engine_impl;
+    // std::unique_ptr<EngineImpl> engine_impl;
     std::unique_ptr<gui::RadlUI> ui;
 
 public:

@@ -31,7 +31,6 @@ public:
 
     void process_event(const sf::Event& event);
 
-    void update();
     void render_ui();
 
     /**
