@@ -33,10 +33,7 @@ void DijkstraMap::compute(std::vector<position_t> starts) {
             auto new_idx    = to_index(new_pos);
             auto new_depth  = depth + add_depth;
             auto prev_depth = cost_map[new_idx];
-            if(new_depth >= prev_depth) {
-                continue;
-            }
-            if(new_depth >= max_depth) {
+            if(new_depth >= prev_depth || new_depth >= max_depth) {
                 continue;
             }
             cost_map[new_idx] = new_depth;

@@ -282,12 +282,12 @@ void system_render(double duration_ms) {
 
 void system_camera() {
     auto& camera  = reg.ctx<camera_t>();
-    camera.width  = engine::console->term_width;
-    camera.height = engine::console->term_height;
+    auto& console = *rltk::term(gui::UI_MAP);
+    camera.width  = console.term_width;
+    camera.height = console.term_height;
     if(!camera.custom_position) {
         camera.position = reg.get<position_t>(player);
     }
-    // gui::render_gui();
 }
 
 void restart_game_state() {

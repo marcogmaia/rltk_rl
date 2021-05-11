@@ -71,8 +71,6 @@ void init() {
                    "16x16", resize_main, true);
     gui->add_layer(UI_ENTITIES, map_rect.x1, map_rect.y1, map_rect.x2,
                    map_rect.y2, "16x16", resize_main, false);
-
-    engine::console = term(UI_MAP);
 }
 
 
@@ -82,9 +80,6 @@ void RadlUI::render_ui() {
     }
     static sf::Clock deltaClock;
     auto& main_window = *rltk::get_window();
-    if(!main_window.isOpen()) {
-        return;
-    }
     ImGui::SFML::Update(main_window, deltaClock.restart());
     // render UI
     render_game_window();
@@ -174,10 +169,10 @@ void RadlUI::render_game_window() {
           | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse
           | ImGuiWindowFlags_NoScrollbar
           | ImGuiWindowFlags_NoBringToFrontOnFocus;
-
-    auto& io = ImGui::GetIO();
-    ImGui::SetNextWindowSize(io.DisplaySize, ImGuiCond_Always);
-    ImGui::SetNextWindowPos({0, 0});
+    auto& io                      = ImGui::GetIO();
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize(viewport->Size, ImGuiCond_Always);
     ImGui::Begin("Game", nullptr, game_window_flags);
     {
         ImGui::BeginChild("left", {192, 0}, true);

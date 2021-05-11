@@ -25,8 +25,6 @@ using entt::registry;
 namespace radl::engine {
 
 
-extern rltk::virtual_terminal* console;
-
 using namespace component;
 
 class Engine {
