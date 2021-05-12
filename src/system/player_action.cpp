@@ -211,7 +211,7 @@ void system_player() {
     sf::Event ev;
     auto& game_state = reg.ctx<game_state_t>();
 
-    while(engine::engine.get_kb_event(ev)) {
+    while(engine::Engine::get_kb_event(ev)) {
         // every player action may mutate the game state, all the other systems
         // makes use of the state
         game_state = player_input(ev);

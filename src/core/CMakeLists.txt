@@ -2,7 +2,6 @@
 add_library(
     game_core
     "engine.cpp"
-    "engine_impl.cpp"
     "gui/gui.cpp"
     "gui/item_menu.cpp"
 )

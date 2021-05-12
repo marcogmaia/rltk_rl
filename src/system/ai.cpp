@@ -125,9 +125,6 @@ void ai_enemy_dijkstra_map(entity ent) {
         return;
     }
 
-    // auto player_pos = reg.get<position_t>(player);
-    auto memory_pos = enemy.memory;
-
     bool somebody_already_wants_to_walk_to = false;
     // check if anybody already wants to walk to this tile
     for(auto [e_other, other_walk] : reg.view<want_to_walk_t>().each()) {
