@@ -50,3 +50,5 @@ AllowShortLambdasOnASingleLine: Empty
 # AlignAfterOpenBracket: AlwaysBreak
 # BinPackArguments: false
 # BinPackParameters: false
+
+IndentPPDirectives: BeforeHash
