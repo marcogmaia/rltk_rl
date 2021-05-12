@@ -9,6 +9,7 @@ enum ui_order_t {
     UI_MAP,
     UI_ENTITIES,
     UI_PARTICLES,
+    UI_LIGHT,
     UI_STATUS,
     UI_INVENTORY,
     UI_INVENTORY_POPUP,

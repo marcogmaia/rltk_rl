@@ -44,7 +44,6 @@ void render_hp_bar(int x, int y, vchar_t fg_vch, vchar_t bg_vch) {
     }
 }
 
-}  // namespace
 
 void draw_tooltips() {
     term(UI_TOOLTIPS)->clear();
@@ -142,6 +141,7 @@ void resize_inventory(rltk::layer_t* l, int w, int h) {
     l->y = (h / fh - l->h / fh) * fh;
 }
 
+
 #ifdef DEBUG
 
 void imgui_process_event(const sf::Event& event) {
@@ -220,6 +220,8 @@ void imgui_init() {
 
 #endif
 
+}  // namespace
+
 void init() {
     rect_t invent_rect{
         1024 - 16 * 16,
@@ -244,6 +246,8 @@ void init() {
                    "16x16", resize_main, true);
     gui->add_layer(UI_ENTITIES, map_rect.x1, map_rect.y1, map_rect.x2,
                    map_rect.y2, "16x16", resize_main, false);
+    gui->add_layer(UI_LIGHT, map_rect.x1, map_rect.y1, map_rect.x2, map_rect.y2,
+                   "16x16", resize_main, false);
     gui->add_sparse_layer(UI_PARTICLES, map_rect.x1, map_rect.y1, map_rect.x2,
                           map_rect.y2, "16x16", resize_main);
 
@@ -351,6 +355,67 @@ void render_gui() {
 void clear_gui() {
     term(UI_INVENTORY)->clear();
     term(UI_INVENTORY_POPUP)->clear();
+}
+
+Gui::Gui() {
+    using rltk::gui;
+
+    rect_t invent_rect{
+        1024 - 16 * 16,
+        0,
+        1024,
+        768,
+    };
+    rect_t map_rect = {
+        0,
+        0,
+        1024,
+        768 - 16 * 10,
+    };
+    rect_t status_rect = {
+        1 * 12,
+        map_rect.y2,
+        12 + 144,
+        768,
+    };
+
+    gui->add_layer(UI_MAP, map_rect.x1, map_rect.y1, map_rect.x2, map_rect.y2,
+                   "16x16", resize_main, true);
+    gui->add_layer(UI_ENTITIES, map_rect.x1, map_rect.y1, map_rect.x2,
+                   map_rect.y2, "16x16", resize_main, false);
+    gui->add_layer(UI_LIGHT, map_rect.x1, map_rect.y1, map_rect.x2, map_rect.y2,
+                   "16x16", resize_main, false);
+    gui->add_sparse_layer(UI_PARTICLES, map_rect.x1, map_rect.y1, map_rect.x2,
+                          map_rect.y2, "16x16", resize_main);
+
+    gui->add_layer(UI_STATUS, status_rect.x1, status_rect.y1, status_rect.x2,
+                   status_rect.y2, "8x16", resize_status, true);
+    gui->add_layer(UI_INVENTORY, invent_rect.x1, invent_rect.y1, invent_rect.x2,
+                   invent_rect.y2, "8x16", resize_inventory, false);
+    gui->add_layer(UI_INVENTORY_POPUP, invent_rect.x1, invent_rect.y1,
+                   invent_rect.x2, invent_rect.y2, "8x16",
+                   resize_inventory_popup, false);
+
+    // cursor
+    gui->add_layer(UI_MOUSE, map_rect.x1, map_rect.y1, map_rect.x2, map_rect.y2,
+                   "16x16", resize_main, true);
+    // tooltips
+    gui->add_layer(UI_TOOLTIPS, map_rect.x1, map_rect.y1, map_rect.x2,
+                   map_rect.y2, "8x16", resize_main, true);
+    term(UI_MOUSE)->set_alpha(127);
+    term(UI_TOOLTIPS)->set_alpha(0xDF);
+
+    engine::console = term(UI_MAP);
+
+#ifdef DEBUG
+    imgui_init();
+#endif
+}
+
+Gui::~Gui() {
+#ifdef DEBUG
+    ImGui::SFML::Shutdown();
+#endif
 }
 
 }  // namespace radl::gui

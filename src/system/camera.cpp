@@ -120,75 +120,77 @@ inline void render_visible_map(const camera_t& camera) {
                     } else {
                         tile_vch.foreground = color_t(36, 18, 4);
                     }
-                    term(gui::UI_ENTITIES)
-                        ->set_char(rx, ry,
-                                   vchar_t{glyph::CDOT, DARK_GREY, BLACK});
                 }
                 term(gui::UI_MAP)->set_char(rx, ry, tile_vch);
             }
         }
-    } else {
-        for(const auto& v_pos : pvshed.visible_coordinates) {
-            const auto& tile = base_map.at(v_pos);
-            auto [rx, ry]    = render_position(v_pos, camera);
-            vchar_t tile_vch = tile.get_vchar();
-            if(tile.type == tile_type_t::wall) {
-                tile_vch.foreground = color_t(0, 31, 36);
-            } else if(tile.type == tile_type_t::floor) {
-                if(tile.status == tile_status_t::BLOODIED) {
-                    tile_vch.foreground = DARKER_RED;
-                } else {
-                    tile_vch.foreground = color_t(36, 18, 4);
-                }
-                term(gui::UI_ENTITIES)
-                    ->set_char(rx, ry, vchar_t{glyph::CDOT, DARK_GREY, BLACK});
+    }
+    for(const auto& v_pos : pvshed.visible_coordinates) {
+        const auto& tile = base_map.at(v_pos);
+        auto [rx, ry]    = render_position(v_pos, camera);
+        vchar_t tile_vch = tile.get_vchar();
+        if(tile.type == tile_type_t::wall) {
+            tile_vch.foreground = color_t(0, 31, 36);
+        } else if(tile.type == tile_type_t::floor) {
+            if(tile.status == tile_status_t::BLOODIED) {
+                tile_vch.foreground = DARKER_RED;
+            } else {
+                tile_vch.foreground = color_t(36, 18, 4);
             }
-            term(gui::UI_MAP)->set_char(rx, ry, tile_vch);
+            color_t color = WHITE;
+            color.a       = 127;
+            term(gui::UI_ENTITIES)
+                ->set_char(rx, ry, vchar_t{glyph::CDOT, color, BLACK});
+        }
+        term(gui::UI_MAP)->set_char(rx, ry, tile_vch);
+    }
+}
+
+void render_dijkstra_map(camera_t& camera) {
+    const auto& base_map = reg.ctx<Map>();
+    for(int x = 0; x < base_map.rect.width(); ++x) {
+        for(int y = 0; y < base_map.rect.height(); ++y) {
+            auto& dm              = reg.ctx<DijkstraMap>();
+            auto cost             = static_cast<int>(dm.at({x, y}));
+            auto [rx, ry]         = render_position({x, y}, camera);
+            vchar_t vch_cost      = {glyph::SOLID1, BLACK, BLACK};
+            vch_cost.foreground.a = cost * 7;
+            term(gui::UI_LIGHT)->set_char(rx, ry, vch_cost);
         }
     }
 }
 
-void camera_player(camera_t& camera) {
-    if(!camera.dirty) {
-        return;
-    }
-    camera.dirty = false;
+void gui_clear() {
     term(gui::UI_MAP)->clear();
     term(gui::UI_ENTITIES)->clear();
+    term(gui::UI_LIGHT)->clear();
+}
+
+void camera_player(camera_t& camera) {
     render_explored_map(camera);
     render_visible_map(camera);
-
-    // auto& dm         = reg.ctx<DijkstraMap>();
-    // auto cost        = static_cast<int>(dm.at(v_pos));
-    // vchar_t vch_cost = {glyph::SOLID1,
-    //                     color_t{
-    //                         cost * 8,
-    //                         cost * 8,
-    //                         cost * 8,
-    //                     },
-    //                     BLACK};
-    // term(gui::UI_MAP)->set_char(rx, ry, vch_cost);
-
+    // render_dijkstra_map(camera);
     // render renderables
     render_renderables(camera, reg.view<renderable_t, position_t>());
     render_particles(camera, reg.view<renderable_t, position_t, particle_t>());
 }
 
+
 void camera_debug(camera_t& camera) {
-    if(!camera.dirty) {
-        return;
-    }
-    camera.dirty = false;
-    term(gui::UI_MAP)->clear();
-    term(gui::UI_ENTITIES)->clear();
     render_explored_map(camera);
     render_visible_map(camera);
     render_renderables(camera, reg.view<renderable_t, position_t>());
     render_particles(camera, reg.view<renderable_t, position_t, particle_t>());
+    render_dijkstra_map(camera);
 }
 
 void camera() {
     auto& camera = reg.ctx<camera_t>();
+    if(!camera.dirty) {
+        return;
+    }
+    camera.dirty = false;
+    gui_clear();
     if(camera.reveal_map) {
         camera_debug(camera);
     } else {

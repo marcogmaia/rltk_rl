@@ -21,4 +21,14 @@ void clear_gui();
 
 // void render_inventory_use(std::function<char(void)> get_option);
 
+class Gui {
+private:
+public:
+    Gui();
+    ~Gui();
+
+    void render();
+    void clear();
+};
+
 }  // namespace radl::gui
