@@ -9,14 +9,16 @@
 
 #include "system/game_state.hpp"
 #include "core/gui/gui.hpp"
+#include "component/camera.hpp"
 
 namespace radl {
 
 namespace system {
 
 void init_systems();
+void system_camera();
 
-}
+}  // namespace system
 
 namespace engine {
 
@@ -86,6 +88,14 @@ public:
                 sf::FloatRect(0.F, 0.F, static_cast<float>(screen_width),
                               static_cast<float>(screen_height))));
             rltk::gui->on_resize(screen_width, screen_height);
+            // TODO refactor screen resize
+            if(reg.valid(player)) {
+                auto* pcamera = reg.try_ctx<camera_t>();
+                if(pcamera != nullptr) {
+                    system::system_camera();
+                    pcamera->dirty = true;
+                }
+            }
             // engine::event_queue.push_back(event);
         } break;
         default: break;
@@ -162,9 +172,9 @@ position_t Engine::get_mouse_position() {
 void Engine::run_game() {
     engine_impl->reset_mouse_state();
 
-    auto& main_window  = engine_impl->get_window();
+    auto& main_window = engine_impl->get_window();
     main_window.setFramerateLimit(140);
-    
+
     double duration_ms = 0.0;
 
     auto clock = std::chrono::steady_clock();
