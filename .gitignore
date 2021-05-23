@@ -4,7 +4,6 @@ perf.*
 
 lib/libtcod/
 build/
-assets/
 .vscode/browse.*
 .vscode/ipch
 
