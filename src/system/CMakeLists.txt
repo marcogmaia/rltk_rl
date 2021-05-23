@@ -22,6 +22,7 @@ add_library(
 target_link_libraries(
     game_system 
     game_component
+    game_utils
     spdlog::spdlog
     pthread
     tbb

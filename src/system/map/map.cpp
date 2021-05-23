@@ -107,14 +107,15 @@ void make_corridors_between_rooms(Map& map) {
                    });
 }
 
-std::unique_ptr<std::vector<entt::entity>> active_entities_near_player
-    = std::make_unique<std::vector<entt::entity>>();
+using entity_vec = std::vector<entt::entity>;
+std::unique_ptr<entity_vec> active_entities_near_player
+    = std::make_unique<entity_vec>();
 /**
  * @brief Get the entities near the player
  *
  * @return std::vector<entt::entity>*
  */
-std::vector<entt::entity>* get_entities_near_player() {
+entity_vec* get_entities_near_player() {
     return active_entities_near_player.get();
 }
 

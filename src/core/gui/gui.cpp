@@ -66,11 +66,11 @@ void init() {
     };
 
     gui->add_sparse_layer(UI_PARTICLES, map_rect.x1, map_rect.y1, map_rect.x2,
-                          map_rect.y2, "16x16", resize_main);
+                          map_rect.y2, "16x16", resize_main, UI_PARTICLES);
     gui->add_layer(UI_MAP, map_rect.x1, map_rect.y1, map_rect.x2, map_rect.y2,
-                   "16x16", resize_main, true);
+                   "16x16", resize_main, true, UI_MAP);
     gui->add_layer(UI_ENTITIES, map_rect.x1, map_rect.y1, map_rect.x2,
-                   map_rect.y2, "16x16", resize_main, false);
+                   map_rect.y2, "16x16", resize_main, false, UI_ENTITIES);
 }
 
 

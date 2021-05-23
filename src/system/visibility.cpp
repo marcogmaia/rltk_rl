@@ -68,7 +68,29 @@ using fov_user_type_t = std::tuple<entity, radl::Map*,
 //     .numheights   = 0,
 // };
 
-class private_fov_t {
+class IFov {
+public:
+    /**
+     * @brief check if @p location is blocked
+     *
+     * @param x in the map
+     * @param y in the map
+     *
+     * @return true if can't see through, false otherwise
+     */
+    virtual bool isBlocked(int x, int y) = 0;
+
+    /**
+     * @brief Visit a location in the map, we can perform some action, like: add
+     * the visited location to a vector with visible locations
+     *
+     * @param x
+     * @param y
+     */
+    virtual void visit(int x, int y) = 0;
+};
+
+class private_fov_t final : public IFov {
 private:
     entity m_ent;
     radl::Map& m_map;
@@ -81,7 +103,7 @@ public:
         , m_map(map)
         , m_vis(vis) {}
 
-    bool isBlocked(int destX, int destY) {
+    bool isBlocked(int destX, int destY) override {
         position_t check_pos{destX, destY};
         const position_t& ent_pos = reg.get<position_t>(m_ent);
         if(check_pos == ent_pos) {
@@ -94,7 +116,7 @@ public:
         return true;
     }
 
-    void visit(int destX, int destY) {
+    void visit(int destX, int destY) override {
         position_t vis_pos{destX, destY};
         if(m_map.rect.contains(vis_pos)) {
             if(m_ent == player) {

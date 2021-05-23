@@ -20,8 +20,8 @@ namespace radl {
 
 namespace system {
 
-void init_systems();
 void system_camera();
+void init_systems(engine::Engine& engine);
 
 }  // namespace system
 
@@ -44,7 +44,7 @@ Engine::Engine() {
 #endif
     spdlog::info("Initializing engine.");
     reg.set<game_state_t>(game_state_t::PRE_RUN);
-    system::init_systems();
+    system::init_systems(*this);
     ui = std::make_unique<gui::RadlUI>();
 }
 
@@ -61,6 +61,8 @@ void Engine::set_kb_event(const sf::Event& event) {
     default: break;
     }
 }
+
+std::queue<sf::Event> Engine::event_queue;
 
 bool Engine::get_kb_event(sf::Event& event) {
     if(event_queue.empty()) {

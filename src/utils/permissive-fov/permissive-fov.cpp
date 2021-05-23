@@ -28,7 +28,8 @@ public:
     int y;
 };
 
-std::ostream& operator<<(std::ostream& stream, offsetT const& right) {
+[[maybe_unused]] std::ostream& operator<<(std::ostream& stream,
+                                          offsetT const& right) {
     stream << "(" << right.x << ", " << right.y << ")";
     return stream;
 }
@@ -128,8 +129,8 @@ void calculateFovQuadrant(fovStateT const* state) {
     }
 
     list<fieldT>::iterator currentField = activeFields.begin();
-    int i                             = 0;
-    int j                             = 0;
+    int i                               = 0;
+    int j                               = 0;
     int maxI                            = state->extent.x + state->extent.y;
     // For each square outline
     for(i = 1; i <= maxI && !activeFields.empty(); ++i) {
@@ -388,7 +389,7 @@ permissiveErrorT loadPermissiveMask(permissiveMaskT* mask,
             case '#': bit = 0; break;
             case '!':
                 bit = 0;
-                // Deliberate fall-through.
+                [[fallthrough]];
             case '@':
                 // Bit is already set properly.
                 mask->south = i;

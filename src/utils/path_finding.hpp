@@ -56,8 +56,8 @@ struct navigator_t {
                     continue;
                 }
                 location_t offset{x, y};
-                auto w_pos      = pos + offset;
-                const auto& map = get_map();
+                auto w_pos       = pos + offset;
+                const auto& map  = get_map();
                 auto& player_pos = reg.get<position_t>(player);
                 if(w_pos == player_pos
                    || (map.rect.contains(w_pos) && map[w_pos].props.walkable
@@ -86,7 +86,8 @@ struct navigator_t {
 
 
 template <typename location_t, typename navigator_t>
-class map_search_node {
+class map_search_node final
+    : AStarState<map_search_node<location_t, navigator_t>> {
 public:
     location_t pos;
 
@@ -95,9 +96,13 @@ public:
         : pos(loc) {}
 
     float GoalDistanceEstimate(map_search_node<location_t, navigator_t>& goal) {
-        float result = navigator_t::get_distance_estimate(pos, goal.pos);
+        // float result = navigator_t::get_distance_estimate(pos, goal.pos);
         // std::cout << "GoalDistanceEstimate called (" << result << ").\n";
-        return result;
+
+        auto& [xi, yi] = pos;
+        auto& [xf, yf] = goal.pos;
+        float d        = distance2d_squared(xi, yi, xf, yf);
+        return d;
     }
 
     bool IsGoal(map_search_node<location_t, navigator_t>& node_goal) {
@@ -114,12 +119,10 @@ public:
         if(parent_node) {
             navigator_t::get_successors(parent_node->pos, successors);
         } else {
-            map_search_node<location_t, navigator_t> tmp(pos);
             navigator_t::get_successors(pos, successors);
         }
         for(location_t loc : successors) {
             map_search_node<location_t, navigator_t> tmp(loc);
-            // std::cout << " --> " << loc.first << "/" << loc.second << "\n";
             a_star_search->AddSuccessor(tmp);
         }
         return true;

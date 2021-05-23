@@ -3,8 +3,8 @@ set(
     UTILS_SRC
     "fov.c"
     "permissive-fov/permissive-fov.cpp"
-    "utils.cpp"
     "rng.cpp"
+    "utils.cpp"
    
 )
 

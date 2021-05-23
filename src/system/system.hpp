@@ -17,6 +17,6 @@ void systems_player();
 
 void system_camera();
 
-void init_systems();
+void init_systems(engine::Engine &engine);
 
 }  // namespace radl::system

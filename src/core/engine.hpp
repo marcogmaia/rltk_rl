@@ -30,7 +30,7 @@ using namespace component;
 class Engine {
 private:
     // class EngineImpl;
-    std::queue<sf::Event> event_queue;
+    static std::queue<sf::Event> event_queue;
 
     // std::unique_ptr<EngineImpl> engine_impl;
     std::unique_ptr<gui::RadlUI> ui;
@@ -50,7 +50,7 @@ public:
      * @param event - event output
      * @return true if event was written to @a event
      */
-    bool get_kb_event(sf::Event& event);
+    static bool get_kb_event(sf::Event& event);
 
     sf::Event get_mouse_event();
 
@@ -59,7 +59,5 @@ public:
     void game_tick();
     void run_game();
 };
-
-extern Engine engine;
 
 }  // namespace radl::engine

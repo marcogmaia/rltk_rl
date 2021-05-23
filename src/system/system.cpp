@@ -322,41 +322,41 @@ void pre_run() {
 game_state_t game_state_inventory_show() {
     // ! Ou faria associação com o reg
     using gui::item_menu_result_t;
-    auto [menu_res, ent] = gui::render_inventory_use();
-    auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
+    // auto [menu_res, ent] = gui::render_inventory_use();
+    // auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
 
-    switch(menu_res) {
-    case item_menu_result_t::CANCEL: {
-        inv_ui.clear();
-        return game_state_t::AWAITING_INPUT;
-    } break;
-    case item_menu_result_t::NO_RESPONSE: break;
-    case item_menu_result_t::SELECTED: {
-        inv_ui.clear();
-        reg.emplace<wants_to_use_t>(player, ent);
-        return game_state_t::PLAYER_TURN;
-    } break;
-    }
+    // switch(menu_res) {
+    // case item_menu_result_t::CANCEL: {
+    //     inv_ui.clear();
+    //     return game_state_t::AWAITING_INPUT;
+    // } break;
+    // case item_menu_result_t::NO_RESPONSE: break;
+    // case item_menu_result_t::SELECTED: {
+    //     inv_ui.clear();
+    //     reg.emplace<wants_to_use_t>(player, ent);
+    //     return game_state_t::PLAYER_TURN;
+    // } break;
+    // }
     return game_state_t::SHOW_INVENTORY;
 }
 
 game_state_t game_state_inventory_drop() {
     using gui::item_menu_result_t;
-    auto [menu_res, ent] = gui::render_inventory_drop();
-    auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
+    // auto [menu_res, ent] = gui::render_inventory_drop();
+    // auto& inv_ui         = *term(gui::UI_INVENTORY_POPUP);
 
-    switch(menu_res) {
-    case item_menu_result_t::CANCEL: {
-        inv_ui.clear();
-        return game_state_t::AWAITING_INPUT;
-    } break;
-    case item_menu_result_t::NO_RESPONSE: break;
-    case item_menu_result_t::SELECTED: {
-        inv_ui.clear();
-        reg.emplace<wants_to_drop_t>(player, ent);
-        return game_state_t::PLAYER_TURN;
-    } break;
-    }
+    // switch(menu_res) {
+    // case item_menu_result_t::CANCEL: {
+    //     inv_ui.clear();
+    //     return game_state_t::AWAITING_INPUT;
+    // } break;
+    // case item_menu_result_t::NO_RESPONSE: break;
+    // case item_menu_result_t::SELECTED: {
+    //     inv_ui.clear();
+    //     reg.emplace<wants_to_drop_t>(player, ent);
+    //     return game_state_t::PLAYER_TURN;
+    // } break;
+    // }
     return game_state_t::SHOW_INVENTORY_DROP;
 }
 
@@ -450,11 +450,11 @@ void phase_mouse_cursor(double elapsed_time) {
 }
 
 
-void init_systems() {
+void init_systems(engine::Engine &engine) {
     reg.set<camera_t>();
-    engine::engine.dispatcher.sink<double>().connect<&system_render>();
-    engine::engine.dispatcher.sink<double>().connect<&system_particle>();
-    engine::engine.dispatcher.sink<double>().connect<&system_game_state>();
+    engine.dispatcher.sink<double>().connect<&system_render>();
+    engine.dispatcher.sink<double>().connect<&system_particle>();
+    engine.dispatcher.sink<double>().connect<&system_game_state>();
 }
 
 

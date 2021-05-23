@@ -1,19 +1,28 @@
+include_directories("../../lib/imgui-sfml")
+
+add_library(
+    imgui_sfml
+    "../../lib/imgui-sfml/imgui-SFML.cpp"
+    "../../lib/imgui/imgui.cpp"
+    "../../lib/imgui/imgui_widgets.cpp"
+    "../../lib/imgui/imgui_tables.cpp"
+    "../../lib/imgui/imgui_draw.cpp"
+    "../../lib/imgui/imgui_demo.cpp"
+)
+
+target_link_libraries(imgui_sfml OpenGL)
 
 add_library(
     game_core
     "engine.cpp"
-    "engine_impl.cpp"
     "gui/gui.cpp"
     "gui/item_menu.cpp"
-    "../../lib/imgui/imgui_demo.cpp"
 )
 
 target_link_libraries(
     game_core PRIVATE
-    ImGui-SFML
     "game_component"
     "game_system"
-    "game_utils"
     "fmt"
     "pthread"
     "rltk"
@@ -22,5 +31,7 @@ target_link_libraries(
     
 target_link_libraries(
     game_core PUBLIC
+    imgui_sfml
     "spdlog::spdlog"
+    "game_utils"
 )
