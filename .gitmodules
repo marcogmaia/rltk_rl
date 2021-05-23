@@ -1,3 +1,7 @@
 [submodule "lib/radl"]
 	path = lib/radl
 	url = https://github.com/marcogmaia/radl
+
+[submodule "lib/imgui"]
+    path = lib/imgui
+	url = https://github.com/ocornut/imgui
