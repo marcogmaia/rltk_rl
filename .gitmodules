@@ -1,0 +1,3 @@
+[submodule "lib/radl"]
+	path = lib/radl
+	url = https://github.com/marcogmaia/radl
